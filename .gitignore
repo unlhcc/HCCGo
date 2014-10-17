@@ -4,3 +4,6 @@ node_modules/*
 webkitbuilds/*
 
 .DS_Store
+
+
+src/css/application.css
