@@ -1,0 +1,50 @@
+
+
+@headerBackground: #D00000;
+@whiteBackground: #FEFDFA;
+
+@import "elements.less";
+@import "material-color.less";
+
+
+.header {
+  color: @whiteBackground;
+  padding: 0.5em;
+  background-color: @headerBackground;
+  margin-top: 0px;
+  margin-bottom: 0.5em;
+  text-align: center;
+  .drop-shadow(0, 1px, 2px, 0.4);
+  
+}
+
+
+.cluster {
+  
+  
+  .box-shadow(0 12px 15px rgba(0, 0, 0, 0.24));
+  background-color: @whiteBackground;
+  padding: 1em;
+  height: 180px;
+  
+  h3 {
+    text-align: center;
+  }
+  
+  button {
+    float: right;
+  }
+  
+  
+}
+
+
+.otherCluster {
+  .rounded(5px);
+  border-style: dashed;
+  border-width: 5px;
+  border-color: @md-clr-grey;
+  padding: 1em;
+  text-align: center;
+  margin: 1em 0;
+}
