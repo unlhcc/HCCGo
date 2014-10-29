@@ -7,13 +7,13 @@
   "window": {
     "title": "HCCGo",
     "icon": "PromotionalIcon128x128.png",
-    "toolbar": true,
+    "toolbar": false,
     "frame": true,
     "width": 1000,
-    "height": 500,
+    "height": 800,
     "position": "mouse",
-    "min_width": 400,
-    "min_height": 200,
+    "min_width": 800,
+    "min_height": 500,
     "_max_width": 800,
     "_max_height": 600
   },

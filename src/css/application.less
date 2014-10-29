@@ -18,25 +18,41 @@
   
 }
 
+.card {
+  .box-shadow(0 12px 15px rgba(0, 0, 0, 0.24));
+  background-color: @whiteBackground;
+  padding: 0.5em;
+}
 
 .cluster {
   
+  .card();
   
-  .box-shadow(0 12px 15px rgba(0, 0, 0, 0.24));
-  background-color: @whiteBackground;
-  padding: 1em;
-  height: 180px;
+  margin-bottom: 0.5em;
+  display: inline-block;
+  width: 100%;
   
   h3 {
-    text-align: center;
+    text-align: left;
+    float: left;
+    margin: 0.5em;
   }
   
   button {
+    margin-top: 0.5em;
     float: right;
   }
   
+  > p {
+    display: none;
+  }
+}
+
+.messages{
+  .card();
   
 }
+
 
 
 .otherCluster {
