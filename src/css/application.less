@@ -68,9 +68,17 @@
   margin: 1em 0;
 }
 
-.well .debug_window {
+.debugWindow {
+  padding: 1em;
+  .drop-shadow(0, 1px, 2px, 0.2);
+  overflow: scroll;
+  height: 20em;
   color: white;
   background-color: black;
-  
-  
+  .warning {
+    color: yellow;
+  }
+  .error {
+    color: red;
+  }
 }
