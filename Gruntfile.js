@@ -31,15 +31,25 @@ module.exports = function(grunt) {
       start_webkit: {
         command: 'open  webkitbuilds/HCCGo/osx/HCCGo.app'
       }
+    },
+    
+    bower: {
+      install: {
+        options: {
+          targetDir: 'src/lib'
+        }
+      }
     }
+    
   });
 
   grunt.loadNpmTasks('grunt-node-webkit-builder');
   grunt.loadNpmTasks('grunt-contrib-less');
   grunt.loadNpmTasks('grunt-shell');
+  grunt.loadNpmTasks('grunt-bower-task');
 
-  grunt.registerTask('default', ['less', 'nodewebkit']);
-  grunt.registerTask('run', ['less', 'nodewebkit', 'shell:start_webkit'])
+  grunt.registerTask('default', ['less', 'bower', 'nodewebkit']);
+  grunt.registerTask('run', ['less', 'bower', 'nodewebkit', 'shell:start_webkit'])
 
 
 };
