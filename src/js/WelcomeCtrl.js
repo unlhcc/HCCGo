@@ -1,7 +1,7 @@
 
 welcomeModule = angular.module('HccGoApp.WelcomeCtrl', [ ]);
 
-welcomeModule.controller('welcomeCtrl', ['$scope', '$log', '$timeout', 'connectionService', function($scope, $log, $timeout, connectionService) {
+welcomeModule.controller('welcomeCtrl', ['$scope', '$log', '$timeout', 'connectionService', '$location', function($scope, $log, $timeout, connectionService, $location) {
   
   $scope.clusters = [
     { label: 'Crane', url: 'crane.unl.edu' },
@@ -25,15 +25,21 @@ welcomeModule.controller('welcomeCtrl', ['$scope', '$log', '$timeout', 'connecti
     logger = this.logger;
     
     connectionService.initiateConnection($scope.username, $scope.password, $scope.selectedCluster.url, this.logger, userPrompt,  function(err) {
-      if (err) {
-        logger.error("Got error from connection");
-        $('#loginSubmit').prop('disabled', false);
-        $('#loginForm').fadeTo('fast', 1.0);
-      } else {
+      $scope.$apply(function() {
+        
+        if (err) {
+          logger.error("Got error from connection");
+          $('#loginSubmit').prop('disabled', false);
+          $('#loginForm').fadeTo('fast', 1.0);
+        } else {
+          
+          $location.path("/cluster/" + $scope.selectedCluster.label)
+          
+        }
         
         
-        
-      }
+      });
+      
       
       
     });
