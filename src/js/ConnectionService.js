@@ -25,7 +25,7 @@ connectionModule.factory('connectionService', function($log) {
   
   return {
     getConnection: getConnection,
-    initiateConnection: function initiateConnection(username, password, hostname, logger, completed) {
+    initiateConnection: function initiateConnection(username, password, hostname, logger, needInput, completed) {
       
       var Client = require('ssh2').Client;
       var conn = new Client();
@@ -62,7 +62,9 @@ connectionModule.factory('connectionService', function($log) {
           finishFunc([password]);
         } else {
           logger.log(prompts[0].prompt);
-          finishFunc(['1']);
+          needInput(prompts[0].prompt, function(input) {
+            finishFunc([input]);
+          });
         }
         
         

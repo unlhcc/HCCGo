@@ -7,3 +7,5 @@ webkitbuilds/*
 
 
 src/css/application.css
+bower_components/*
+src/lib/*
