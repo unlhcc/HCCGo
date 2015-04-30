@@ -4,10 +4,10 @@ welcomeModule = angular.module('HccGoApp.WelcomeCtrl', [ ]);
 welcomeModule.controller('welcomeCtrl', ['$scope', '$log', '$timeout', 'connectionService', '$location', function($scope, $log, $timeout, connectionService, $location) {
   
   $scope.clusters = [
-    { label: 'Crane', url: 'crane.unl.edu' },
-    { label: 'Tusker', url: 'tusker.unl.edu' },
-    { label: 'Sandhills', url: 'sandhills.unl.edu' },
-    { label: 'Glidein', url: 'glidein.unl.edu' }
+    { label: 'Crane', url: 'crane.unl.edu', type: 'slurm' },
+    { label: 'Tusker', url: 'tusker.unl.edu', type: 'slurm' },
+    { label: 'Sandhills', url: 'sandhills.unl.edu', type: 'slurm' },
+    { label: 'Glidein', url: 'glidein.unl.edu', type: 'condor' }
   ];
   
   $scope.selectedCluster = $scope.clusters[0];

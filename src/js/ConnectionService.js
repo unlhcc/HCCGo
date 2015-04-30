@@ -1,7 +1,7 @@
 
 connectionModule = angular.module('ConnectionServiceModule', [])
 
-connectionModule.factory('connectionService', function($log) {
+connectionModule.factory('connectionService',['$log', '$q', function($log, $q) {
   
   var connectionList = [];
   
@@ -20,11 +20,72 @@ connectionModule.factory('connectionService', function($log) {
     }
     
   };
+  
+  
+  var commandSem = require('semaphore')(1);
+  
+  var runCommand = function(command) {
+    
+    var deferred = $q.defer();
+    
+    commandSem.take(function() {
+
+      // Run a command remotely
+      connectionList[0].exec(command, function(err, stream) {
+        
+        cumulData = "";
+        
+        if (err) {
+          $log.error("Error running command " + command + ": "+ err);
+          commandSem.leave();
+          deferred.reject("Error running command " + command + ": "+ err);
+          return;
+        }
+        
+        stream.on('data', function(data) {
+          
+          $log.debug("Got data: " + data);
+          cumulData += data;
+          
+        }).on('close', function(code, signal) {
+          
+          $log.debug('Stream :: close :: code: ' + code + ', signal: ' + signal);
+          commandSem.leave();
+          deferred.resolve(cumulData);
+          
+        });
+        
+
+      });
+      
+
+    });
+    
+    
+    
+    return deferred.promise;
+    
+  }
+  
+  var getUsername = function() {
+    var deferred = $q.defer();
+    
+    runCommand('whoami').then(function(data) {
+      
+      deferred.resolve(data.trim());
+      
+    })
+    
+    return deferred.promise;
+    
+  }
     
     
   
   return {
     getConnection: getConnection,
+    runCommand: runCommand,
+    getUsername: getUsername,
     initiateConnection: function initiateConnection(username, password, hostname, logger, needInput, completed) {
       
       var Client = require('ssh2').Client;
@@ -78,7 +139,7 @@ connectionModule.factory('connectionService', function($log) {
         }
       });
         
-      connectionList[hostname] = conn;
+      connectionList.push(conn);
       
       
     }
@@ -86,4 +147,4 @@ connectionModule.factory('connectionService', function($log) {
   }
   
   
-});
+}]);
