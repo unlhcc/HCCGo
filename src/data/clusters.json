@@ -1,0 +1,24 @@
+{
+  "clusters": [
+    {
+      "label": "Crane",
+      "url": "crane.unl.edu",
+      "type": "slurm"
+    },
+    {
+      "label": "Tusker",
+      "url": "tusker.unl.edu",
+      "type": "slurm"
+    },
+    {
+      "label": "Sandhills",
+      "url": "sandhills.unl.edu",
+      "type": "slurm"
+    },
+    {
+      "label": "Glidein",
+      "url": "glidein.unl.edu",
+      "type": "condor"
+    }
+  ]
+}

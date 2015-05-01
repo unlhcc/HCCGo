@@ -1,21 +1,12 @@
 
 welcomeModule = angular.module('HccGoApp.WelcomeCtrl', [ ]);
 
-welcomeModule.controller('welcomeCtrl', ['$scope', '$log', '$timeout', 'connectionService', '$location', function($scope, $log, $timeout, connectionService, $location) {
-  
-  $scope.clusters = [
-    { label: 'Crane', url: 'crane.unl.edu', type: 'slurm' },
-    { label: 'Tusker', url: 'tusker.unl.edu', type: 'slurm' },
-    { label: 'Sandhills', url: 'sandhills.unl.edu', type: 'slurm' },
-    { label: 'Glidein', url: 'glidein.unl.edu', type: 'condor' }
-  ];
+welcomeModule.controller('welcomeCtrl', ['$scope', '$log', '$timeout', 'connectionService', '$location', 'preferencesManager', function($scope, $log, $timeout, connectionService, $location, preferencesManager) {
   
   var $selector = $('#clusterSelect').selectize({
     
     createOnBlur: true,
     labelField: 'label',
-    options: $scope.clusters,
-    items: [ $scope.clusters[0].url ],
     searchField: 'label',
     valueField: 'url',
     selectOnTab: true,
@@ -36,12 +27,20 @@ welcomeModule.controller('welcomeCtrl', ['$scope', '$log', '$timeout', 'connecti
        callback(new_object);
       
      }
-       
-     
     
   });
   
   var selection = $selector[0].selectize;
+  
+  preferencesManager.getClusters().then(function(clusters) {
+    $scope.clusters = clusters;
+    selection.addOption(clusters);
+    selection.addItem(clusters[0].url, false);
+    selection.refreshOptions(false);
+    selection.refreshItems();
+  });
+  
+
   
   $scope.login = function() {
     // Get the input
