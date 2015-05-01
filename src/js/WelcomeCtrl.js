@@ -27,7 +27,7 @@ welcomeModule.controller('welcomeCtrl', ['$scope', '$log', '$timeout', 'connecti
     create: function(input, callback) {
       
       new_object = {}
-      new_object.label = input;
+      new_object.label = input.split(".")[0];
       new_object.url = input;
       new_object.type = 'slurm';
       $scope.clusters.push(new_object);
@@ -45,7 +45,7 @@ welcomeModule.controller('welcomeCtrl', ['$scope', '$log', '$timeout', 'connecti
     $('#loginForm').fadeTo('fast', 0.3);
     
     var connectUrl = selection.getValue();
-    $scope.selectCluster = $.grep($scope.clusters, function(e) {return e.url == connectUrl})[0];
+    $scope.selectedCluster = $.grep($scope.clusters, function(e) {return e.url == connectUrl})[0];
     
     this.logger = new DebugLogger($('#LoginDebugWindow'))
     

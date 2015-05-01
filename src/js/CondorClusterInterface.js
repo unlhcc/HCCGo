@@ -2,7 +2,7 @@
 
 
 
-var SlurmClusterInterface = function(connectionService, $q) {
+var CondorClusterInterface = function(connectionService, $q) {
   
   GenericClusterInterface.call(this, connectionService, $q);
   
@@ -11,30 +11,32 @@ var SlurmClusterInterface = function(connectionService, $q) {
 
 
 // Javascript object inheritance
-SlurmClusterInterface.prototype = Object.create(GenericClusterInterface.prototype);
+CondorClusterInterface.prototype = Object.create(GenericClusterInterface.prototype);
 
-SlurmClusterInterface.prototype.constructor = SlurmClusterInterface;
+CondorClusterInterface.prototype.constructor = CondorClusterInterface;
 
-SlurmClusterInterface.prototype.getJobs = function() {
+CondorClusterInterface.prototype.getJobs = function() {
   
   // return a promise if the jobs info are found
   var deferred = this.$q.defer();
   
-  var promise = this.connectionService.runCommand("squeue -u `whoami`")
+  var promise = this.connectionService.runCommand("condor_q  `whoami` -format '%i\\n' JobStatus")
   promise.then(function(data) {
     console.log("Got data: " + data);
     
     var lines = data.split('\n');
     var returnData = {
       numRunning: 0,
-      numIdle: 0
+      numIdle: 0,
+      numError: 0
     };
     for (var i = 0; i < lines.length; i++) {
-      split_line = lines[i].split(/[ ]+/);
-      if (split_line[5] == 'R') {
+      if (lines[i] == '2') {
         returnData.numRunning += 1;
-      } else if (split_line[5] == 'PD') {
+      } else if (lines[i] == '1') {
         returnData.numIdle += 1;
+      } else {
+        returnData.numError += 1;
       }
     }
     returnData.data = data;
@@ -52,7 +54,7 @@ SlurmClusterInterface.prototype.getJobs = function() {
 
 
 
-SlurmClusterInterface.prototype.getStorageInfo = function() {
+CondorClusterInterface.prototype.getStorageInfo = function() {
   
   // Return a promise if the jobs are found
   
