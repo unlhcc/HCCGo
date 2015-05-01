@@ -20,20 +20,24 @@ welcomeModule.controller('welcomeCtrl', ['$scope', '$log', '$timeout', 'connecti
     valueField: 'url',
     selectOnTab: true,
     render: {
-      option: function(data, escape) {
-  		    return '<div><span class="clusterLabel">' + escape(data.label) + '</span>' + '<span class="url">' + escape(data.url) + '</span></div>'
-    	}
-    },
-    create: function(input, callback) {
+      'option': function(data, escape) {
+  		    return '<div><span class="clusterLabel">' + escape(data.label) + '</span>' + '<span class="url">' + escape(data.url) + '</span></div>';
+    	 },
+       'option_create': function(data, escape) {
+         return '<div class="create">Hostname: <strong>' +  escape(data.input) + '</strong>&hellip;</div>';
+       }
+     },
+     create: function(input, callback) {
+       new_object = {}
+       new_object.label = input.split(".")[0];
+       new_object.url = input;
+       new_object.type = 'slurm';
+       $scope.clusters.push(new_object);
+       callback(new_object);
       
-      new_object = {}
-      new_object.label = input.split(".")[0];
-      new_object.url = input;
-      new_object.type = 'slurm';
-      $scope.clusters.push(new_object);
-      callback(new_object);
-      
-    }
+     }
+       
+     
     
   });
   
