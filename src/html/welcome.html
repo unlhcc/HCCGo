@@ -16,23 +16,23 @@
           <fieldset>
             <legend>Login with HCC Crendentials</legend>
             <div class="form-group">
-              <label for="clusterSelect" class="col-md-4 control-label">Cluster</label>
-              <div class="col-md-8">
-                <select class="form-control" id="clusterSelect" ng-model="selectedCluster" ng-options="cluster.label for cluster in clusters">
-                  
+              <label for="clusterSelect" class=" control-label col-lg-2">Cluster</label>
+              <div class="col-lg-10">
+                <select class="form-control servers" id="clusterSelect">
                 </select>
               </div>
+                
             </div>
             <div class="form-group">
-              <label for="inputUsername" class="col-md-4 control-label">Username</label>
-              <div class="col-md-8">
-                <input type="text" ng-model="username" class="form-control floating-label" id="inputUsername" placeholder="username"></input>
+                <label for="inputUsername" class=" control-label col-lg-2">Username</label>
+              <div class="col-lg-10">
+                <input type="text" ng-model="username" class="form-control floating-label" id="inputUsername" ></input>
               </div>
             </div>
             <div class="form-group">
-              <label for="inputPassword" class="col-md-4 control-label">Password</label>
-              <div class="col-md-8">
-                <input type="password" ng-model="password" class="form-control empty" id="inputPassword" placeholder="*****"></input>
+                <label for="inputPassword" class=" control-label col-lg-2">Password</label>
+              <div class="col-lg-10">
+                <input type="password" ng-model="password" class="form-control empty" id="inputPassword" ></input>
               </div>
             </div>
             <div class="col-md-8 col-md-offset-4">

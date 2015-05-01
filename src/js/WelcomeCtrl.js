@@ -10,12 +10,42 @@ welcomeModule.controller('welcomeCtrl', ['$scope', '$log', '$timeout', 'connecti
     { label: 'Glidein', url: 'glidein.unl.edu', type: 'condor' }
   ];
   
-  $scope.selectedCluster = $scope.clusters[0];
+  var $selector = $('#clusterSelect').selectize({
+    
+    createOnBlur: true,
+    labelField: 'label',
+    options: $scope.clusters,
+    items: [ $scope.clusters[0].url ],
+    searchField: 'label',
+    valueField: 'url',
+    selectOnTab: true,
+    render: {
+      option: function(data, escape) {
+  		    return '<div><span class="clusterLabel">' + escape(data.label) + '</span>' + '<span class="url">' + escape(data.url) + '</span></div>'
+    	}
+    },
+    create: function(input, callback) {
+      
+      new_object = {}
+      new_object.label = input;
+      new_object.url = input;
+      new_object.type = 'slurm';
+      $scope.clusters.push(new_object);
+      callback(new_object);
+      
+    }
+    
+  });
+  
+  var selection = $selector[0].selectize;
   
   $scope.login = function() {
     // Get the input
     $('#loginSubmit').prop('disabled', true);
     $('#loginForm').fadeTo('fast', 0.3);
+    
+    var connectUrl = selection.getValue();
+    $scope.selectCluster = $.grep($scope.clusters, function(e) {return e.url == connectUrl})[0];
     
     this.logger = new DebugLogger($('#LoginDebugWindow'))
     
@@ -24,7 +54,7 @@ welcomeModule.controller('welcomeCtrl', ['$scope', '$log', '$timeout', 'connecti
     this.logger.log("Starting login process", 'warning');
     logger = this.logger;
     
-    connectionService.initiateConnection($scope.username, $scope.password, $scope.selectedCluster.url, this.logger, userPrompt,  function(err) {
+    connectionService.initiateConnection($scope.username, $scope.password, connectUrl, this.logger, userPrompt,  function(err) {
       $scope.$apply(function() {
         
         if (err) {
@@ -45,6 +75,13 @@ welcomeModule.controller('welcomeCtrl', ['$scope', '$log', '$timeout', 'connecti
     });
     
     
+    
+  };
+  
+  $scope.transformCustom = function(customUrl) {
+    
+    this.logger.log("Got custom attribute: " + customUrl);
+    return { label: customUrl, url: customUrl, type: 'slurm'};
     
   };
   
