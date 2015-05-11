@@ -1,10 +1,11 @@
 
 clusterLandingModule = angular.module('HccGoApp.clusterLandingCtrl', ['ngRoute' ]);
 
-clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeout', 'connectionService', '$routeParams', '$location', '$q', function($scope, $log, $timeout, connectionService, $routeParams, $location, $q) {
+clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeout', 'connectionService', '$routeParams', '$location', '$q', 'preferencesManager', function($scope, $log, $timeout, connectionService, $routeParams, $location, $q, preferencesManager) {
   
   $scope.params = $routeParams
-  var clusterInterface = new SlurmClusterInterface(connectionService, $q);
+  var clusterInterface = null;
+  
   
   $scope.logout = function() {
     
@@ -24,6 +25,7 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
       
       $scope.numRunning = data.numRunning;
       $scope.numIdle = data.numIdle;
+      $scope.jobs = data.jobs;
       
 
             
@@ -44,6 +46,22 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
   }
   
   getUsername();
-  getClusterStats($scope.params.clusterId);
+  preferencesManager.getClusters().then(function(clusters) {
+    // Get the cluster type
+    var clusterType = $.grep(clusters, function(e) {return e.label == $scope.params.clusterId})[0].type;
+    
+    switch (clusterType) {
+      case "slurm":
+        clusterInterface = new SlurmClusterInterface(connectionService, $q);
+        break;
+      case "condor":
+        clusterInterface = new CondorClusterInterface(connectionService, $q);
+        break;
+    }
+    
+    getClusterStats($scope.params.clusterId);
+    
+  })
+  
   
 }]);
