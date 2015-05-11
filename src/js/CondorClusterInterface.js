@@ -63,13 +63,12 @@ CondorClusterInterface.prototype.getJobs = function() {
         
         split_values = element.split(" = ");
         name = split_values[0]
-        value = split_values[1].replace("\"", "");
+        value = split_values[1].replace(/\"/g, "");
         curJob[name] = value;
       });
       
       // Set some attributes 
       curJob.jobId = curJob.ClusterId + "." + curJob.ProcId;
-      curJob.running = curJob.JobStatus == "2" ? true : false;
       curJob.runTime = secondsToTimeDelta(parseInt(curJob["ServerTime"]) - parseInt(curJob["EnteredCurrentStatus"]));
       curJob.jobName = basename(curJob.Cmd);
       
@@ -79,15 +78,20 @@ CondorClusterInterface.prototype.getJobs = function() {
         numError: 0
       };
       
+      curJob.idle = curJob.running = curJob.error = false;
+      
       switch(curJob.JobStatus) {
         case "1":
           returnData.numIdle += 1;
+          curJob.idle = true;
           break;
         case "2":
           returnData.numRunning += 1;
+          curJob.running = true;
           break;
         default:
           returnData.numError += 1;
+          curJob.error = true;
       }
       
       jobs.push(curJob);

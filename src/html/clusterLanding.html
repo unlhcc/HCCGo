@@ -53,20 +53,27 @@
       </div>
     </div>
     
-    <div class="col-md-8">
+    <div class="col-md-8 jobdisplay">
       <div class="card">
         <input type="search" ng-model="q" placeholder="filter jobs..." />
         <ul>
           <li class="animate-repeat" ng-repeat="job in jobs | filter:q as results">
             <div class="row">
-              <div class="col-md-12">
-                <span class="jobname">{{job.jobName}}</span>
+              <div class="col-md-1">
+                <i class="mdi-action-trending-neutral" ng-if="job.running" />
+                <i class="mdi-action-query-builder" ng-if="job.idle" />
+                <i class="mdi-alert-error" ng-if="job.error" />
               </div>
-            </div>
-            <div class="row">
-              <span class="jobid">ID: {{job.jobId}}</span>
-              <span class="runTime" ng-if="job.running">Runtime: {{job.runTime}}</span>
-              <span class="startTime" ng-if="!job.running">Estimated Start: {{job.startTime}}</span>
+              <div class="col-md-11">
+                <div class="row">
+                  <span class="jobname">{{job.jobName}}</span>
+                </div>
+                <div class="row">
+                  <span class="jobid">ID: {{job.jobId}}</span>
+                  <span class="runTime" ng-if="job.running">Runtime: {{job.runTime}}</span>
+                  <span class="startTime" ng-if="!job.running">Estimated Start: {{job.startTime}}</span>
+                </div>
+              </div>
             </div>
             
           </li>
