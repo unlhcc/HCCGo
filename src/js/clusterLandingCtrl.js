@@ -28,7 +28,28 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
       $scope.numError = data.numError;
       $scope.jobs = data.jobs;
       
-
+      var storageUsageGauge = c3.generate({
+        bindto: '#storageUsageGauge',
+        data: {
+          columns: [
+            ['data', 15.5]
+          ],
+          type: 'gauge'
+        },
+        gauge: {
+          units: ' TB'
+        },
+        color: {
+          pattern: [ '#60B044', '#F6C600', '#F97600', '#FF0000' ],
+          threshold: {
+            values: [30, 60, 90, 100]
+          }
+        },
+        size: {
+          height: 180
+        }
+        
+      });
             
     }, function(error) {
       console.log("Error in CTRL: " + error);
