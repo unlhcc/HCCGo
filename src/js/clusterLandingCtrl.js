@@ -25,6 +25,7 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
       
       $scope.numRunning = data.numRunning;
       $scope.numIdle = data.numIdle;
+      $scope.numError = data.numError;
       $scope.jobs = data.jobs;
       
 

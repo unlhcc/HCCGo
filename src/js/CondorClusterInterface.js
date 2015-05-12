@@ -49,7 +49,11 @@ CondorClusterInterface.prototype.getJobs = function() {
   promise.then(function(data) {
     console.log("Got data: " + data);
     jobs = [];
-    returnData = {}
+    var returnData = {
+      numRunning: 0,
+      numIdle: 0,
+      numError: 0
+    };
     
     // Classads are split by 2 new lines
     classads = data.split("\n\n");
@@ -72,11 +76,7 @@ CondorClusterInterface.prototype.getJobs = function() {
       curJob.runTime = secondsToTimeDelta(parseInt(curJob["ServerTime"]) - parseInt(curJob["EnteredCurrentStatus"]));
       curJob.jobName = basename(curJob.Cmd);
       
-      var returnData = {
-        numRunning: 0,
-        numIdle: 0,
-        numError: 0
-      };
+
       
       curJob.idle = curJob.running = curJob.error = false;
       

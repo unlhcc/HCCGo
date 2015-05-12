@@ -39,7 +39,7 @@
                   <td>Idle</td>
                   <td>{{numIdle}}</td>
                 </tr>
-                <tr>
+                <tr class="danger">
                   <td>Error</td>
                   <td>{{numError}}</td>
                 </tr>
@@ -57,7 +57,7 @@
       <div class="card">
         <input type="search" ng-model="q" placeholder="filter jobs..." />
         <ul>
-          <li class="animate-repeat" ng-repeat="job in jobs | filter:q as results">
+          <li class="animate-repeat" ng-repeat="job in jobs | filter:q as results" ng-class="{running: job.running, idle: job.idle, error: job.error}">
             <div class="row">
               <div class="col-md-1">
                 <i class="mdi-action-trending-neutral" ng-if="job.running" />
@@ -66,7 +66,7 @@
               </div>
               <div class="col-md-11">
                 <div class="row">
-                  <span class="jobname">{{job.jobName}}</span>
+                  <h3 class="jobname">{{job.jobName}}</h3>
                 </div>
                 <div class="row">
                   <span class="jobid">ID: {{job.jobId}}</span>
