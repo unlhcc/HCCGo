@@ -9,9 +9,6 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
   
   $scope.logout = function() {
     
-    
-    
-    
     $location.path("/");
     
   }
@@ -28,16 +25,31 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
       $scope.numError = data.numError;
       $scope.jobs = data.jobs;
       
-      var storageUsageGauge = c3.generate({
-        bindto: '#storageUsageGauge',
+        
+    }, function(error) {
+      console.log("Error in CTRL: " + error);
+    })
+    
+    clusterInterface.getStorageInfo().then(function(data) {
+      
+      
+      var homeUsageGauge = c3.generate({
+        bindto: '#homeUsageGauge',
         data: {
           columns: [
-            ['data', 15.5]
+            ['Used', data.blocksUsed]
           ],
           type: 'gauge'
         },
         gauge: {
-          units: ' TB'
+          units: 'Gigabytes',
+          label: {
+            format: function(value, ratio) {
+                return value.toFixed(2);
+            }
+          },
+          max: data.blocksQuota,
+          
         },
         color: {
           pattern: [ '#60B044', '#F6C600', '#F97600', '#FF0000' ],
@@ -50,10 +62,9 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
         }
         
       });
-            
-    }, function(error) {
-      console.log("Error in CTRL: " + error);
-    })
+      
+      
+    });
     
     
   }

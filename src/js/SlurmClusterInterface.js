@@ -52,8 +52,8 @@ SlurmClusterInterface.prototype.getJobs = function() {
 
 
 
-SlurmClusterInterface.prototype.getStorageInfo = function() {
+//SlurmClusterInterface.prototype.getStorageInfo = function() {
   
   // Return a promise if the jobs are found
   
-}
+//}
