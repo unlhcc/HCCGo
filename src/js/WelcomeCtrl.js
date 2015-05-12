@@ -92,8 +92,13 @@ welcomeModule.controller('welcomeCtrl', ['$scope', '$log', '$timeout', 'connecti
   userPrompt = function(prompt, finishFunc) {
     $scope.$apply(function() {
       $scope.userPrompt = prompt;
-    
+      
+      // Event registration must be before show command
+      $('#promptModal').on('shown.bs.modal', function () {
+        $('#userPromptInput').focus();
+      });
       $("#promptModal").modal('show');
+
       $scope.finishFunc = finishFunc;
     });
     
