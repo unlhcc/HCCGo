@@ -37,7 +37,7 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
         bindto: '#homeUsageGauge',
         data: {
           columns: [
-            ['Used', data.blocksUsed]
+            ['Used', data[0].blocksUsed]
           ],
           type: 'gauge'
         },
@@ -48,7 +48,37 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
                 return value.toFixed(2);
             }
           },
-          max: data.blocksQuota,
+          max: data[0].blocksQuota,
+          
+        },
+        color: {
+          pattern: [ '#60B044', '#F6C600', '#F97600', '#FF0000' ],
+          threshold: {
+            values: [30, 60, 90, 100]
+          }
+        },
+        size: {
+          height: 180
+        }
+        
+      });
+      
+      var homeUsageGauge = c3.generate({
+        bindto: '#workUsageGauge',
+        data: {
+          columns: [
+            ['Used', data[1].blocksUsed]
+          ],
+          type: 'gauge'
+        },
+        gauge: {
+          units: 'Gigabytes',
+          label: {
+            format: function(value, ratio) {
+                return value.toFixed(2);
+            }
+          },
+          max: data[1].blocksQuota,
           
         },
         color: {
