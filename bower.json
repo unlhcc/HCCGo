@@ -24,6 +24,11 @@
         "dist/css/selectize.bootstrap3.css",
         "dist/js/selectize.js"
       ]
+    },
+    "bootstrap": {
+	"css"	: "**/*.css",
+	"js" 	: "**/*.js",
+	"less" 	: "**/*.less"
     }
   },
   "resolutions": {
