@@ -28,7 +28,8 @@
     "bootstrap": {
 	"css"	: "**/*.css",
 	"js" 	: "**/*.js",
-	"less" 	: "**/*.less"
+	"less" 	: "**/*.less",
+	"fonts"	: ["**/*.eot","**/*.svg","**/*.ttf","**/*.woff"]
     }
   },
   "resolutions": {
