@@ -7,6 +7,7 @@ module.exports = function(grunt) {
     nodewebkit: {
        options: {
        	build_dir: './webkitbuilds',
+	platforms: ['osx','linux','win'],
       	 mac: true,
          version: '0.12.2'
        },
@@ -29,7 +30,7 @@ module.exports = function(grunt) {
     
     shell: {
       start_webkit: {
-        command: 'open  webkitbuilds/HCCGo/osx/HCCGo.app'
+        command: 'open webkitbuilds/HCCGo/osx/HCCGo.app'
       }
     },
     

@@ -1,6 +1,6 @@
 {
   "name": "HCCGo",
-  "version": "1.0",
+  "version": "0.1.0",
   "main": "index.html",
   "description": "Interface for HCC Resouces",
   "keywords": [ "HCC" ],
