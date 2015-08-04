@@ -8,7 +8,7 @@ module.exports = function(grunt) {
        options: {
        	build_dir: './webkitbuilds',
 	platforms: ['osx','linux','win'],
-		version: '0.10.0'
+		version: '0.12.3'
        },
        src: ['src/**']
 
