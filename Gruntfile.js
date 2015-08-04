@@ -4,12 +4,10 @@ module.exports = function(grunt) {
 
   grunt.initConfig({
 
-    nodewebkit: {
+    nwjs: {
        options: {
        	build_dir: './webkitbuilds',
-	platforms: ['osx','linux','win'],
-      	 mac: true,
-         version: '0.12.2'
+	platforms: ['osx','linux','win']
        },
        src: ['src/**']
 
@@ -47,13 +45,13 @@ module.exports = function(grunt) {
     
   });
 
-  grunt.loadNpmTasks('grunt-node-webkit-builder');
+  grunt.loadNpmTasks('grunt-nw-builder');
   grunt.loadNpmTasks('grunt-contrib-less');
   grunt.loadNpmTasks('grunt-shell');
   grunt.loadNpmTasks('grunt-bower-task');
 
-  grunt.registerTask('default', ['less', 'bower', 'nodewebkit']);
-  grunt.registerTask('run', ['less', 'bower', 'nodewebkit', 'shell:start_webkit'])
+  grunt.registerTask('default', ['less', 'bower', 'nwjs']);
+  grunt.registerTask('run', ['less', 'bower', 'nwjs', 'shell:start_webkit'])
 
 
 };
