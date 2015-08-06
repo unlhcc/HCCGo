@@ -12,7 +12,7 @@ connectionModule.factory('connectionService',['$log', '$q', function($log, $q) {
     
   var getConnection = function(host) {
     
-    // Check if the host exists in the conneciton list
+    // Check if the host exists in the connection list
     if( connectionList.hasOwnProperty(host)) {
       return connectionList[host];
     } else {
@@ -20,7 +20,6 @@ connectionModule.factory('connectionService',['$log', '$q', function($log, $q) {
     }
     
   };
-  
   
   var commandSem = require('semaphore')(1);
   
@@ -79,13 +78,47 @@ connectionModule.factory('connectionService',['$log', '$q', function($log, $q) {
     return deferred.promise;
     
   }
-    
-    
+    // Functionality to upload a file to the server
+	var uploadFile = function(localPath, remotePath) {
+		var deferred = $q.defer();
+	
+		// using the 'fs' library for this, temporary until how to pass
+		// process progression data is figured out
+		var fs = require('fs');
+		
+		// Starts the connection
+		connectionList[0].sftp(function (err, sftp) {
+			if (err) throw err;		// If something happens, kills process kindly
+			
+			// Process to console
+			$log.debug( "SFTP has begun");
+			$log.debug( "Value of localPath: " + localPath );
+			$log.debug( "Value of remotePath: " + remotePath );
+			
+			// Setting the I/O streams
+			var readStream = fs.createReadStream( localPath );
+			var writeStream = sftp.createWriteStream ( remotePath );
+			
+			// Sets logic for finishing of process
+			writeStream.on(
+				'close',
+				function () {
+					$log.debug("File has been transferred");
+				}
+			);
+			
+			// Does the thing
+			readStream.pipe( writeStream );
+		});
+		
+		return deferred.promise;
+	}
   
   return {
     getConnection: getConnection,
     runCommand: runCommand,
     getUsername: getUsername,
+	uploadFile: uploadFile,
     initiateConnection: function initiateConnection(username, password, hostname, logger, needInput, completed) {
       
       var Client = require('ssh2').Client;

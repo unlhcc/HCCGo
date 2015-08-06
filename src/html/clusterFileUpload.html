@@ -1,0 +1,56 @@
+
+
+<div class="navbar navbar-hcc">
+  <div class="navbar-header">
+    <a class="navbar-brand">HCC Go</a>
+  </div>
+  
+  <div class="navbar-collapse collapse navbar-responsive-collapse">
+    
+    
+    <ul class="nav navbar-nav navbar-right">
+      <li class="dropdown">
+        <a href="javascript:void(0)" data-target="#" class="dropdown-toggle" data-toggle="dropdown"> {{username}}@{{params.clusterId}} <b class="caret"></b></a>
+        <ul class="dropdown-menu">
+          <li><a ng-click="logout()">Logout</a></li>
+        </ul>
+      </li>
+    </ul>
+    
+  </div>
+</div>
+
+
+
+
+<div class="container">
+  
+    <div class="col-md-8 jobdisplay">
+      <div class="card">
+        <input type="file" ng-model-instant 
+			id="fileToUpload" 
+			multiple 
+			onchange="angular.element(this).scope().setFiles(this)"></input>
+        <div ng-show="files.length">
+        <div ng-repeat="file in files.slice(0)">
+            <span>{{file.webkitRelativePath || file.name}}</span>
+			<span>{{file.path}}</span>
+            (<span ng-switch="file.size > 1024*1024">
+                <span ng-switch-when="true">{{file.size / 1024 / 1024 | number:2}} MB</span>
+                <span ng-switch-default>{{file.size / 1024 | number:2}} kB</span>
+            </span>)
+        </div>
+        <input type="button" ng-click="uploadFile()" value="Upload" />
+        <div ng-show="progressVisible">
+            <div class="percent">{{progress}}%</div>
+            <div class="progress-bar">
+                <div class="uploaded" ng-style="{'width': progress+'%'}"></div>
+            </div>
+        </div>
+    </div>
+      </div>
+    </div>
+    
+  
+  
+</div>
