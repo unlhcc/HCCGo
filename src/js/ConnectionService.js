@@ -4,6 +4,7 @@ connectionModule = angular.module('ConnectionServiceModule', [])
 connectionModule.factory('connectionService',['$log', '$q', function($log, $q) {
   
   var connectionList = [];
+  var progressData = [];
   
   /**
     * To initiate ssh connections to remote clusters.
@@ -71,18 +72,18 @@ connectionModule.factory('connectionService',['$log', '$q', function($log, $q) {
     
   }
   
-  var getUsername = function() {
-    var deferred = $q.defer();
+	var getUsername = function() {
+		var deferred = $q.defer();
     
-    runCommand('whoami').then(function(data) {
+		runCommand('whoami').then(function(data) {
       
-      deferred.resolve(data.trim());
+			deferred.resolve(data.trim());
       
-    })
+		})
     
-    return deferred.promise;
+		return deferred.promise;
     
-  }
+	}
     
 	// Reads filesystem directory on server
 	var readDir = function() {
@@ -108,22 +109,27 @@ connectionModule.factory('connectionService',['$log', '$q', function($log, $q) {
 			$log.debug( "Value of remotePath: " + remotePath );
 			
 			// Setting the I/O streams
-			var readStream = fs.createReadStream( localPath );
-			var writeStream = sftp.createWriteStream ( remotePath );
+			sftp.fastPut(localPath, remotePath, {step:function(total_transferred,chunk,total){
+					fileProgress(total_transferred, chunk, total)
+				}}, 
+				function(err){
+					// Processes errors
+					$log.debug(err);
+				});
 			
-			// Sets logic for finishing of process
-			writeStream.on(
-				'close',
-				function () {
-					$log.debug("File has been transferred");
-				}
-			);
-			
-			// Does the thing
-			readStream.pipe( writeStream );
 		});
 		
 		return deferred.promise;
+	}
+	
+	// Processes progress data for fastPut and fastGet
+	var fileProgress = function(total_transferred, chunk, total) {
+		progressData[0] = total_transferred;
+		progressData[1] = chunk;
+		progressData[2] = total;
+		$log.debug("Progress data index 0: " + progressData[0]);
+		$log.debug("Progress data index 1: " + progressData[1]);
+		$log.debug("Progress data index 2: " + progressData[2]);
 	}
   
   return {
@@ -132,6 +138,7 @@ connectionModule.factory('connectionService',['$log', '$q', function($log, $q) {
     getUsername: getUsername,
 	uploadFile: uploadFile,
 	closeStream: closeStream,
+	progress: progressData,
     initiateConnection: function initiateConnection(username, password, hostname, logger, needInput, completed) {
       
       var Client = require('ssh2').Client;

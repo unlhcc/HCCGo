@@ -30,6 +30,12 @@
         <input type="file" ng-model-instant 
 			id="fileToUpload" 
 			multiple 
+			onchange="angular.element(this).scope().setFiles(this)"
+			webkitdirectory
+			directory></input>
+		<input type="file" ng-model-instant
+			id="folderToUpload"
+			multiple
 			onchange="angular.element(this).scope().setFiles(this)"></input>
         <div ng-show="files.length">
         <div ng-repeat="file in files.slice(0)">

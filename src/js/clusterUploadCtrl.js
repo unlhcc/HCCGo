@@ -33,10 +33,6 @@ clusterUploadModule.controller('clusterUploadCtrl', ['$scope', '$log', '$timeout
 	// Let's do some debugging
 	var index = 0;
 	var file = $scope.files[index];
-	console.log("Value of files: " + $scope.files[index]);
-	console.log("Value of files[0].slice(0): " + $scope.files[index].slice(0));
-	console.log("Value of files[0].slice(0).path: " + $scope.files[index].slice(0).path);
-	console.log("Value of file: " + file);
 	console.log("Value of file.name: " + file.name);
 	console.log("Value of file.path: " + file.path);
 	
@@ -44,6 +40,7 @@ clusterUploadModule.controller('clusterUploadCtrl', ['$scope', '$log', '$timeout
 	connectionService.uploadFile(file.path, file.name).then(function (data) {
 		// Do nothing for now
 	});
+	console.log("Value of progress: " + connectionService.progress());
   }
   
   // Updates progress bar
