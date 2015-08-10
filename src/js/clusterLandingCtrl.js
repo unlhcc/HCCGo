@@ -4,11 +4,11 @@ clusterLandingModule = angular.module('HccGoApp.clusterLandingCtrl', ['ngRoute' 
 clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeout', 'connectionService', '$routeParams', '$location', '$q', 'preferencesManager', function($scope, $log, $timeout, connectionService, $routeParams, $location, $q, preferencesManager) {
   
   $scope.params = $routeParams
-  var clusterInterface = null;
+  var clusterInterface = new GenericClusterInterface(connectionService, $q);
   
   
   $scope.logout = function() {
-    
+    connectionService.closeStream();
     $location.path("/");
     
   }

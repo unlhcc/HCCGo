@@ -6,9 +6,8 @@ clusterUploadModule.controller('clusterUploadCtrl', ['$scope', '$log', '$timeout
   $scope.params = $routeParams
   var clusterInterface = null;
   
-  
   $scope.logout = function() {
-    
+    connectionService.closeStream();
     $location.path("/");
     
   }

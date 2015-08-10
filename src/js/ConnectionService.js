@@ -21,6 +21,11 @@ connectionModule.factory('connectionService',['$log', '$q', function($log, $q) {
     
   };
   
+  var closeStream = function() {
+	// Closes the connection stream
+	connectionList[0].end();
+  };
+  
   var commandSem = require('semaphore')(1);
   
   var runCommand = function(command) {
@@ -78,13 +83,20 @@ connectionModule.factory('connectionService',['$log', '$q', function($log, $q) {
     return deferred.promise;
     
   }
-    // Functionality to upload a file to the server
-	var uploadFile = function(localPath, remotePath) {
+    
+	// Reads filesystem directory on server
+	var readDir = function() {
+	
+	}
+	
+	// Functionality to upload a file to the server
+	var uploadFile = function(localPath, remotePath, callback) {
 		var deferred = $q.defer();
 	
 		// using the 'fs' library for this, temporary until how to pass
 		// process progression data is figured out
-		var fs = require('fs');
+		// var fs = require('fs');
+		// Using fastPut
 		
 		// Starts the connection
 		connectionList[0].sftp(function (err, sftp) {
@@ -119,6 +131,7 @@ connectionModule.factory('connectionService',['$log', '$q', function($log, $q) {
     runCommand: runCommand,
     getUsername: getUsername,
 	uploadFile: uploadFile,
+	closeStream: closeStream,
     initiateConnection: function initiateConnection(username, password, hostname, logger, needInput, completed) {
       
       var Client = require('ssh2').Client;

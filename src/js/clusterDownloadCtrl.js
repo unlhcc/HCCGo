@@ -8,7 +8,7 @@ clusterDownloadModule.controller('clusterDownloadCtrl', ['$scope', '$log', '$tim
   
   
   $scope.logout = function() {
-    
+    connectionService.closeStream();
     $location.path("/");
     
   }
