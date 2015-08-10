@@ -1,5 +1,5 @@
 
-clusterUploadModule = angular.module('HccGoApp.clusterUploadCtrl', ['ngRoute' ]);
+clusterUploadModule = angular.module('HccGoApp.clusterUploadCtrl', ['ngRoute', 'ui.bootstrap' ]);
 
 clusterUploadModule.controller('clusterUploadCtrl', ['$scope', '$log', '$timeout', 'connectionService', '$routeParams', '$location', '$q', 'preferencesManager', function($scope, $log, $timeout, connectionService, $routeParams, $location, $q, preferencesManager) {
   
@@ -27,8 +27,6 @@ clusterUploadModule.controller('clusterUploadCtrl', ['$scope', '$log', '$timeout
   
   // Uploads files through SFTPStream
   $scope.uploadFile = function() {
-	// Makes progress bar visible
-	$scope.progressVisible = true;
 	
 	// Let's do some debugging
 	var index = 0;
@@ -37,15 +35,24 @@ clusterUploadModule.controller('clusterUploadCtrl', ['$scope', '$log', '$timeout
 	console.log("Value of file.path: " + file.path);
 	
 	// Runs file upload
-	connectionService.uploadFile(file.path, file.name).then(function (data) {
+	connectionService.uploadFile(file.path, file.name, function(total_transferred,chunk,total){
+		// Callback function for progress bar
+		$log.debug("Total transferred: " + total_transferred);
+		$log.debug("Chunks: " + chunk);
+		$log.debug("Total: " + total);
+		
+		// Work on progress bar
+		$scope.$apply(function(scope) {
+			$scope.max = total;
+			$scope.countFrom = 0;
+			$scope.countTo = total;
+			$scope.progressValue = total_transferred;
+		});
+		
+		}).then(function (data) {
 		// Do nothing for now
-	});
-	console.log("Value of progress: " + connectionService.progress());
-  }
-  
-  // Updates progress bar
-  function uploadProgress(totalTransferred, chunk, total) {
-  
+		
+		});
   }
   
   // Get the username

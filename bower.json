@@ -26,11 +26,14 @@
       ]
     },
     "bootstrap": {
-	"css"	: "**/*.css",
+	"css"	: ["**/*.css","**/*.map"],
 	"js" 	: "**/*.js",
 	"less" 	: "**/*.less",
 	"fonts"	: ["**/*.eot","**/*.svg","**/*.ttf","**/*.woff"]
-    }
+    },
+	"bootstrap-material-design": {
+	""	: ["**/*.css","**/*.map","**/*.js","**/*.less","**/*.eot","**/*.svg","**/*.ttf","**/*.woff"]
+	}
   },
   "resolutions": {
     "angular": "~1.3.15"

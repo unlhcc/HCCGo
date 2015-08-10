@@ -47,12 +47,13 @@
             </span>)
         </div>
         <input type="button" ng-click="uploadFile()" value="Upload" />
-        <div ng-show="progressVisible">
-            <div class="percent">{{progress}}%</div>
-            <div class="progress-bar">
-                <div class="uploaded" ng-style="{'width': progress+'%'}"></div>
-            </div>
-        </div>
+		<progressbar class="progress active"
+			animate="false"
+			max="{{max}}"
+			value="{{progressValue}}" 
+			type="success"><span count-to="{{countTo}}"
+								duration="1" count-from="{{countFrom}}"></span>
+		</progressbar>
     </div>
       </div>
     </div>

@@ -4,7 +4,6 @@ connectionModule = angular.module('ConnectionServiceModule', [])
 connectionModule.factory('connectionService',['$log', '$q', function($log, $q) {
   
   var connectionList = [];
-  var progressData = [];
   
   /**
     * To initiate ssh connections to remote clusters.
@@ -93,11 +92,6 @@ connectionModule.factory('connectionService',['$log', '$q', function($log, $q) {
 	// Functionality to upload a file to the server
 	var uploadFile = function(localPath, remotePath, callback) {
 		var deferred = $q.defer();
-	
-		// using the 'fs' library for this, temporary until how to pass
-		// process progression data is figured out
-		// var fs = require('fs');
-		// Using fastPut
 		
 		// Starts the connection
 		connectionList[0].sftp(function (err, sftp) {
@@ -110,7 +104,7 @@ connectionModule.factory('connectionService',['$log', '$q', function($log, $q) {
 			
 			// Setting the I/O streams
 			sftp.fastPut(localPath, remotePath, {step:function(total_transferred,chunk,total){
-					fileProgress(total_transferred, chunk, total)
+					callback(total_transferred, chunk, total)
 				}}, 
 				function(err){
 					// Processes errors
@@ -121,16 +115,6 @@ connectionModule.factory('connectionService',['$log', '$q', function($log, $q) {
 		
 		return deferred.promise;
 	}
-	
-	// Processes progress data for fastPut and fastGet
-	var fileProgress = function(total_transferred, chunk, total) {
-		progressData[0] = total_transferred;
-		progressData[1] = chunk;
-		progressData[2] = total;
-		$log.debug("Progress data index 0: " + progressData[0]);
-		$log.debug("Progress data index 1: " + progressData[1]);
-		$log.debug("Progress data index 2: " + progressData[2]);
-	}
   
   return {
     getConnection: getConnection,
@@ -138,7 +122,6 @@ connectionModule.factory('connectionService',['$log', '$q', function($log, $q) {
     getUsername: getUsername,
 	uploadFile: uploadFile,
 	closeStream: closeStream,
-	progress: progressData,
     initiateConnection: function initiateConnection(username, password, hostname, logger, needInput, completed) {
       
       var Client = require('ssh2').Client;
