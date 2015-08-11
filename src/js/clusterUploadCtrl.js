@@ -21,7 +21,7 @@ clusterUploadModule.controller('clusterUploadCtrl', ['$scope', '$log', '$timeout
 		for (var i = 0; i < element.files.length; i++) {
 			$scope.files.push(element.files[i]);
 		}
-		$scope.progressVisible = false;
+		$scope.progressValue = 0;
 	})
   }
   
@@ -44,9 +44,8 @@ clusterUploadModule.controller('clusterUploadCtrl', ['$scope', '$log', '$timeout
 		// Work on progress bar
 		$scope.$apply(function(scope) {
 			$scope.max = total;
-			$scope.countFrom = 0;
-			$scope.countTo = total;
-			$scope.progressValue = total_transferred;
+			$scope.progressValue = Math.floor((total_transferred/total)*100);
+			$log.debug("Progress: " + Math.floor(((total_transferred/total)*100) + "%"));
 		});
 		
 		}).then(function (data) {
@@ -77,8 +76,6 @@ clusterUploadModule.controller('clusterUploadCtrl', ['$scope', '$log', '$timeout
         clusterInterface = new CondorClusterInterface(connectionService, $q);
         break;
     }
-    
-    getClusterStats($scope.params.clusterId);
     
   })
   

@@ -169,10 +169,10 @@ connectionModule.factory('connectionService',['$log', '$q', function($log, $q) {
         host: hostname,
         username: username,
         tryKeyboard: true,
-        readyTimeout: 99999999,
+        readyTimeout: 99999999/*,
         debug: function(message) {
           logger.log(message);
-        }
+        }*/
       });
         
       connectionList.push(conn);
