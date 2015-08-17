@@ -17,7 +17,7 @@
     "bootstrap": "~3.3.4",
     "selectize": "~0.12.1",
     "c3": "~0.4.10",
-	"angular-bootstrap": "~0.13.3"
+	"jquery-file-tree": "~1.0.1"
   },
   "exportsOverride": {
     "selectize": {

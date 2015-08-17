@@ -115,12 +115,40 @@ connectionModule.factory('connectionService',['$log', '$q', function($log, $q) {
 		
 		return deferred.promise;
 	}
+	
+	// Functionality to download a file from the server
+	var downloadFile = function(localPath, remotePath, callback) {
+		var deferred = $q.defer();
+		
+		// Starts the connection
+		connectionList[0].sftp(function (err, sftp) {
+			if (err) throw err;		// If something happens, kills process kindly
+			
+			// Process to console
+			$log.debug( "SFTP has begun");
+			$log.debug( "Value of localPath: " + localPath );
+			$log.debug( "Value of remotePath: " + remotePath );
+			
+			// Setting the I/O streams
+			sftp.fastGet(remotePath, localPath, {step:function(total_transferred,chunk,total){
+					callback(total_transferred, chunk, total)
+				}}, 
+				function(err){
+					// Processes errors
+					$log.debug(err);
+				});
+			
+		});
+		
+		return deferred.promise;
+	}
   
   return {
     getConnection: getConnection,
     runCommand: runCommand,
     getUsername: getUsername,
 	uploadFile: uploadFile,
+	downloadFile: downloadFile,
 	closeStream: closeStream,
     initiateConnection: function initiateConnection(username, password, hostname, logger, needInput, completed) {
       
@@ -169,13 +197,13 @@ connectionModule.factory('connectionService',['$log', '$q', function($log, $q) {
         host: hostname,
         username: username,
         tryKeyboard: true,
-        readyTimeout: 99999999/*,
+        readyTimeout: 99999999,
         debug: function(message) {
           logger.log(message);
-        }*/
+        }
       });
         
-      connectionList.push(conn);
+      connectionList[0] = conn;
       
       
     }

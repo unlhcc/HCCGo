@@ -22,4 +22,29 @@ var app = angular.module('HccGoApp', ['HccGoApp.WelcomeCtrl',
       redirectTo: '/'
     });
   }
-]);
+]).controller('NavCtrl', ['$route', '$scope', '$routeParams', '$location', '$log', 'preferencesManager', 'connectionService',
+	function($route,$scope,$routeParams,$location,$log,preferencesManager,connectionService) {
+	// This controller intended purely to manage navigation bar
+	// No code beyond navigational controls should be used here
+	$scope.params = $routeParams;
+	var clusterInterface = null;
+  
+	$scope.logout = function() {
+		connectionService.closeStream();
+		$location.path("/");
+	};
+	
+	// Runs code when contents of ngView changes
+	connectionService.getUsername().then(function(username) {
+		$scope.username = username;
+	})
+	
+	/* For Reference
+	$scope.onViewLoad = function viewLoad() {
+		$log.debug("ngView has changed");
+		connectionService.getUsername().then(function(username) {
+			$scope.username = username;
+		}) 
+	}*/
+	
+}]);
