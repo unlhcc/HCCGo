@@ -57,7 +57,7 @@ welcomeModule.controller('welcomeCtrl', ['$scope', '$log', '$timeout', 'connecti
     this.logger.log("Starting login process", 'warning');
     logger = this.logger;
     
-    connectionService.initiateConnection($scope.username, $scope.password, connectUrl, this.logger, userPrompt,  function(err) {
+    connectionService.initiateConnection($scope.username, $scope.password, connectUrl, $scope.selectedCluster.label, this.logger, userPrompt,  function(err) {
       $scope.$apply(function() {
         
         if (err) {
@@ -66,7 +66,8 @@ welcomeModule.controller('welcomeCtrl', ['$scope', '$log', '$timeout', 'connecti
           $('#loginForm').fadeTo('fast', 1.0);
         } else {
           
-          $location.path("/cluster/" + $scope.selectedCluster.label)
+          $location.path("/cluster/" + $scope.selectedCluster.label);
+		  $log.debug("Cluster label: " + $scope.selectedCluster.label);
           
         }
         

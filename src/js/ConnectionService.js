@@ -1,7 +1,7 @@
 
 connectionModule = angular.module('ConnectionServiceModule', [])
 
-connectionModule.factory('connectionService',['$log', '$q', function($log, $q) {
+connectionModule.factory('connectionService',['$log', '$q', '$routeParams', function($log, $q, $routeParams) {
   
 	var connectionList = {crane: null,
 							tusker: null,
@@ -13,67 +13,113 @@ connectionModule.factory('connectionService',['$log', '$q', function($log, $q) {
 	* To initiate ssh connections to remote clusters.
 	*
 	*/
-
-	var getConnection = function(host) {
-
-	// Check if the host exists in the connection list
-	if( connectionList.hasOwnProperty(host)) {
-	  return connectionList[host];
-	} else {
-	  return null;
+		
+	// Returns the context of the connection (if cluster is Sandhills, use Sandhills connection etc...)
+	var getClusterContext = function() {
+		switch($routeParams.clusterId) {
+			case "Crane":
+				return 'crane';
+				break;
+			case "Tusker":
+				return 'tusker';
+				break;
+			case "Sandhills":
+				return 'sandhills';
+				break;
+			case "Glidein":
+				return 'glidein';
+				break;
+			default:
+				return 'crane';
+		}
 	}
+	
+	// Checks if connection for a cluster exists
+	var getConnection = function(host) {
+		// Check if the host exists in the connection list
+		switch($routeParams.clusterId) {
+			case "Crane":
+				if (connectionList['crane'] != null) {
+					return true;
+				} else {
+					return false;
+				}
+				break;
+			case "Tusker":
+				if (connectionList['tusker'] != null) {
+					return true;
+				} else {
+					return false;
+				}
+				break;
+			case "Sandhills":
+				if (connectionList['sandhills'] != null) {
+					return true;
+				} else {
+					return false;
+				}
+				break;
+			case "Glidein":
+				if (connectionList['glidein'] != null) {
+					return true;
+				} else {
+					return false;
+				}
+				break;
+			default:
+				return false;
+		}
 
 	};
 
 	var closeStream = function() {
-	// Closes the connection stream
-	connectionList['crane'].end();
+		// Closes the connection stream
+		var clusters = ['crane','tusker','sandhills','glidein'];
+		for (var x = 0; x < clusters.length; x++) {
+			if (connectionList[clusters[x]] != null) {
+				connectionList[clusters[x]].end();
+				connectionList[clusters[x]] = null;
+			}
+		}
 	};
 
 	var commandSem = require('semaphore')(1);
 
 	var runCommand = function(command) {
-    
-    var deferred = $q.defer();
-    
-    commandSem.take(function() {
 
-      // Run a command remotely
-      connectionList['crane'].exec(command, function(err, stream) {
-        
-        cumulData = "";
-        
-        if (err) {
-          $log.error("Error running command " + command + ": "+ err);
-          commandSem.leave();
-          deferred.reject("Error running command " + command + ": "+ err);
-          return;
-        }
-        
-        stream.on('data', function(data) {
-          
-          $log.debug("Got data: " + data);
-          cumulData += data;
-          
-        }).on('close', function(code, signal) {
-          
-          $log.debug('Stream :: close :: code: ' + code + ', signal: ' + signal);
-          commandSem.leave();
-          deferred.resolve(cumulData);
-          
-        });
-        
+		var deferred = $q.defer();			// Used to return promise data
+		
+		commandSem.take(function() {
 
-      });
-      
+		  // Run a command remotely
+		  connectionList[getClusterContext()].exec(command, function(err, stream) {
+			
+			cumulData = "";
+			
+			if (err) {
+			  $log.error("Error running command " + command + ": "+ err);
+			  commandSem.leave();
+			  deferred.reject("Error running command " + command + ": "+ err);
+			  return;
+			}
+			
+			stream.on('data', function(data) {
+			  
+			  $log.debug("Got data: " + data);
+			  cumulData += data;
+			  
+			}).on('close', function(code, signal) {
+			  
+			  $log.debug('Stream :: close :: code: ' + code + ', signal: ' + signal);
+			  commandSem.leave();
+			  deferred.resolve(cumulData);	// Once the command actually completes full data stored here
+			  
+			});
+		  });
+		});
 
-    });
-    
-    
-    
-    return deferred.promise;
-    
-  }
+		return deferred.promise;	// Asynchronous command, doesn't really return anything until deferred.resolve is called
+	}
   
 	var getUsername = function() {
 		var deferred = $q.defer();
@@ -83,7 +129,6 @@ connectionModule.factory('connectionService',['$log', '$q', function($log, $q) {
 			deferred.resolve(data.trim());
       
 		})
-    
 		return deferred.promise;
     
 	}
@@ -93,7 +138,7 @@ connectionModule.factory('connectionService',['$log', '$q', function($log, $q) {
 		var deferred = $q.defer();
 		
 		// Starts SFTP session
-		connectionList['crane'].sftp(function (err, sftp) {
+		connectionList[getClusterContext()].sftp(function (err, sftp) {
 			if (err) throw err;		// If something happens, kills process kindly
 			
 			// Debug to console
@@ -117,7 +162,7 @@ connectionModule.factory('connectionService',['$log', '$q', function($log, $q) {
 		var deferred = $q.defer();
 		
 		// Starts the connection
-		connectionList['crane'].sftp(function (err, sftp) {
+		connectionList[getClusterContext()].sftp(function (err, sftp) {
 			if (err) throw err;		// If something happens, kills process kindly
 			
 			// Process to console
@@ -144,7 +189,7 @@ connectionModule.factory('connectionService',['$log', '$q', function($log, $q) {
 		var deferred = $q.defer();
 		
 		// Starts the connection
-		connectionList['crane'].sftp(function (err, sftp) {
+		connectionList[getClusterContext()].sftp(function (err, sftp) {
 			if (err) throw err;		// If something happens, kills process kindly
 			
 			// Process to console
@@ -174,7 +219,7 @@ connectionModule.factory('connectionService',['$log', '$q', function($log, $q) {
 	downloadFile: downloadFile,
 	closeStream: closeStream,
 	readDir: readDir,
-	initiateConnection: function initiateConnection(username, password, hostname, logger, needInput, completed) {
+	initiateConnection: function initiateConnection(username, password, hostname, cluster, logger, needInput, completed) {
 	  
 	  var Client = require('ssh2').Client;
 	  var conn = new Client();
@@ -226,8 +271,22 @@ connectionModule.factory('connectionService',['$log', '$q', function($log, $q) {
 		  // logger.log(message);
 		}
 	  });
-		
-	  connectionList['crane'] = conn;
+	   switch(cluster) {
+		case "Crane":
+			connectionList['crane'] = conn;
+			break;
+		case "Tusker":
+			connectionList['tusker'] = conn;
+			break;
+		case "Sandhills":
+			connectionList['sandhills'] = conn;
+			break;
+		case "Glidein":
+			connectionList['glidein'] = conn;
+			break;
+		default:
+			return false;
+	  }
 	  $log.debug(connectionList);
 	  
 	  

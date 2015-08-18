@@ -6,24 +6,6 @@ clusterDownloadModule.controller('clusterDownloadCtrl', ['$scope', '$log', '$tim
   $scope.params = $routeParams
   var clusterInterface = null;
   
-  
-  $scope.logout = function() {
-    connectionService.closeStream();
-    $location.path("/");
-    
-  }
-  
-  
-  // Get the username
-  function getUsername() {
-    
-    connectionService.getUsername().then(function(username) {
-      $scope.username = username;
-    })
-    
-  }
-  
-  getUsername();
   preferencesManager.getClusters().then(function(clusters) {
     // Get the cluster type
     var clusterType = $.grep(clusters, function(e) {return e.label == $scope.params.clusterId})[0].type;

@@ -34,7 +34,7 @@ var app = angular.module('HccGoApp', ['HccGoApp.WelcomeCtrl',
 		$location.path("/");
 	};
 	
-	// Runs code when contents of ngView changes
+	// Sets username in nav bar
 	connectionService.getUsername().then(function(username) {
 		$scope.username = username;
 	})

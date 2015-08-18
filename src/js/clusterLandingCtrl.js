@@ -4,18 +4,15 @@ clusterLandingModule = angular.module('HccGoApp.clusterLandingCtrl', ['ngRoute' 
 clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeout', 'connectionService', '$routeParams', '$location', '$q', 'preferencesManager', function($scope, $log, $timeout, connectionService, $routeParams, $location, $q, preferencesManager) {
   
   $scope.params = $routeParams
-  var clusterInterface = new GenericClusterInterface(connectionService, $q);
-  
-  
-  $scope.logout = function() {
-    connectionService.closeStream();
-    $location.path("/");
-    
-  }
-  
+  var clusterInterface = new GenericClusterInterface(connectionService, $q);  
   
   function getClusterStats(clusterId) {
     
+	// Navigational controls
+	$scope.goToUpload = function() {
+		$location.path("/cluster/" + $routeParams.clusterId + "/upload");
+	};
+	
     // Query the connection service for the cluster
     clusterInterface.getJobs().then(function(data) {
       // Process the data
@@ -99,16 +96,6 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
     
   }
   
-  // Get the username
-  function getUsername() {
-    
-    connectionService.getUsername().then(function(username) {
-      $scope.username = username;
-    })
-    
-  }
-  
-  getUsername();
   preferencesManager.getClusters().then(function(clusters) {
     // Get the cluster type
     var clusterType = $.grep(clusters, function(e) {return e.label == $scope.params.clusterId})[0].type;

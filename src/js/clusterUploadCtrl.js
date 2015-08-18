@@ -5,12 +5,6 @@ clusterUploadModule.controller('clusterUploadCtrl', ['$scope', '$log', '$timeout
   
 	$scope.params = $routeParams
 	var clusterInterface = null;
-
-	$scope.logout = function() {
-	connectionService.closeStream();
-	$location.path("/");
-
-	}
  
 	// Sets default values on load
 	$scope.onViewLoad = function viewLoad() {
@@ -21,15 +15,15 @@ clusterUploadModule.controller('clusterUploadCtrl', ['$scope', '$log', '$timeout
   
 	// Sets the name of the file to upload in the declaration box
 	$scope.setFiles = function(element) {
-	$scope.$apply(function(scope) {
-		$log.debug('File set: ' + element.files);
-		$log.debug('Number of files: ' + element.files.length);
-		$scope.files = [];
-		for (var i = 0; i < element.files.length; i++) {
-			$scope.files.push(element.files[i]);
-		}
-		$scope.progressValue = 0;
-	})
+		$scope.$apply(function(scope) {
+			$log.debug('File set: ' + element.files);
+			$log.debug('Number of files: ' + element.files.length);
+			$scope.files = [];
+			for (var i = 0; i < element.files.length; i++) {
+				$scope.files.push(element.files[i]);
+			}
+			$scope.progressValue = 0;
+		})
 	}
 
 	// Uploads files through SFTPStream
