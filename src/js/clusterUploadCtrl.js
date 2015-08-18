@@ -16,7 +16,7 @@ clusterUploadModule.controller('clusterUploadCtrl', ['$scope', '$log', '$timeout
 	$scope.onViewLoad = function viewLoad() {
 		$log.debug("ngView has changed");
 		$scope.progressVisible = false;
-		$scope.uploadStatue = false;
+		$scope.uploadStatus = false;
 	}
   
 	// Sets the name of the file to upload in the declaration box
@@ -35,38 +35,38 @@ clusterUploadModule.controller('clusterUploadCtrl', ['$scope', '$log', '$timeout
 	// Uploads files through SFTPStream
 	$scope.uploadFile = function() {
 
-	// Let's do some debugging
-	var index = 0;
-	var file = $scope.files[index];
-	console.log("Value of file.name: " + file.name);
-	console.log("Value of file.path: " + file.path);
+		// Let's do some debugging
+		var index = 0;
+		var file = $scope.files[index];
+		console.log("Value of file.name: " + file.name);
+		console.log("Value of file.path: " + file.path);
 
-	// Runs file upload
-	connectionService.uploadFile(file.path, file.name, function(total_transferred,chunk,total){
-		// Callback function for progress bar
-		$log.debug("Total transferred: " + total_transferred);
-		$log.debug("Chunks: " + chunk);
-		$log.debug("Total: " + total);
-		
-		// Work on progress bar
-		$scope.$apply(function(scope) {
-			$scope.progressVisible = true;
-			$scope.uploadStatue = false;
-			$scope.max = total;
-			$scope.progressValue = Math.floor((total_transferred/total)*100);
-			$scope.progressVisible = true;
-			$log.debug("Progress: " + ((total_transferred/total)*100) + "%");
+		// Runs file upload
+		connectionService.uploadFile(file.path, file.name, function(total_transferred,chunk,total){
+			// Callback function for progress bar
+			$log.debug("Total transferred: " + total_transferred);
+			$log.debug("Chunks: " + chunk);
+			$log.debug("Total: " + total);
 			
-			if($scope.progressValue == 100) {
-				$scope.progressVisible = false;
+			// Work on progress bar
+			$scope.$apply(function(scope) {
+				$scope.progressVisible = true;
+				$scope.uploadStatus = false;
+				$scope.max = total;
+				$scope.progressValue = Math.floor((total_transferred/total)*100);
+				$scope.progressVisible = true;
+				$log.debug("Progress: " + ((total_transferred/total)*100) + "%");
 				
-			}
-		});
-		
-		}).then(function (data) {
-		// Do nothing for now
-		
-		});
+				if($scope.progressValue == 100) {
+					$scope.progressVisible = false;
+					
+				}
+			});
+			
+			}).then(function (data) {
+			// Do nothing for now
+			
+			}); 
 	}
 
 	preferencesManager.getClusters().then(function(clusters) {

@@ -7,7 +7,7 @@ module.exports = function(grunt) {
     nwjs: {
        options: {
        	build_dir: './webkitbuilds',
-	platforms: ['osx','linux','win'],
+		platforms: ['osx','linux','win'],
 		version: '0.12.3'
        },
        src: ['src/**']
@@ -29,7 +29,7 @@ module.exports = function(grunt) {
     
     shell: {
       start_webkit: {
-        command: 'webkitbuilds/HCCGo/linux64/HCCGo'
+        command: 'start webkitbuilds/HCCGo/win64/HCCGo.exe'
       }
     },
     
