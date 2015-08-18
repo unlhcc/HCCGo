@@ -3,7 +3,9 @@
   "version": "0.1.0",
   "main": "index.html",
   "description": "Interface for HCC Resouces",
-  "keywords": [ "HCC" ],
+  "keywords": [
+    "HCC"
+  ],
   "window": {
     "title": "HCCGo",
     "icon": "PromotionalIcon128x128.png",
@@ -16,15 +18,13 @@
     "min_height": 500,
     "_max_width": 800,
     "_max_height": 600
-    
   },
   "webkit": {
     "plugin": true
   },
   "dependencies": {
-    "grunt-contrib-less": ">= 0.11.0",
-    "grunt-node-webkit-builder": ">= 0.1.21",
     "ssh2": ">= 0.3.3",
-    "semaphore": ">= 1.0.2"
+    "semaphore": ">= 1.0.2",
+    "fs": ">= 0.0.2"
   }
 }
