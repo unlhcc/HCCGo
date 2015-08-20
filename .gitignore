@@ -9,3 +9,4 @@ webkitbuilds/*
 src/css/application.css
 bower_components/*
 src/lib/*
+src/node_modules/*

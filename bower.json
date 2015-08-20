@@ -21,19 +21,28 @@
   },
   "exportsOverride": {
     "selectize": {
-      "": [
-        "dist/css/selectize.bootstrap3.css",
-        "dist/js/selectize.js"
+		"": [
+			"dist/css/selectize.bootstrap3.css",
+			"dist/js/selectize.js"
       ]
     },
-    "bootstrap": {
-	"css"	: ["**/*.css","**/*.map"],
-	"js" 	: "**/*.js",
-	"less" 	: "**/*.less",
-	"fonts"	: ["**/*.eot","**/*.svg","**/*.ttf","**/*.woff"]
+		"bootstrap": {
+			"css"	: ["**/*.css","**/*.map"],
+			"js" 	: "**/*.js",
+			"less" 	: "**/*.less",
+			"fonts"	: ["**/*.eot","**/*.svg","**/*.ttf","**/*.woff"]
     },
-	"bootstrap-material-design": {
-	""	: ["**/*.css","**/*.map","**/*.js","**/*.less","**/*.eot","**/*.svg","**/*.ttf","**/*.woff"]
+		"bootstrap-material-design": {
+			""	: ["**/*.css","**/*.map","**/*.js",
+					"**/*.less","**/*.eot","**/*.svg",
+					"**/*.ttf","**/*.woff"]
+	},
+		"jquery-file-tree": {
+			"img": [
+				"**/img/*.png", 
+				"**/img/*.gif"],
+			"css": "**/*.css",
+			"js": "**/*.js"
 	}
   },
   "resolutions": {

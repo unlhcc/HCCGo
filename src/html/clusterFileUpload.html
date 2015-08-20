@@ -2,11 +2,10 @@
 <div ng-include="'html/navbar.html'"></div>
 
 <div class="container"> 
-    <div class="col-md-8">
       <div class="card">
 		<ul class="nav nav-tabs" style="margin-bottom: 15px;">
-			<li class="active"><button class="btn btn-primary" href="#directory" data-toggle="tab">Upload Directory</a></li>
-			<li><button class="btn btn-primary" href="#file" data-toggle="tab">Upload File</a></li>
+			<li><button id="btnDirectory" class="btn btn-primary active" href="#directory" data-toggle="tab">Upload Directory</a></li>
+			<li><button id="btnFile" class="btn btn-primary" href="#file" data-toggle="tab">Upload File</a></li>
 		</ul>
 		<div id="myTabContent" class="tab-content">
 			<div class="tab-pane fade active in" id="directory">
@@ -20,31 +19,35 @@
 					<tbody>
 						<tr>
 							<td>
-								<ul id="directoryUploadList" 
-									class="jqueryFileTree" style="display: none;">
-									
-								</ul>
+								<div class="panel panel-default">
+									<div class="panel-heading">Working Directory: 
+										<ul class="breadcrumb">
+											<li ng-repeat="pwd in wdList" class="{{pwd.wdClass}}">
+												<a ng-click="cdSSHWD(pwd)">{{pwd.name}}</a>
+											</li>
+										</ul>
+									</div>
+									<div class="panel-body">Available Folders:
+										<ul class="jqueryFileTree" 
+											ng-repeat="folder in clusterFolder">
+											<li class="{{folder.wdClass}}">
+												<a ng-click="cdSSH(folder)">{{folder.name}}</a>
+											</li>
+										</ul>
+									</div>
+								</div>
 							</td>
 							<td>
 								<input type="file" ng-model-instant 
-									id="fileToUpload" 
+									id="folderToUpload" 
 									multiple 
 									onchange="angular.element(this).scope().setFiles(this)"
 									webkitdirectory
 									directory></input>
-								<div ng-show="files.length">
-									<div ng-repeat="file in files.slice(0)">
-										<span>{{file.webkitRelativePath || file.name}}</span>
-										(<span ng-switch="file.size > 1024*1024">
-											<span ng-switch-when="true">{{file.size / 1024 / 1024 | number:2}} MB</span>
-											<span ng-switch-default>{{file.size / 1024 | number:2}} kB</span>
-										</span>)
-									</div>
-								</div>
 							</td>
 						</tr>
 						<tr>
-							<td><input type="button" ng-click="uploadFile()" value="Upload" /></td>
+							<td><input type="button" ng-click="uploadDirectory()" value="Upload" /></td>
 						</tr>
 					</tbody>
 				</table>
@@ -60,14 +63,27 @@
 					<tbody>
 						<tr>
 							<td>
-								<ul id="fileUploadList" 
-									class="jqueryFileTree" style="display: none;">
-									
-								</ul>
+								<div class="panel panel-default">
+									<div class="panel-heading">Working Directory: 
+										<ul class="breadcrumb">
+											<li ng-repeat="pwd in wdList" class="{{pwd.wdClass}}">
+												<a ng-click="cdSSHWD(pwd)">{{pwd.name}}</a>
+											</li>
+										</ul>
+									</div>
+									<div class="panel-body">Available Folders:
+										<ul class="jqueryFileTree" 
+											ng-repeat="folder in clusterFolder">
+											<li class="{{folder.wdClass}}">
+												<a ng-click="cdSSH(folder)">{{folder.name}}</a>
+											</li>
+										</ul>
+									</div>
+								</div>
 							</td>
 							<td>
 								<input type="file" ng-model-instant
-									id="folderToUpload"
+									id="fileToUpload"
 									multiple
 									onchange="angular.element(this).scope().setFiles(this)"></input>
 								<div ng-show="files.length">
@@ -87,10 +103,10 @@
 					</tbody>
 				</table>
 				<div class="progress progress-striped active" ng-show="progressVisible">
-					<div class="progress-bar" style="width: {{progressValue}}%"></div>{{progressValue}}%
+					<div class="progress-bar" style="width: {{progressValue}}%"></div><p>{{progressValue}}%</p>
 				</div>
 				<div ng-show="uploadStatus">
-					Done!
+					<p>Done!</p>
 				</div
 			</div>
 
@@ -98,7 +114,4 @@
 		</div>
       </div>
     </div>
-    
-  
-  
 </div>
