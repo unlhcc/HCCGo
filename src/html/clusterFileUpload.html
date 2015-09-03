@@ -48,6 +48,14 @@
 						</tr>
 						<tr>
 							<td><input type="button" ng-click="uploadDirectory()" value="Upload" /></td>
+							<td>
+								<div class="progress progress-striped active" ng-show="progressVisible">
+									<div class="progress-bar" style="width: {{progressValue}}%"></div><p>{{progressValue}}%</p>
+								</div>
+								<div ng-show="uploadStatus">
+									<p>Done!</p>
+								</div>
+							</td>
 						</tr>
 					</tbody>
 				</table>
@@ -99,15 +107,17 @@
 						</tr>
 						<tr>
 							<td><input type="button" ng-click="uploadFile()" value="Upload" /></td>
+							<td>
+								<div class="progress progress-striped active" ng-show="progressVisible">
+									<div class="progress-bar" style="width: {{progressValue}}%"></div><p>{{progressValue}}%</p>
+								</div>
+								<div ng-show="uploadStatus">
+									<p>Done!</p>
+								</div>
+							</td>
 						</tr>
 					</tbody>
 				</table>
-				<div class="progress progress-striped active" ng-show="progressVisible">
-					<div class="progress-bar" style="width: {{progressValue}}%"></div><p>{{progressValue}}%</p>
-				</div>
-				<div ng-show="uploadStatus">
-					<p>Done!</p>
-				</div
 			</div>
 
 

@@ -37,17 +37,20 @@ clusterUploadModule.controller('clusterUploadCtrl', ['$scope', '$log', '$timeout
 		if (data.name != $scope.wdList[$scope.wdList.length - 1].name) {
 			var directoryIndex = 1;		// Sets index of array where working directory exists
 			// loops through array finding wanted previous folder
-			for (var x = 1; x < $scope.wdList.length; x++) {
+			for (var x = 0; x < $scope.wdList.length; x++) {
 				if ($scope.wdList[x].name == data.name) {
 					directoryIndex = x;
 				}
 			}
 			
 			// Sets working directory to desired path
+			$log.debug("wdList before slice");
 			$log.debug($scope.wdList);
-			$scope.wdList = $scope.wdList.slice(0,directoryIndex);
+			$scope.wdList = $scope.wdList.slice(0,directoryIndex + 1);
 			$scope.wdList[$scope.wdList.length - 1].wdClass = "active";
+			$log.debug("wdList after slice");
 			$log.debug($scope.wdList);
+		
 			// Resets file listing display
 			
 			resetFileDisplay();
@@ -151,6 +154,59 @@ clusterUploadModule.controller('clusterUploadCtrl', ['$scope', '$log', '$timeout
 				$log.debug("File upload deferred");
 			}); 
 			resetFileDisplay();
+	}
+	
+	// Upload entire directory
+	$scope.uploadDirectory = function() {
+		// Establishes access to object
+		var file = $scope.files[0];
+		var activeDir = { path: file.path,
+							webkitRelativePath: file.webkitRelativePath};
+		
+		// Cuts the 'excess' portion off the relative path
+		for (var x = 0; x >= 0; x++) {
+			if (activeDir.webkitRelativePath.indexOf('/') != -1) {
+				activeDir.webkitRelativePath = activeDir.webkitRelativePath.slice(
+					activeDir.webkitRelativePath.indexOf('/') + 1, 
+					activeDir.webkitRelativePath.length
+					);
+			} else {
+				x = -100;
+			}
+		}
+		
+		$log.debug(getFiles(activeDir));
+	}
+	
+	// pulling all files from a directory
+	var getFiles = function(dir, files_){
+		var fs = require('fs');
+		files_ = files_ || [];
+		var files = fs.readdirSync(dir.path);
+		var name = {path: dir.path,
+					webkitRelativePath: dir.webkitRelativePath};
+		for (var x = 0; x < files.length; x++) {
+			name.path = dir.path + '/' + files[x];
+			name.webkitRelativePath = dir.webkitRelativePath + '/' + files[x];
+			if (fs.statSync(name.path).isDirectory()){
+				connectionService.makeDir(getWD() + '/' + name.webkitRelativePath);
+				getFiles(name, files_);
+			} else {
+				files_.push(name);
+			}
+		}
+		return files_;
+	}
+	
+	// get current active directory
+	var getWD = function() {
+		var path = "";
+		
+		for (var x = 0; x < $scope.wdList.length; x++) {
+			path += $scope.wdList[x].path;
+		}
+		$log.debug("Current working directory: " + path);
+		return path;
 	}
 
 	preferencesManager.getClusters().then(function(clusters) {

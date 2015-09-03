@@ -157,6 +157,50 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
 		return deferred.promise;
 	}
 	
+	// Creates directory on server
+	var makeDir = function(path) {
+		connectionList[getClusterContext()].sftp(function (err, sftp) {
+			if (err) { $log.debug(err) };		// If something happens, kills process kindly
+			var destPath = [];
+			var currPath = path;
+			var testIndex = 0;
+			// Debug to console
+			$log.debug("SFTP has begun, creating folder " + path);
+			
+			// Loops through passed path to create array of desired folders
+			for (var x = 0; x >= 0; x++) {
+				if (currPath.indexOf('/') != -1) {
+					destPath[x] = currPath.slice( 0, currPath.indexOf('/'));
+					currPath = currPath.slice(currPath.indexOf('/') + 1, currPath.length);
+					$log.debug("makeDir currPath: " + currPath);
+				} else {
+					destPath[x] = currPath;
+					x = -100;
+				}
+			}
+			
+			// Finished array
+			$log.debug("destPath result: ");
+			$log.debug(destPath);
+			currPath = destPath[0];			
+			
+			// Create folder(s)
+			for (var x = 0; x < destPath.length; x++) {
+				// Rebuilds relative path of directories
+				currPath += (destPath[x] + '/');
+				sftp.readdir(currPath, function(err, list) {
+					if (typeof list == 'undefined') {
+						$log.debug("Actually processing: " + path);
+						sftp.mkdir(currPath, function(err) { $log.debug(err)});
+					}
+				});
+			}
+			
+			// Debug to console
+			$log.debug("Folder " + path + " has been created");
+		})
+	}
+	
 	// Functionality to upload a file to the server
 	var uploadFile = function(localPath, remotePath, callback) {
 		var deferred = $q.defer();
@@ -219,6 +263,7 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
 	downloadFile: downloadFile,
 	closeStream: closeStream,
 	readDir: readDir,
+	makeDir: makeDir,
 	initiateConnection: function initiateConnection(username, password, hostname, cluster, logger, needInput, completed) {
 	  
 	  var Client = require('ssh2').Client;
