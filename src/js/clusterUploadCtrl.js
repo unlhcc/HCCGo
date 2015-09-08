@@ -124,7 +124,7 @@ clusterUploadModule.controller('clusterUploadCtrl', ['$scope', '$log', '$timeout
 		// Pulls active working directory
 		var filePath = "";
 		for(var x = 0; x < $scope.wdList.length; x++) {
-			filePath += $scope.wdList[x].path;
+			filePath += ($scope.wdList[x].path + '/');
 		}
 		
 		// Runs file upload

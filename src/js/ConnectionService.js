@@ -147,11 +147,18 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
 			
 			// Read directory
 			sftp.readdir(directory, function(err, list) {
-				if (err) throw err;
+				if (err) {
+					$log.debug(err);
+					sftp.end();
+				} else {
+					$log.debug("SFTP :: readdir success");
+					sftp.end();
+				}
 				
 				deferred.resolve(list);
 				$log.debug(list);
 			});
+
 		});
 		
 		return deferred.promise;
@@ -159,46 +166,51 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
 	
 	// Creates directory on server
 	var makeDir = function(path) {
-		connectionList[getClusterContext()].sftp(function (err, sftp) {
-			if (err) { $log.debug(err) };		// If something happens, kills process kindly
-			var destPath = [];
-			var currPath = path;
-			var testIndex = 0;
-			// Debug to console
-			$log.debug("SFTP has begun, creating folder " + path);
-			
-			// Loops through passed path to create array of desired folders
-			for (var x = 0; x >= 0; x++) {
-				if (currPath.indexOf('/') != -1) {
-					destPath[x] = currPath.slice( 0, currPath.indexOf('/'));
-					currPath = currPath.slice(currPath.indexOf('/') + 1, currPath.length);
-					$log.debug("makeDir currPath: " + currPath);
-				} else {
-					destPath[x] = currPath;
-					x = -100;
-				}
+		var destPath = [];
+		var currPath = path;
+		var testIndex = 0;
+
+		// Loops through passed path to create array of desired folders
+		for (var x = 0; x >= 0; x++) {
+			if (currPath.indexOf('/') != -1) {
+				destPath[x] = currPath.slice(0, currPath.indexOf('/'));
+				currPath = currPath.slice(currPath.indexOf('/') + 1, currPath.length);
+				$log.debug("makeDir currPath: " + currPath);
+			} else {
+				destPath[x] = currPath;
+				x = -100;
 			}
+		}
+
+		// Finished array
+		$log.debug("destPath result: ");
+		$log.debug(destPath);
+		currPath = "";
+
+		// Create folder(s)
+		for (var x = 0; x < destPath.length; x++) {
+			// Rebuilds relative path of directories
+			currPath += (destPath[x] + '/');
+			connectionList[getClusterContext()].sftp(function (err, sftp) {
+				if (err) { $log.debug(err) };		// If something happens, kills process kindly
+				// Debug to console
+				$log.debug("SFTP has begun, creating folder " + path);
 			
-			// Finished array
-			$log.debug("destPath result: ");
-			$log.debug(destPath);
-			currPath = destPath[0];			
-			
-			// Create folder(s)
-			for (var x = 0; x < destPath.length; x++) {
-				// Rebuilds relative path of directories
-				currPath += (destPath[x] + '/');
-				sftp.readdir(currPath, function(err, list) {
-					if (typeof list == 'undefined') {
-						$log.debug("Actually processing: " + path);
-						sftp.mkdir(currPath, function(err) { $log.debug(err)});
+				sftp.mkdir(currPath, function(err) {
+					if (err) {
+						$log.debug(err);
+						sftp.end();
+					} else {
+						$log.debug("SFTP :: mkdir success");
+						sftp.end();
 					}
 				});
-			}
+			
 			
 			// Debug to console
 			$log.debug("Folder " + path + " has been created");
-		})
+			});
+		}
 	}
 	
 	// Functionality to upload a file to the server
@@ -220,8 +232,15 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
 				}}, 
 				function(err){
 					// Processes errors
-					$log.debug(err);
+					if (err) {
+						$log.debug(err);
+						sftp.end();
+					} else {
+						$log.debug("SFTP :: fastPut success");
+						sftp.end();
+					}
 				});
+			
 			
 		});
 		
@@ -247,9 +266,14 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
 				}}, 
 				function(err){
 					// Processes errors
-					$log.debug(err);
+					if (err) {
+						$log.debug(err);
+						sftp.end();
+					} else {
+						$log.debug("SFTP :: fastGet success");
+						sftp.end();
+					}
 				});
-			
 		});
 		
 		return deferred.promise;
@@ -313,7 +337,7 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
 		tryKeyboard: true,
 		readyTimeout: 99999999,
 		debug: function(message) {
-		  // logger.log(message);
+		  //logger.log(message);
 		}
 	  });
 	   switch(cluster) {

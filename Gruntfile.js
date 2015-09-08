@@ -29,7 +29,7 @@ module.exports = function(grunt) {
     
     shell: {
       start_webkit: {
-        command: 'start webkitbuilds/HCCGo/win64/HCCGo.exe'
+        command: 'webkitbuilds/HCCGo/linux64/HCCGo'
       }
     },
     
