@@ -182,26 +182,26 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
 			}
 		}
 
-		// Finished array
-		$log.debug("destPath result: ");
-		$log.debug(destPath);
-		currPath = "";
+		// Creates array of folders and paths to create
+		for (var x = 1; x < destPath.length; x++) {
+			destPath[x] = (destPath[x - 1] + '/' + destPath[x]);
+		}
 
+		$log.debug(destPath);
 		// Create folder(s)
-		for (var x = 0; x < destPath.length; x++) {
+		for (var x = 1; x < destPath.length; x++) {
 			// Rebuilds relative path of directories
-			currPath += (destPath[x] + '/');
 			connectionList[getClusterContext()].sftp(function (err, sftp) {
-				if (err) { $log.debug(err) };		// If something happens, kills process kindly
 				// Debug to console
-				$log.debug("SFTP has begun, creating folder " + path);
-			
-				sftp.mkdir(currPath, function(err) {
+				$log.debug("SFTP has begun, creating folder " + destPath[x]);
+				sftp.mkdir(""+destPath[x]+"", function(err) {
 					if (err) {
+						$log.debug("SFTP :: mkdir did not finish with directory " + currPath);
 						$log.debug(err);
 						sftp.end();
 					} else {
-						$log.debug("SFTP :: mkdir success");
+						$log.debug("SFTP :: mkdir success on " + currPath);
+						$log.debug("SFTP :: mkdir :: next directory");
 						sftp.end();
 					}
 				});
