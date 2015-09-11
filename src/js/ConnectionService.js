@@ -165,10 +165,11 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
 	}
 	
 	// Creates directory on server
+	// Publicly available
 	var makeDir = function(path) {
 		var destPath = [];
 		var currPath = path;
-		var testIndex = 0;
+		var pathQueue = [];
 
 		// Loops through passed path to create array of desired folders
 		for (var x = 0; x >= 0; x++) {
@@ -178,39 +179,58 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
 				$log.debug("makeDir currPath: " + currPath);
 			} else {
 				destPath[x] = currPath;
+				pathQueue[0] = destPath[0];
 				x = -100;
 			}
 		}
 
 		// Creates array of folders and paths to create
 		for (var x = 1; x < destPath.length; x++) {
-			destPath[x] = (destPath[x - 1] + '/' + destPath[x]);
+			pathQueue.unshift((pathQueue[0] + "/" + destPath[x]));
 		}
 
-		$log.debug(destPath);
+		$log.debug(pathQueue);
+		$log.debug(x);
 		// Create folder(s)
-		for (var x = 1; x < destPath.length; x++) {
+		// destPath used as the limiter as otherwise pathQueue will shrink in size and cause the loop to end early
+		commandSem.take(function () {
+		for (var x = 0; x < destPath.length; x++) {
 			// Rebuilds relative path of directories
+			$log.debug("Value of x before connection : " + x);
+			// mkDir(destPath[x]);
 			connectionList[getClusterContext()].sftp(function (err, sftp) {
-				// Debug to console
-				$log.debug("SFTP has begun, creating folder " + destPath[x]);
-				sftp.mkdir(""+destPath[x]+"", function(err) {
+				sftp.mkdir(String(pathQueue.pop()), function(err) {
 					if (err) {
-						$log.debug("SFTP :: mkdir did not finish with directory " + currPath);
+						$log.debug("SFTP :: mkdir did not finish with directory");
 						$log.debug(err);
-						sftp.end();
 					} else {
-						$log.debug("SFTP :: mkdir success on " + currPath);
+						$log.debug("SFTP :: mkdir success on");
 						$log.debug("SFTP :: mkdir :: next directory");
-						sftp.end();
 					}
+					// Closes SFTP
+					sftp.end();
 				});
-			
-			
-			// Debug to console
-			$log.debug("Folder " + path + " has been created");
 			});
 		}
+		commandSem.leave();
+		});
+	}
+
+	// Local function to generate a folder
+	var mkDir = function (folder) {
+		connectionList[getClusterContext()].sftp(function (err, sftp) {
+			sftp.mkdir(folder, function(err) {
+				if (err) {
+					$log.debug("SFTP :: mkdir did not finish with directory " + folder);
+					$log.debug(err);
+				} else {
+					$log.debug("SFTP :: mkdir success on " + folder);
+					$log.debug("SFTP :: mkdir :: next directory");
+				}
+				// Closes SFTP
+				sftp.end();
+			});
+		});
 	}
 	
 	// Functionality to upload a file to the server
