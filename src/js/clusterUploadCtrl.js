@@ -175,7 +175,41 @@ clusterUploadModule.controller('clusterUploadCtrl', ['$scope', '$log', '$timeout
 			}
 		}
 		
-		$log.debug(getFiles(activeDir));
+		var fileDir = getFiles(activeDir);
+		$log.debug("fileDir length: " + fileDir.length);
+		// Loops through and uploads files
+		for (var z = 0; z < fileDir.length; z++) {
+			$log.debug("listing value");
+			$log.debug(listing);
+			$log.debug("fileDir value");
+			$log.debug(fileDir);
+			connectionService.uploadFile((fileDir.pop()).path, "./" + (fileDire.pop()).webkitRelativePath, function(total_transferred,chunk,total) {
+				// Callback function for progress bar
+				$log.debug("Total transferred: " + total_transferred);
+				$log.debug("Chunks: " + chunk);
+				$log.debug("Total: " + total);
+
+				// Work on progress bar
+				$scope.$apply(function(scope) {
+					$scope.progressVisible = true;
+					$scope.uploadStatus = false;
+					$scope.max = total;
+					$scope.progressValue = Math.floor((total_transferred/total)*100);
+					$scope.progressVisible = true;
+					$log.debug("Progress " + ((total_transferred/total)*100) + "%");
+
+					if($scope.progressValue == 100) {
+						$scope.progressVisible = false;
+						$scope.uploadStatus = true;
+					}
+
+				});
+			}).then(function (data) {
+				// Resets file display
+				$log.debug("File upload deferred");
+			});
+		}
+		resetFileDisplay();
 	}
 	
 	// pulling all files from a directory

@@ -197,7 +197,6 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
 		for (var x = 0; x < destPath.length; x++) {
 			// Rebuilds relative path of directories
 			$log.debug("Value of x before connection : " + x);
-			// mkDir(destPath[x]);
 			connectionList[getClusterContext()].sftp(function (err, sftp) {
 				sftp.mkdir(String(pathQueue.pop()), function(err) {
 					if (err) {
@@ -216,30 +215,15 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
 		});
 	}
 
-	// Local function to generate a folder
-	var mkDir = function (folder) {
-		connectionList[getClusterContext()].sftp(function (err, sftp) {
-			sftp.mkdir(folder, function(err) {
-				if (err) {
-					$log.debug("SFTP :: mkdir did not finish with directory " + folder);
-					$log.debug(err);
-				} else {
-					$log.debug("SFTP :: mkdir success on " + folder);
-					$log.debug("SFTP :: mkdir :: next directory");
-				}
-				// Closes SFTP
-				sftp.end();
-			});
-		});
-	}
 	
 	// Functionality to upload a file to the server
 	var uploadFile = function(localPath, remotePath, callback) {
 		var deferred = $q.defer();
-		
+		$log.debug("Local Path: " + localPath);
+		$log.debug("Remote Path: " + remotePath);
 		// Starts the connection
 		connectionList[getClusterContext()].sftp(function (err, sftp) {
-			if (err) throw err;		// If something happens, kills process kindly
+			//if (err) throw err;		// If something happens, kills process kindly
 			
 			// Process to console
 			$log.debug( "SFTP has begun");
