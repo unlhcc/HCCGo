@@ -4,10 +4,10 @@
   <div class="navbar-header">
     <a class="navbar-brand">HCC Go</a>
   </div>
-  
+
   <div class="navbar-collapse collapse navbar-responsive-collapse">
-    
-    
+
+
     <ul class="nav navbar-nav navbar-right">
       <li class="dropdown">
         <a href="javascript:void(0)" data-target="#" class="dropdown-toggle" data-toggle="dropdown"> {{username}}@{{params.clusterId}} <b class="caret"></b></a>
@@ -16,7 +16,7 @@
         </ul>
       </li>
     </ul>
-    
+
   </div>
 </div>
 
@@ -24,7 +24,7 @@
 
 
 <div class="container">
-  
+
   <div class="row">
     <div class="col-md-4">
       <div class="row">
@@ -46,29 +46,29 @@
                   <td>{{numError}}</td>
                 </tr>
               </tbody>
-              
+
             </table>
-          
-            <a href="javascript:void(0)" class="btn btn-primary btn-lg">Submit Job <i class="mdi-navigation-chevron-right"></i></a>
-          </div>
-        </div>
+            <a href="javascript:void(0)" class="btn btn-primary btn-lg" ng-click="jobSubmission()"> Submit Job <i class="mdi-navigation-chevron-right"></i></a>
+
+      </div>
+      </div>
       </div>
       <div class="row">
         <div class="card">
           <div class="col-md-12">
-            
+
             <h3>Storage Usage</h3>
-            
+
             <div id="homeUsageGauge"></div>
             <div id="workUsageGauge"></div>
           </div>
-          
+
         </div>
-        
+
       </div>
-      
+
     </div>
-    
+
     <div class="col-md-8 jobdisplay">
       <div class="card">
         <input type="search" ng-model="q" placeholder="filter jobs..." />
@@ -92,15 +92,15 @@
               </div>
             </div>
             <hr />
-            
+
           </li>
-          
+
         </ul>
-        
+
       </div>
     </div>
-    
+
   </div>
-  
-  
+
+
 </div>
