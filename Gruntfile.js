@@ -7,8 +7,8 @@ module.exports = function(grunt) {
     nwjs: {
        options: {
        	build_dir: './webkitbuilds',
-		platforms: ['osx','linux','win'],
-		version: '0.12.3'
+        platforms: ['osx','linux','win'],
+        version: '0.12.3'
        },
        src: ['src/**']
 
@@ -40,7 +40,7 @@ module.exports = function(grunt) {
           layout: 'byComponent',
           install: true,
           verbose: true,
-		  cleanTargetDir: true
+          cleanTargetDir: true
         }
       }
     }
