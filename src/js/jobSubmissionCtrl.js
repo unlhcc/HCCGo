@@ -37,6 +37,7 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
         tmp.label = module;
         modArray.push(tmp);
       });
+
       modArray.sort();
       $scope.modules = modArray;
       deferred.resolve($scope.modules);
@@ -102,7 +103,8 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
     console.log(job.commands);
     // Send data to ConnectionService for file upload
     connectionService.uploadJobFile(jobFile, job.location).then(function (data) {
-      // Do something
+      connectionService.submitJob(job.location);
+      $location.path("cluster/" + $scope.params.clusterId);
     });
   }
 
