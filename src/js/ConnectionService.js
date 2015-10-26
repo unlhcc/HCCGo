@@ -109,14 +109,21 @@ connectionModule.factory('connectionService',['$log', '$q', function($log, $q) {
 
       // Does the thing
       writeStream.write(jobFile);
-      /*runCommand('sbatch ' + remotePath).then(function(data) {
-          deferred.resolve();
-      }*/
       deferred.resolve();
     });
 
     return deferred.promise;
   }
+
+  var submitJob = function(location) {
+      var deferred = $q.defer();
+
+      runCommand('sbatch ' + location).then(function(data) {
+          deferred.resolve();
+      })
+      return deferred.promise;
+  }
+
   var test = function() {
     alert("Success");
   }
@@ -125,6 +132,7 @@ connectionModule.factory('connectionService',['$log', '$q', function($log, $q) {
     runCommand: runCommand,
     getUsername: getUsername,
     uploadJobFile: uploadJobFile,
+    submitJob: submitJob,
     initiateConnection: function initiateConnection(username, password, hostname, logger, needInput, completed) {
 
       var Client = require('ssh2').Client;
