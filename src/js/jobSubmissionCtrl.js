@@ -78,14 +78,14 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
       "#SBATCH --mem-per-cpu=" + job.memory + "\n" +
       "#SBATCH --job-name=" + job.jobname + "\n" +
       "#SBATCH --error=" + job.error + "\n" +
-      "#SBATCH --output=" + job.output + "\n\n";
-      if(typeof job.modules !== 'undefined'){
+      "#SBATCH --output=" + job.output + "\n";
+      if(job.modules != null){
           for(var i = 0; i < job.modules.length; i++) {
-              jobFile += "module load " + job.modules[i] + "\n";
+              jobFile += "\nmodule load " + job.modules[i];
           }
       }
 
-      jobFile += "\n" + job.commands;
+      jobFile += "\n" + job.commands + "\n";
 
     console.log("The generated file:\n")
     console.log("#!/bin/sh\n");
@@ -93,19 +93,21 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
     console.log("#SBATCH --mem-per-cpu=" + job.memory + "\n");
     console.log("#SBATCH --job-name=" + job.jobname + "\n");
     console.log("#SBATCH --error=" + job.error + "\n");
-    console.log("#SBATCH --output=" + job.output + "\n\n");
-    if(typeof job.modules !== 'undefined'){
+    console.log("#SBATCH --output=" + job.output + "\n");
+    if(job.modules != null){
         for(var i = 0; i < job.modules.length; i++) {
-            console.log("module load " + job.modules[i] + "\n");
+            console.log("\nmodule load " + job.modules[i]);
         }
+        console.log("\n");
     }
     console.log("\n");
     console.log(job.commands);
+    console.log("\n");
     // Send data to ConnectionService for file upload
     connectionService.uploadJobFile(jobFile, job.location).then(function (data) {
-      connectionService.submitJob(job.location);
       $location.path("cluster/" + $scope.params.clusterId);
     });
+    connectionService.submitJob(job.location);
   }
 
 
