@@ -8,11 +8,11 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
   
   function getClusterStats(clusterId) {
     
-	// Navigational controls
-	$scope.goToUpload = function() {
-		$location.path("/cluster/" + $routeParams.clusterId + "/upload");
-	};
-	
+   // Navigational controls
+   $scope.goToUpload = function() {
+      $location.path("/cluster/" + $routeParams.clusterId + "/upload");
+   };
+   
     // Query the connection service for the cluster
     clusterInterface.getJobs().then(function(data) {
       // Process the data

@@ -12,8 +12,8 @@ welcomeModule.controller('welcomeCtrl', ['$scope', '$log', '$timeout', 'connecti
     selectOnTab: true,
     render: {
       'option': function(data, escape) {
-  		    return '<div><span class="clusterLabel">' + escape(data.label) + '</span>' + '<span class="url">' + escape(data.url) + '</span></div>';
-    	 },
+            return '<div><span class="clusterLabel">' + escape(data.label) + '</span>' + '<span class="url">' + escape(data.url) + '</span></div>';
+        },
        'option_create': function(data, escape) {
          return '<div class="create">Hostname: <strong>' +  escape(data.input) + '</strong>&hellip;</div>';
        }
@@ -67,7 +67,7 @@ welcomeModule.controller('welcomeCtrl', ['$scope', '$log', '$timeout', 'connecti
         } else {
           
           $location.path("/cluster/" + $scope.selectedCluster.label);
-		  $log.debug("Cluster label: " + $scope.selectedCluster.label);
+        $log.debug("Cluster label: " + $scope.selectedCluster.label);
           
         }
         
