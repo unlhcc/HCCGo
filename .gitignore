@@ -8,4 +8,5 @@ webkitbuilds/*
 
 src/css/application.css
 bower_components/*
-src/lib/*node_modules/
+src/lib/*
+node_modules/
