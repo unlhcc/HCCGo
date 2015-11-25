@@ -218,7 +218,6 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
    
    // Functionality to upload a file to the server
    var uploadFile = function(localPath, remotePath, callback) {
-      var deferred = $q.defer();
       $log.debug("Local Path: " + localPath);
       $log.debug("Remote Path: " + remotePath);
       // Starts the connection
@@ -248,7 +247,7 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
          
       });
       
-      return deferred.promise;
+      return 0;
    }
    
    // Functionality to download a file from the server

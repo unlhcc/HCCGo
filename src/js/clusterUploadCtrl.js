@@ -112,23 +112,9 @@ clusterUploadModule.controller('clusterUploadCtrl', ['$scope', '$log', '$timeout
 
    }
 
-   // Uploads files through SFTPStream
-   $scope.uploadFile = function() {
-
-      // Let's do some debugging
-      var index = 0;
-      var file = $scope.files[index];
-      console.log("Value of file.name: " + file.name);
-      console.log("Value of file.path: " + file.path);
-
-      // Pulls active working directory
-      var filePath = "";
-      for(var x = 0; x < $scope.wdList.length; x++) {
-         filePath += ($scope.wdList[x].path + '/');
-      }
-      
+   var uploadCall = function(local, remote) {
       // Runs file upload
-      connectionService.uploadFile(file.path, filePath + file.name, function(total_transferred,chunk,total){
+      connectionService.uploadFile(local, remote, function(total_transferred,chunk,total){
          // Callback function for progress bar
          $log.debug("Total transferred: " + total_transferred);
          $log.debug("Chunks: " + chunk);
@@ -149,11 +135,26 @@ clusterUploadModule.controller('clusterUploadCtrl', ['$scope', '$log', '$timeout
             }
          });
          
-         }).then(function (data) {
-            // Resets file display
-            $log.debug("File upload deferred");
-         }); 
-         resetFileDisplay();
+         });
+   }
+
+   // Uploads files through SFTPStream
+   $scope.uploadFile = function() {
+
+      // Let's do some debugging
+      var index = 0;
+      var file = $scope.files[index];
+      console.log("Value of file.name: " + file.name);
+      console.log("Value of file.path: " + file.path);
+
+      // Pulls active working directory
+      var filePath = "";
+      for(var x = 0; x < $scope.wdList.length; x++) {
+         filePath += ($scope.wdList[x].path + '/');
+      }
+      
+      uploadCall(file.path,filePath + file.name); 
+      resetFileDisplay();
    }
    
    // Upload entire directory
@@ -178,38 +179,19 @@ clusterUploadModule.controller('clusterUploadCtrl', ['$scope', '$log', '$timeout
       var fileDir = getFiles(activeDir);
       $log.debug("fileDir length: " + fileDir.length);
       // Loops through and uploads files
+      var holdPath = [];            // Holds queue of local file paths to upload
+      var holdwebkitPath = [];      // Holds queue of remote locations to upload too
       for (var z = 0; z < fileDir.length; z++) {
-         $log.debug("listing value");
-         $log.debug(listing);
          $log.debug("fileDir value");
          $log.debug(fileDir);
-         connectionService.uploadFile((fileDir.pop()).path, "./" + (fileDire.pop()).webkitRelativePath, function(total_transferred,chunk,total) {
-            // Callback function for progress bar
-            $log.debug("Total transferred: " + total_transferred);
-            $log.debug("Chunks: " + chunk);
-            $log.debug("Total: " + total);
-
-            // Work on progress bar
-            $scope.$apply(function(scope) {
-               $scope.progressVisible = true;
-               $scope.uploadStatus = false;
-               $scope.max = total;
-               $scope.progressValue = Math.floor((total_transferred/total)*100);
-               $scope.progressVisible = true;
-               $log.debug("Progress " + ((total_transferred/total)*100) + "%");
-
-               if($scope.progressValue == 100) {
-                  $scope.progressVisible = false;
-                  $scope.uploadStatus = true;
-               }
-
-            });
-         }).then(function (data) {
-            // Resets file display
-            $log.debug("File upload deferred");
-         });
+         $log.debug("fileDir.path: " + fileDir[z].path);
+         $log.debug("fileDir.webkitRelativePath: " + fileDir[z].webkitRelativePath);
+         holdPath.push(String(fileDir[z].path));
+         holdwebkitPath.push("./" + String(fileDir[z].webkitRelativePath));
+         uploadCall(holdPath.pop(), holdwebkitPath.pop());
       }
-      resetFileDisplay();
+         // Resets file display
+         resetFileDisplay();
    }
    
    // pulling all files from a directory
@@ -256,7 +238,7 @@ clusterUploadModule.controller('clusterUploadCtrl', ['$scope', '$log', '$timeout
       break;
    }
 
-   })
+   });
    
    // jQuery controls
    angular.element("#btnDirectory").on('click', function() {
