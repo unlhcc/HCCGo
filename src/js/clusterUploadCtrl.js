@@ -179,16 +179,17 @@ clusterUploadModule.controller('clusterUploadCtrl', ['$scope', '$log', '$timeout
       var fileDir = getFiles(activeDir);
       $log.debug("fileDir length: " + fileDir.length);
       // Loops through and uploads files
-      var holdPath = [];            // Holds queue of local file paths to upload
-      var holdwebkitPath = [];      // Holds queue of remote locations to upload too
+      //var holdPath = [];            // Holds queue of local file paths to upload
+      //var holdwebkitPath = [];      // Holds queue of remote locations to upload too
       for (var z = 0; z < fileDir.length; z++) {
          $log.debug("fileDir value");
          $log.debug(fileDir);
          $log.debug("fileDir.path: " + fileDir[z].path);
          $log.debug("fileDir.webkitRelativePath: " + fileDir[z].webkitRelativePath);
-         holdPath.push(String(fileDir[z].path));
-         holdwebkitPath.push("./" + String(fileDir[z].webkitRelativePath));
-         uploadCall(holdPath.pop(), holdwebkitPath.pop());
+         //holdPath.push(String(fileDir[z].path));
+         //holdwebkitPath.push("./" + String(fileDir[z].webkitRelativePath));
+         //uploadCall(holdPath.pop(), holdwebkitPath.pop());
+         uploadCall(String(fileDir[z].path),"./" + String(fileDir[z].webkitRelativePath));
       }
          // Resets file display
          resetFileDisplay();
@@ -199,6 +200,10 @@ clusterUploadModule.controller('clusterUploadCtrl', ['$scope', '$log', '$timeout
       var fs = require('fs');
       files_ = files_ || [];
       var files = fs.readdirSync(dir.path);
+      $log.debug("getFiles dir: ");
+      $log.debug(dir);
+      $log.debug("getFiles files: ");
+      $log.debug(files);
       var name = {path: dir.path,
                webkitRelativePath: dir.webkitRelativePath};
       for (var x = 0; x < files.length; x++) {
@@ -206,7 +211,12 @@ clusterUploadModule.controller('clusterUploadCtrl', ['$scope', '$log', '$timeout
          name.webkitRelativePath = dir.webkitRelativePath + '/' + files[x];
          if (fs.statSync(name.path).isDirectory()){
             connectionService.makeDir(getWD() + '/' + name.webkitRelativePath);
-            getFiles(name, files_);
+            var fileArray = getFiles(name, files_);
+            $log.debug("FILEARRAY CONTENT AT " + x + ": ");
+            $log.debug(fileArray);
+            /*
+            for (var y = 0; y < fileArray.length; y++)
+                files_.push(fileArray[y]);*/
          } else {
             files_.push(name);
          }

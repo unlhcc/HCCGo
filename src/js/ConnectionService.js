@@ -137,9 +137,10 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
    var readDir = function(directory) {
       var deferred = $q.defer();
       
+      commandSem.take(function () {
       // Starts SFTP session
       connectionList[getClusterContext()].sftp(function (err, sftp) {
-         if (err) throw err;      // If something happens, kills process kindly
+        if (err) throw err;      // If something happens, kills process kindly
          
          // Debug to console
          $log.debug("SFTP has begun");
@@ -156,9 +157,11 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
             }
             
             deferred.resolve(list);
+            $log.debug("READDIR COMMANDSEM LEAVE");
+            commandSem.leave();
             $log.debug(list);
          });
-
+      });
       });
       
       return deferred.promise;
@@ -197,14 +200,18 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
       for (var x = 0; x < destPath.length; x++) {
          // Rebuilds relative path of directories
          $log.debug("Value of x before connection : " + x);
+         $log.debug("length of destPath: " + destPath.length);
+         $log.debug("length of pathQueue: " + pathQueue.length);
          connectionList[getClusterContext()].sftp(function (err, sftp) {
             sftp.mkdir(String(pathQueue.pop()), function(err) {
                if (err) {
                   $log.debug("SFTP :: mkdir did not finish with directory");
                   $log.debug(err);
+                  $log.debug("MAKE DIR COMMANDSEM LEAVE");
                } else {
                   $log.debug("SFTP :: mkdir success on");
                   $log.debug("SFTP :: mkdir :: next directory");
+                  $log.debug("MAKE DIR COMMANDSEM LEAVE");
                }
                // Closes SFTP
                sftp.end();
@@ -221,6 +228,7 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
       $log.debug("Local Path: " + localPath);
       $log.debug("Remote Path: " + remotePath);
       // Starts the connection
+      commandSem.take(function() {
       connectionList[getClusterContext()].sftp(function (err, sftp) {
          //if (err) throw err;      // If something happens, kills process kindly
          
@@ -238,13 +246,15 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
                if (err) {
                   $log.debug(err);
                   sftp.end();
+                  commandSem.leave();
                } else {
                   $log.debug("SFTP :: fastPut success");
                   sftp.end();
+                  commandSem.leave();
                }
             });
-         
-         
+          
+      });
       });
       
       return 0;
