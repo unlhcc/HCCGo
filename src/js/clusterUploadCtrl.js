@@ -204,22 +204,21 @@ clusterUploadModule.controller('clusterUploadCtrl', ['$scope', '$log', '$timeout
       $log.debug(dir);
       $log.debug("getFiles files: ");
       $log.debug(files);
-      var name = {path: dir.path,
-               webkitRelativePath: dir.webkitRelativePath};
+      $log.debug("getFiles files count: " + files.length);
       for (var x = 0; x < files.length; x++) {
-         name.path = dir.path + '/' + files[x];
-         name.webkitRelativePath = dir.webkitRelativePath + '/' + files[x];
+       (function () {
+         var name = {path: dir.path + '/' + files[x],
+               webkitRelativePath: dir.webkitRelativePath + '/' + files[x]};
+         $log.debug("CLUSTERUPLOAD :: NAME :: VALUE :: ITERATION " + x);
+         $log.debug(name);
+       
          if (fs.statSync(name.path).isDirectory()){
             connectionService.makeDir(getWD() + '/' + name.webkitRelativePath);
-            var fileArray = getFiles(name, files_);
-            $log.debug("FILEARRAY CONTENT AT " + x + ": ");
-            $log.debug(fileArray);
-            /*
-            for (var y = 0; y < fileArray.length; y++)
-                files_.push(fileArray[y]);*/
+            files_ = getFiles(name, files_);
          } else {
             files_.push(name);
          }
+       }());
       }
       return files_;
    }
