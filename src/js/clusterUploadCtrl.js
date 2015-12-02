@@ -179,16 +179,11 @@ clusterUploadModule.controller('clusterUploadCtrl', ['$scope', '$log', '$timeout
       var fileDir = getFiles(activeDir);
       $log.debug("fileDir length: " + fileDir.length);
       // Loops through and uploads files
-      //var holdPath = [];            // Holds queue of local file paths to upload
-      //var holdwebkitPath = [];      // Holds queue of remote locations to upload too
       for (var z = 0; z < fileDir.length; z++) {
          $log.debug("fileDir value");
          $log.debug(fileDir);
          $log.debug("fileDir.path: " + fileDir[z].path);
          $log.debug("fileDir.webkitRelativePath: " + fileDir[z].webkitRelativePath);
-         //holdPath.push(String(fileDir[z].path));
-         //holdwebkitPath.push("./" + String(fileDir[z].webkitRelativePath));
-         //uploadCall(holdPath.pop(), holdwebkitPath.pop());
          uploadCall(String(fileDir[z].path),"./" + String(fileDir[z].webkitRelativePath));
       }
          // Resets file display
@@ -206,7 +201,6 @@ clusterUploadModule.controller('clusterUploadCtrl', ['$scope', '$log', '$timeout
       $log.debug(files);
       $log.debug("getFiles files count: " + files.length);
       for (var x = 0; x < files.length; x++) {
-       //(function () {
          var name = {path: dir.path + '/' + files[x],
                webkitRelativePath: dir.webkitRelativePath + '/' + files[x]};
          $log.debug("CLUSTERUPLOAD :: NAME :: VALUE :: ITERATION " + x);
@@ -218,7 +212,6 @@ clusterUploadModule.controller('clusterUploadCtrl', ['$scope', '$log', '$timeout
          } else {
             files_.push(name);
          }
-       //}());
       }
       return files_;
    }
