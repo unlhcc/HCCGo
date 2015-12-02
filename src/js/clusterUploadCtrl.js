@@ -206,7 +206,7 @@ clusterUploadModule.controller('clusterUploadCtrl', ['$scope', '$log', '$timeout
       $log.debug(files);
       $log.debug("getFiles files count: " + files.length);
       for (var x = 0; x < files.length; x++) {
-       (function () {
+       //(function () {
          var name = {path: dir.path + '/' + files[x],
                webkitRelativePath: dir.webkitRelativePath + '/' + files[x]};
          $log.debug("CLUSTERUPLOAD :: NAME :: VALUE :: ITERATION " + x);
@@ -218,7 +218,7 @@ clusterUploadModule.controller('clusterUploadCtrl', ['$scope', '$log', '$timeout
          } else {
             files_.push(name);
          }
-       }());
+       //}());
       }
       return files_;
    }
