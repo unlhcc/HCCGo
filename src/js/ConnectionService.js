@@ -82,7 +82,6 @@ connectionModule.factory('connectionService',['$log', '$q', function($log, $q) {
 
   // Functionality to upload a file to the server
   var uploadJobFile = function(jobFile, remotePath) {
-    var deferred = $q.defer();
     // using the 'fs' library for this, temporary until how to pass
     // process progression data is figured out
     var fs = require('fs');
@@ -109,10 +108,9 @@ connectionModule.factory('connectionService',['$log', '$q', function($log, $q) {
 
       // Does the thing
       writeStream.write(jobFile);
-      deferred.resolve();
     });
 
-    return deferred.promise;
+    return 0;
   }
 
   var submitJob = function(location) {

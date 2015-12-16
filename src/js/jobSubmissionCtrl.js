@@ -11,6 +11,10 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
 
   }
 
+  $scope.cancel = function() {
+    $location.path("cluster/" + $scope.params.clusterId);
+  }
+
   // Get the username
   function getUsername() {
 
@@ -105,8 +109,8 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
     console.log("\n");
     // Send data to ConnectionService for file upload
     connectionService.uploadJobFile(jobFile, job.location).then(function (data) {
-      $location.path("cluster/" + $scope.params.clusterId);
     });
+    $location.path("cluster/" + $scope.params.clusterId);
     connectionService.submitJob(job.location);
   }
 
