@@ -108,8 +108,7 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
     console.log(job.commands);
     console.log("\n");
     // Send data to ConnectionService for file upload
-    connectionService.uploadJobFile(jobFile, job.location).then(function (data) {
-    });
+    connectionService.uploadJobFile(jobFile, job.location);
     $location.path("cluster/" + $scope.params.clusterId);
     connectionService.submitJob(job.location);
   }
