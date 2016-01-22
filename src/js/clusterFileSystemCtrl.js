@@ -1,7 +1,7 @@
 
-clusterUploadModule = angular.module('HccGoApp.clusterUploadCtrl', ['ngRoute' ]);
+clusterUploadModule = angular.module('HccGoApp.clusterFileSystemCtrl', ['ngRoute' ]);
 
-clusterUploadModule.controller('clusterUploadCtrl', ['$scope', '$log', '$timeout', 'connectionService', '$routeParams', '$location', '$q', 'preferencesManager', function($scope, $log, $timeout, connectionService, $routeParams, $location, $q, preferencesManager) {
+clusterUploadModule.controller('clusterFileSystemCtrl', ['$scope', '$log', '$timeout', 'connectionService', '$routeParams', '$location', '$q', 'preferencesManager', function($scope, $log, $timeout, connectionService, $routeParams, $location, $q, preferencesManager) {
   
    $scope.params = $routeParams
    var clusterInterface = null;
@@ -164,15 +164,16 @@ clusterUploadModule.controller('clusterUploadCtrl', ['$scope', '$log', '$timeout
       var activeDir = { path: file.path,
                      webkitRelativePath: file.webkitRelativePath};
       
-      // Cuts the 'excess' portion off the relative path
-      for (var x = 0; x >= 0; x++) {
+      /*// Cuts the 'excess' portion off the relative path
+      var loopVal = true;
+      while (loopVal) {
          if (activeDir.webkitRelativePath.indexOf('/') != -1) {
             activeDir.webkitRelativePath = activeDir.webkitRelativePath.slice(
                activeDir.webkitRelativePath.indexOf('/') + 1, 
                activeDir.webkitRelativePath.length
                );
          } else {
-            x = -100;
+            loopVal = false;
          }
       }
       
@@ -184,8 +185,9 @@ clusterUploadModule.controller('clusterUploadCtrl', ['$scope', '$log', '$timeout
          $log.debug(fileDir);
          $log.debug("fileDir.path: " + fileDir[z].path);
          $log.debug("fileDir.webkitRelativePath: " + fileDir[z].webkitRelativePath);
-         uploadCall(String(fileDir[z].path),"./" + String(fileDir[z].webkitRelativePath));
-      }
+        // uploadCall(String(fileDir[z].path),"./" + String(fileDir[z].webkitRelativePath));
+      }*/
+         uploadCall(String(activeDir.path), "./");
          // Resets file display
          resetFileDisplay();
    }
@@ -194,6 +196,7 @@ clusterUploadModule.controller('clusterUploadCtrl', ['$scope', '$log', '$timeout
    var getFiles = function(dir, files_){
       var fs = require('fs');
       files_ = files_ || [];
+
       var files = fs.readdirSync(dir.path);
       $log.debug("getFiles dir: ");
       $log.debug(dir);
@@ -243,18 +246,26 @@ clusterUploadModule.controller('clusterUploadCtrl', ['$scope', '$log', '$timeout
    });
    
    // jQuery controls
-   angular.element("#btnDirectory").on('click', function() {
-      angular.element("#btnDirectory").removeClass('active');
-      angular.element("#btnDirectory").addClass('active');
-      angular.element("#btnFile").removeClass('active');
-   });
    
+   angular.element('input[type=radio][name=radUp]').change(function() {
+       if(this.value == 'file') {
+           angular.element("#fileToUpload").removeAttr('directory');
+           angular.element("#fileToUpload").removeAttr('webkitdirectory');
+           angular.element("#headFile").text("File to upload");
+           $log.debug("radio is file");
+       } else if (this.value == 'folder') {
+           angular.element("#fileToUpload").attr('directory', '');
+           angular.element("#fileToUpload").attr('webkitdirectory', '');
+           angular.element("#headFile").text("Folder to upload");
+           $log.debug("radio is folder");
+       }
+   });
+   /*
    angular.element("#btnFile").on('click', function() {
       angular.element("#btnDirectory").removeClass('active');
       angular.element("#btnFile").removeClass('active');
       angular.element("#btnFile").addClass('active');
-      angular.element("#btnFile").addClass('active');
    });
-  
+  */
   
 }]);

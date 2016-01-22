@@ -3,8 +3,7 @@ var app = angular.module('HccGoApp', ['HccGoApp.WelcomeCtrl',
                               'ConnectionServiceModule', 
                               'HccGoApp.clusterLandingCtrl', 
                               'PreferencesManager',
-                              'HccGoApp.clusterDownloadCtrl',
-                              'HccGoApp.clusterUploadCtrl',
+                              'HccGoApp.clusterFileSystemCtrl',
                               'HccGoApp.NavCtrl']).config([
   '$routeProvider', function($routeProvider) {
     return $routeProvider.when('/', {
@@ -13,12 +12,9 @@ var app = angular.module('HccGoApp', ['HccGoApp.WelcomeCtrl',
     }).when('/cluster/:clusterId', {
       templateUrl: 'html/clusterLanding.html',
       controller: 'clusterLandingCtrl'
-    }).when('/cluster/:clusterId/upload', {
-      templateUrl: 'html/clusterFileUpload.html',
-      controller: 'clusterUploadCtrl'
-   }).when('/cluster/:clusterId/download', {
-      templateUrl: 'html/clusterFileDownload.html',
-      controller: 'clusterDownloadCtrl'
+    }).when('/cluster/:clusterId/filesystem', {
+      templateUrl: 'html/clusterFileSystem.html',
+      controller: 'clusterFileSystemCtrl'
    }).otherwise({
       redirectTo: '/'
     });
