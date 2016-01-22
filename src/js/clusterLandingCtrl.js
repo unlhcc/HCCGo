@@ -96,7 +96,8 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
         }
 
       });
-
+      angular.element('#homeUsageGauge').prepend('<h4 class="usage text-center">/home Usage</h4>');
+      angular.element('#workUsageGauge').prepend('<h4 class="usage text-center">/work Usage</h4>');
 
     });
 

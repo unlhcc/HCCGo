@@ -12,7 +12,7 @@ connectionModule.factory('connectionService',['$log', '$q', function($log, $q) {
 
   var getConnection = function(host) {
 
-    // Check if the host exists in the conneciton list
+    // Check if the host exists in the connection list
     if( connectionList.hasOwnProperty(host)) {
       return connectionList[host];
     } else {
