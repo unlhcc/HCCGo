@@ -6,6 +6,67 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
   $scope.params = $routeParams;
   var clusterInterface = null;
 
+  // Generate empty graphs
+  var homeUsageGauge = c3.generate({
+    bindto: '#homeUsageGauge',
+    data: {
+      columns: [
+        ['Loading', 0]
+      ],
+      type: 'gauge'
+    },
+    gauge: {
+      units: 'Loading',
+      label: {
+        format: function(value, ratio) {
+            return value.toFixed(2);
+        }
+      },
+      max: 0,
+
+    },
+    color: {
+      pattern: [ '#60B044', '#F6C600', '#F97600', '#FF0000' ],
+      threshold: {
+        values: [30, 60, 90, 100]
+      }
+    },
+    size: {
+      height: 180
+    }
+
+  });
+
+  var workUsageGauge = c3.generate({
+    bindto: '#workUsageGauge',
+    data: {
+      columns: [
+        ['Loading', 0]
+      ],
+      type: 'gauge'
+    },
+    gauge: {
+      units: 'Loading',
+      label: {
+        format: function(value, ratio) {
+            return value.toFixed(2);
+        }
+      },
+      max: 0,
+
+    },
+    color: {
+      pattern: [ '#60B044', '#F6C600', '#F97600', '#FF0000' ],
+      threshold: {
+        values: [30, 60, 90, 100]
+      }
+    },
+    size: {
+      height: 180
+    }
+
+  });
+
   $scope.logout = function() {
 
     $location.path("/");
@@ -67,7 +128,7 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
 
       });
 
-      var homeUsageGauge = c3.generate({
+      var workUsageGauge = c3.generate({
         bindto: '#workUsageGauge',
         data: {
           columns: [
@@ -96,7 +157,6 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
         }
 
       });
-
 
     });
 

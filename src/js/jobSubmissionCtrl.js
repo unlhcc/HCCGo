@@ -4,6 +4,9 @@ jobSubmissionModule = angular.module('HccGoApp.jobSubmissionCtrl', ['ngRoute' ])
 jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout', 'connectionService', '$routeParams', '$location', '$q', 'preferencesManager', function($scope, $log, $timeout, connectionService, $routeParams, $location, $q, preferencesManager) {
 
   $scope.params = $routeParams;
+  $scope.location = "/work/";
+  $scope.error = "/work/";
+  $scope.output = "/work/";
 
   $scope.logout = function() {
 
@@ -108,10 +111,9 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
     console.log(job.commands);
     console.log("\n");
     // Send data to ConnectionService for file upload
-    connectionService.uploadJobFile(jobFile, job.location).then(function (data) {
-    });
-    $location.path("cluster/" + $scope.params.clusterId);
+    connectionService.uploadJobFile(jobFile, job.location);
     connectionService.submitJob(job.location);
+    $location.path("cluster/" + $scope.params.clusterId);
   }
 
 
