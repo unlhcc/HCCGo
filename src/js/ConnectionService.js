@@ -80,6 +80,19 @@ connectionModule.factory('connectionService',['$log', '$q', function($log, $q) {
 
   }
 
+  var getWork = function() {
+    var deferred = $q.defer();
+
+    runCommand('echo $WORK').then(function(data) {
+
+      deferred.resolve(data.trim());
+
+    })
+
+    return deferred.promise;
+
+  }
+
   // Functionality to upload a file to the server
   var uploadJobFile = function(jobFile, remotePath) {
     // using the 'fs' library for this, temporary until how to pass
@@ -129,6 +142,7 @@ connectionModule.factory('connectionService',['$log', '$q', function($log, $q) {
     getConnection: getConnection,
     runCommand: runCommand,
     getUsername: getUsername,
+    getWork: getWork,
     uploadJobFile: uploadJobFile,
     submitJob: submitJob,
     initiateConnection: function initiateConnection(username, password, hostname, logger, needInput, completed) {

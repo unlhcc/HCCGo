@@ -4,7 +4,11 @@ jobSubmissionModule = angular.module('HccGoApp.jobSubmissionCtrl', ['ngRoute' ])
 jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout', 'connectionService', '$routeParams', '$location', '$q', 'preferencesManager', function($scope, $log, $timeout, connectionService, $routeParams, $location, $q, preferencesManager) {
 
   $scope.params = $routeParams;
-  $scope.job = {location: '/work/', error: '/work/', output: '/work/'};
+
+  connectionService.getWork().then(function(workPath) {
+    workPath = workPath + "/";
+    $scope.job = {location: workPath, error: workPath, output: workPath};
+  });
 
   $scope.logout = function() {
 
@@ -21,7 +25,7 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
 
     connectionService.getUsername().then(function(username) {
       $scope.username = username;
-    })
+    });
 
   }
   getUsername();
