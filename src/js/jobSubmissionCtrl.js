@@ -5,7 +5,20 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
 
   $scope.params = $routeParams;
 
-  connectionService.getWork().then(function(workPath) {
+  var getWork = function() {
+    var deferred = $q.defer();
+
+    connectionService.runCommand('echo $WORK').then(function(data) {
+
+      deferred.resolve(data.trim());
+
+    })
+
+    return deferred.promise;
+
+  }
+
+  getWork().then(function(workPath) {
     workPath = workPath + "/";
     $scope.job = {location: workPath, error: workPath, output: workPath};
   });
