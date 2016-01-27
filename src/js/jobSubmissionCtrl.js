@@ -5,6 +5,7 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
 
   $scope.params = $routeParams;
 
+  // get path to work directory
   var getWork = function() {
     var deferred = $q.defer();
 
