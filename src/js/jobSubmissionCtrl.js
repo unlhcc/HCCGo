@@ -4,9 +4,25 @@ jobSubmissionModule = angular.module('HccGoApp.jobSubmissionCtrl', ['ngRoute' ])
 jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout', 'connectionService', '$routeParams', '$location', '$q', 'preferencesManager', function($scope, $log, $timeout, connectionService, $routeParams, $location, $q, preferencesManager) {
 
   $scope.params = $routeParams;
-  $scope.location = "/work/";
-  $scope.error = "/work/";
-  $scope.output = "/work/";
+
+  // get path to work directory
+  var getWork = function() {
+    var deferred = $q.defer();
+
+    connectionService.runCommand('echo $WORK').then(function(data) {
+
+      deferred.resolve(data.trim());
+
+    })
+
+    return deferred.promise;
+
+  }
+
+  getWork().then(function(workPath) {
+    workPath = workPath + "/";
+    $scope.job = {location: workPath, error: workPath, output: workPath};
+  });
 
   $scope.logout = function() {
 
@@ -23,7 +39,7 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
 
     connectionService.getUsername().then(function(username) {
       $scope.username = username;
-    })
+    });
 
   }
   getUsername();
