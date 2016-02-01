@@ -1,0 +1,47 @@
+<div class="navbar navbar-hcc">
+  <div class="navbar-header">
+    <a class="navbar-brand">HCC Go</a>
+  </div>
+
+    <div class="navbar-collapse collapse navbar-responsive-collapse">
+
+
+      <ul class="nav navbar-nav navbar-right">
+        <li class="dropdown">
+          <a href="javascript:void(0)" data-target="#" class="dropdown-toggle" data-toggle="dropdown"> {{username}}@{{params.clusterId}} <b class="caret"></b></a>
+          <ul class="dropdown-menu">
+            <li><a ng-click="logout()">Logout</a></li>
+          </ul>
+        </li>
+      </ul>
+
+    </div>
+</div>
+
+<div class="container">
+    <div class="well clearfix">
+      <h2 class="text-center"> Job History </h2>
+      <form class="form-horizontal" id="jobhistory" name="jobhistory" role="form" novalidate>
+        <label for="history" class="control-label">Load an old job</label>
+        <div class="panel-group" id="accordion">
+           <div class="panel panel-default" ng-repeat="job in jobs">
+             <div class="panel-heading jobhistory">
+               <h4 class="panel-title jobhistory">
+                 <!-- TODO: fix collapse binding and add in rest of job information -->
+                 <button class="btn btn-link btn-block jobhistory" data-toggle="collapse" data-parent="#accordion" href="#collapse1">
+                   {{ job.jobname }}
+                   <small class="pull-right"> {{ job.timestamp }} </small>
+                 </button>
+               </h4>
+             </div>
+             <div id="collapse1" class="panel-collapse collapse">
+               <div class="panel-body">Lorem ipsum dolor sit amet, consectetur adipisicing elit,
+               sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+               quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</div>
+             </div>
+           </div>
+         </div>
+        <button type="button" class="btn btn-primary pull-right" ng-click="loadDefault()">Create New Job</button>
+      </form>
+    </div>
+</div>

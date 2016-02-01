@@ -71,13 +71,13 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
 
   // Selectize field for selecting modules
   var $select = $('#modules').selectize({
-      plugins: ['remove_button'],
-      labelField: 'label',
-      searchField: 'label',
-      valueField: 'label',
-      maxItems: 30,
-      delimiter: ',',
-      selectOnTab: true,
+    plugins: ['remove_button'],
+    labelField: 'label',
+    searchField: 'label',
+    valueField: 'label',
+    maxItems: 30,
+    delimiter: ',',
+    selectOnTab: true,
   });
 
   var selectize = $select[0].selectize;
