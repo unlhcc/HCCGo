@@ -21,6 +21,18 @@ jobHistoryModule.controller('jobHistoryCtrl', ['$scope', '$log', '$timeout', 'co
 
   }
 
+  $scope.loadDefault = function() {
+
+    $location.path("cluster/" + $scope.params.clusterId + "/jobSubmission");
+
+  }
+
+  $scope.loadJob = function(job) {
+
+    $location.path("cluster/" + $scope.params.clusterId + "/jobSubmission");
+
+  }
+
   // load json file
   $.getJSON('data/jobHistory.json', function(json) {
     $scope.jobs = json.jobs;

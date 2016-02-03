@@ -9,18 +9,18 @@
       "output": "/work/",
       "modules": ["R/3.0"],
       "commands": "echo hello",
-      "timestamp": "1454364814"
+      "timestamp": "1454364814000"
     },
     {
-      "runtime": "3:00:00",
-      "memory": "1024",
-      "jobname": "hello-world",
+      "runtime": "5:00:00",
+      "memory": "2048",
+      "jobname": "anotherJob",
       "location": "/work/",
       "error": "/work/",
       "output": "/work/",
-      "modules": ["R/3.0"],
-      "commands": "echo hello",
-      "timestamp": "1454364814"
+      "modules": ["R/3.0", "R/3.1"],
+      "commands": "echo hello \n echo goodbye",
+      "timestamp": "1354364814000"
     }
   ]
 }

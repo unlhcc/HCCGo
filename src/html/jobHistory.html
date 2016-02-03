@@ -22,22 +22,28 @@
     <div class="well clearfix">
       <h2 class="text-center"> Job History </h2>
       <form class="form-horizontal" id="jobhistory" name="jobhistory" role="form" novalidate>
-        <label for="history" class="control-label">Load an old job</label>
         <div class="panel-group" id="accordion">
            <div class="panel panel-default" ng-repeat="job in jobs">
              <div class="panel-heading jobhistory">
                <h4 class="panel-title jobhistory">
-                 <!-- TODO: fix collapse binding and add in rest of job information -->
-                 <button class="btn btn-link btn-block jobhistory" data-toggle="collapse" data-parent="#accordion" href="#collapse1">
+                 <button class="btn btn-link btn-block jobhistory" data-toggle="collapse" data-parent="#accordion" ng-attr-href="{{ '#collapse' + $index }}">
                    {{ job.jobname }}
-                   <small class="pull-right"> {{ job.timestamp }} </small>
+                   <small class="pull-right"> {{ job.timestamp | date:'M-d-yyyy' }} </small>
+                   <button class="btn btn-sm btn-info" style="display: inline-block" ng-click="loadJob(job)">Load Job</button>
                  </button>
                </h4>
              </div>
-             <div id="collapse1" class="panel-collapse collapse">
-               <div class="panel-body">Lorem ipsum dolor sit amet, consectetur adipisicing elit,
-               sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
-               quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</div>
+             <div ng-attr-id="{{ 'collapse' + $index}}" class="panel-collapse collapse">
+               <div class="panel-body">
+                 <p> Runtime: {{ job.runtime }} </p>
+                 <p> Memory: {{ job.memory }} </p>
+                 <p> Jobname: {{ job.jobname }} </p>
+                 <p> Location: {{ job.location }} </p>
+                 <p> Error: {{ job.error }} </p>
+                 <p> Output: {{ job.output }} </p>
+                 <p> Modules: <span ng-repeat="module in job.modules"> {{module}} </span></p>
+                 <p> Commands: {{ job.commands }} </p>
+               </div>
              </div>
            </div>
          </div>
