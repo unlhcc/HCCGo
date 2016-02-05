@@ -184,27 +184,17 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
 	  var exists = false;
          
       
-      var mkdir = function(dir) {   
-      
-          connectionList[getClusterContext()].sftp(function (err, sftp) {
-             sftp.mkdir(dir, function(err){
-                  if (err) {
-                      $log.debug("MKDIR :: SFTP :: FOLDER :: " + dir);
-                      $log.debug("MKDIR :: SFTP :: ");
-                      $log.debug(err);
-                  }
+      connectionList[getClusterContext()].sftp(function (err, sftp) {
+          var mkdir = function(dir, callback) {   
+              sftp.mkdir(dir, function(err){
                   callback(err);
-                  sftp.end();
-                  
               });
-          });
-      };
+          };
 
           async.until(function() {
               return exists;
           }, function(done) {
 
-            connectionList[getClusterContext()].sftp(function (err, sftp) {
               sftp.stat(dir, function(err, attr) {
                   if (err) {
                       $log.debug("STAT :: SFTP :: " + dir);
@@ -214,18 +204,20 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
                       exists = true;
                   }
                   callback(err);
-                  sftp.end();
                   done();
               });
-            });
           }, function(err) {
+              sftp.end();
+
               if (err) {
                   callback(err);
               } else {
-                  async.eachSeries(dirs.reverse(), mkdir, callback);
-                  
+                  async.eachSeries(dirs.reverse(), mkdir, function(err){
+                      callback(err);
+                  });
               }
           });
+      });
    }
    
    // Functionality to upload a file to the server
@@ -279,9 +271,9 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
                  $log.debug(err);
               }
               commandSem.leave();
+              return;
           });
       });
-      return 0;
    }
   
 var uploadFile = function (src, dest, callback) {
