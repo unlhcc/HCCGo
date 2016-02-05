@@ -193,6 +193,7 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
                       $log.debug("MKDIR :: SFTP :: ");
                       $log.debug(err);
                   }
+                  callback(err);
                   sftp.end();
                   
               });
@@ -212,6 +213,7 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
                   } else {
                       exists = true;
                   }
+                  callback(err);
                   sftp.end();
                   done();
               });
@@ -231,6 +233,7 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
       $log.debug("Local Path: " + localPath);
       $log.debug("Remote Path: " + remotePath);
       // Starts the connection
+      commandSem.take(function() {
          async.waterfall([
              function(callback) {
                  fs.stat(localPath, callback);
@@ -239,9 +242,10 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
                  if (stat.isDirectory()) return callback(new Error('Can not upload a directory'));
                  
                  // Get the attributes of the source directory
-                 fs.stat(path.dirname('./' + remotePath), function(err, dirStat) {
-                     makeDir(path.dirname('./' + remotePath));
-                     callback(err, stat);
+                 fs.stat(path.dirname(localPath), function(err, dirStat) {
+                     makeDir(path.dirname('./' + remotePath), function(err) {
+                         callback(err, stat);
+                     });
                  });
              },
              function(stat, callback) {
@@ -251,9 +255,8 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
              $log.debug( "Value of remotePath: " + remotePath );
          
              // Setting the I/O streams
-
              connectionList[getClusterContext()].sftp(function (err, sftp) {
-             if (err) throw err;      // If something happens, kills process kindly
+             //if (err) throw err;      // If something happens, kills process kindly
              sftp.fastPut(localPath, './' + remotePath, {step:function(total_transferred,chunk,total){
                    callback(total_transferred, chunk, total)
                 }}, 
@@ -262,9 +265,11 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
                    if (err) {
                       $log.debug(err);
                       sftp.end();
+                      callback(err);
                    } else {
                       $log.debug("SFTP :: fastPut success");
                       sftp.end();
+                      callback(null);
                    }
                 });
               });
@@ -273,7 +278,9 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
               if(err) {
                  $log.debug(err);
               }
+              commandSem.leave();
           });
+      });
       return 0;
    }
   
@@ -281,7 +288,6 @@ var uploadFile = function (src, dest, callback) {
 
   var _upload = function(files, callback) {
     var rootdir = files[0];
-
     async.eachSeries(files, function(fpath, done) {
       fs.stat(fpath, function(err, stats) {
         if (err) {
