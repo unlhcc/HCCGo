@@ -21,6 +21,10 @@ jobHistoryModule.controller('jobHistoryCtrl', ['$scope', '$log', '$timeout', 'co
 
   }
 
+  $scope.cancel = function() {
+    $location.path("cluster/" + $scope.params.clusterId);
+  }
+
   $scope.loadDefault = function() {
 
     $location.path("cluster/" + $scope.params.clusterId + "/jobSubmission");

@@ -26,10 +26,13 @@
            <div class="panel panel-default" ng-repeat="job in jobs">
              <div class="panel-heading jobhistory">
                <h4 class="panel-title jobhistory">
-                 <button class="btn btn-link btn-block jobhistory" data-toggle="collapse" data-parent="#accordion" ng-attr-href="{{ '#collapse' + $index }}">
-                   {{ job.jobname }}
-                   <small class="pull-right"> {{ job.timestamp | date:'M-d-yyyy' }} </small>
-                   <button class="btn btn-sm btn-info" style="display: inline-block" ng-click="loadJob(job)">Load Job</button>
+                 {{ job.jobname }}
+                 <span class="pull-right">
+                   <small class="jobdate"> {{ job.timestamp | date:'M-d-yyyy' }} </small>
+                   <button class="btn btn-sm btn-info" ng-click="loadJob(job)">Load Job</button>
+                 </span>
+                 <button class="btn btn-block jobhistory" data-toggle="collapse" data-parent="#accordion" ng-attr-href="{{ '#collapse' + $index }}">
+                   <span class="text-lowercase">click to expand</span> <span class="caret"></span>
                  </button>
                </h4>
              </div>
@@ -47,6 +50,7 @@
              </div>
            </div>
          </div>
+        <button type="button" class="btn btn-info" ng-click="cancel()">Cancel</button>
         <button type="button" class="btn btn-primary pull-right" ng-click="loadDefault()">Create New Job</button>
       </form>
     </div>
