@@ -1,7 +1,7 @@
 
-jobSubmissionModule = angular.module('HccGoApp.jobSubmissionCtrl', ['ngRoute' ]);
+jobSubmissionModule = angular.module('HccGoApp.jobSubmissionCtrl', ['ngRoute', 'toastr' ]);
 
-jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout', 'connectionService', '$routeParams', '$location', '$q', 'preferencesManager', 'jobService', function($scope, $log, $timeout, connectionService, $routeParams, $location, $q, preferencesManager, jobService) {
+jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout', 'connectionService', '$routeParams', '$location', '$q', 'preferencesManager', 'toastr', 'jobService', function($scope, $log, $timeout, connectionService, $routeParams, $location, $q, preferencesManager, toastr, jobService) {
 
   $scope.params = $routeParams;
 
@@ -158,7 +158,7 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
     $.getJSON('data/jobHistory.json', function(json) {
       jsonFile = json;
     });
-    
+
     var now = Date.now();
     // updating job history
     if(loadedJob != null) {
@@ -182,6 +182,7 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
       localStorage.setItem('data/jobHistory.json', JSON.stringify(jsonFile));
     }
     $location.path("cluster/" + $scope.params.clusterId);
+    toastr.success('Your job was succesfully submitted to the cluster!', 'Job Submitted!');
   }
 
 
