@@ -1,7 +1,22 @@
 
 jobHistoryModule = angular.module('HccGoApp.jobHistoryCtrl', ['ngRoute' ]);
 
-jobHistoryModule.controller('jobHistoryCtrl', ['$scope', '$log', '$timeout', 'connectionService', '$routeParams', '$location', '$q', 'preferencesManager', function($scope, $log, $timeout, connectionService, $routeParams, $location, $q, preferencesManager) {
+jobHistoryModule.service('jobService', function() {
+
+  var job = null;
+
+  return {
+    getJob: function() {
+      var temp = job;
+      job = null;
+      return temp;
+    },
+    setJob: function(value) {
+      job = value;
+    }
+  };
+
+}).controller('jobHistoryCtrl', ['$scope', '$log', '$timeout', 'connectionService', '$routeParams', '$location', '$q', 'preferencesManager', 'jobService', function($scope, $log, $timeout, connectionService, $routeParams, $location, $q, preferencesManager, jobService) {
 
   $scope.params = $routeParams;
 
@@ -33,6 +48,7 @@ jobHistoryModule.controller('jobHistoryCtrl', ['$scope', '$log', '$timeout', 'co
 
   $scope.loadJob = function(job) {
 
+    jobService.setJob(job);
     $location.path("cluster/" + $scope.params.clusterId + "/jobSubmission");
 
   }

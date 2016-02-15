@@ -1,7 +1,7 @@
 
 jobSubmissionModule = angular.module('HccGoApp.jobSubmissionCtrl', ['ngRoute' ]);
 
-jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout', 'connectionService', '$routeParams', '$location', '$q', 'preferencesManager', function($scope, $log, $timeout, connectionService, $routeParams, $location, $q, preferencesManager) {
+jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout', 'connectionService', '$routeParams', '$location', '$q', 'preferencesManager', 'jobService', function($scope, $log, $timeout, connectionService, $routeParams, $location, $q, preferencesManager, jobService) {
 
   $scope.params = $routeParams;
 
@@ -19,11 +19,26 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
 
   }
 
-  getWork().then(function(workPath) {
-    workPath = workPath + "/";
-    $scope.job = {location: workPath, error: workPath, output: workPath};
-  });
+  var loadedJob = jobService.getJob();
 
+  if(loadedJob == null) {
+    getWork().then(function(workPath) {
+      workPath = workPath + "/";
+      $scope.job = {location: workPath, error: workPath, output: workPath};
+    });
+  }
+  else {
+    $scope.job =
+    {
+      runtime: loadedJob.runtime,
+      memory: loadedJob.memory,
+      jobname: loadedJob.jobname,
+      location: loadedJob.location,
+      error: loadedJob.error,
+      output: loadedJob.output,
+      commands: loadedJob.commands
+    };
+  }
   $scope.logout = function() {
 
     $location.path("/");
@@ -85,6 +100,11 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
   // Add options
   getModules().then(function(modules) {
     selectize.addOption(modules);
+    if(loadedJob != null) {
+      for (var i = 0; i < loadedJob.modules.length; i++) {
+        selectize.addItem(loadedJob.modules[i])
+      }
+    }
     selectize.refreshOptions(false);
     selectize.refreshItems();
   });
@@ -110,25 +130,57 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
 
       jobFile += "\n" + job.commands + "\n";
 
-    console.log("The generated file:\n")
-    console.log("#!/bin/sh\n");
-    console.log("#SBATCH --time=" + job.runtime + "\n");
-    console.log("#SBATCH --mem-per-cpu=" + job.memory + "\n");
-    console.log("#SBATCH --job-name=" + job.jobname + "\n");
-    console.log("#SBATCH --error=" + job.error + "\n");
-    console.log("#SBATCH --output=" + job.output + "\n");
-    if(job.modules != null){
-        for(var i = 0; i < job.modules.length; i++) {
-            console.log("\nmodule load " + job.modules[i]);
-        }
-        console.log("\n");
-    }
-    console.log("\n");
-    console.log(job.commands);
-    console.log("\n");
+    // Debug for job file generation
+    // console.log("The generated file:\n")
+    // console.log("#!/bin/sh\n");
+    // console.log("#SBATCH --time=" + job.runtime + "\n");
+    // console.log("#SBATCH --mem-per-cpu=" + job.memory + "\n");
+    // console.log("#SBATCH --job-name=" + job.jobname + "\n");
+    // console.log("#SBATCH --error=" + job.error + "\n");
+    // console.log("#SBATCH --output=" + job.output + "\n");
+    // if(job.modules != null){
+    //     for(var i = 0; i < job.modules.length; i++) {
+    //         console.log("\nmodule load " + job.modules[i]);
+    //     }
+    //     console.log("\n");
+    // }
+    // console.log("\n");
+    // console.log(job.commands);
+    // console.log("\n");
+
     // Send data to ConnectionService for file upload
     connectionService.uploadJobFile(jobFile, job.location);
+    // TODO: use promises to monitor upload/submission success
     connectionService.submitJob(job.location);
+
+    // load json file
+    var jsonFile;
+    $.getJSON('data/jobHistory.json', function(json) {
+      jsonFile = json;
+    });
+    
+    var now = Date.now();
+    // updating job history
+    if(loadedJob != null) {
+      jsonFile.jobs[loadedJob.index].timestamp = now;
+    }
+    else {
+      var newId = jobs[jobs.length-1].id + 1;
+      var newJob = {
+        "id": newId,
+        "runtime": job.runtime,
+        "memory": job.memory,
+        "jobname": job.jobname,
+        "location": job.location,
+        "error": job.error,
+        "output": job.output,
+        "modules": ((job.modules != null) ? job.modules : []),
+        "commands": job.commands,
+        "timestamp": now
+      }
+      jsonFile.jobs.push(newJob);
+      localStorage.setItem('data/jobHistory.json', JSON.stringify(jsonFile));
+    }
     $location.path("cluster/" + $scope.params.clusterId);
   }
 
