@@ -1,7 +1,7 @@
 
-jobSubmissionModule = angular.module('HccGoApp.jobSubmissionCtrl', ['ngRoute' ]);
+jobSubmissionModule = angular.module('HccGoApp.jobSubmissionCtrl', ['ngRoute', 'toastr' ]);
 
-jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout', 'connectionService', '$routeParams', '$location', '$q', 'preferencesManager', function($scope, $log, $timeout, connectionService, $routeParams, $location, $q, preferencesManager) {
+jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout', 'connectionService', '$routeParams', '$location', '$q', 'preferencesManager', 'toastr', function($scope, $log, $timeout, connectionService, $routeParams, $location, $q, preferencesManager, toastr) {
 
   $scope.params = $routeParams;
 
@@ -130,6 +130,7 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
     connectionService.uploadJobFile(jobFile, job.location);
     connectionService.submitJob(job.location);
     $location.path("cluster/" + $scope.params.clusterId);
+    toastr.success('Your job was succesfully submitted to the cluster!', 'Job Submitted!');
   }
 
 
