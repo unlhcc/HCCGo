@@ -18,6 +18,8 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
    var fs = require('fs');
    $log.debug(connectionList);
 
+   var homeWD, workWD;
+
    /**
    * To initiate ssh connections to remote clusters.
    *
@@ -141,6 +143,20 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
       return deferred.promise;
     
    }
+
+   var getHomeWD = function() {
+     runCommand('echo $HOME').then(function(data) {
+         $log.debug("Home dir: " + data);
+         return data.trim();
+     });
+   }
+
+   var getWorkWD = function() {
+     runCommand('echo $WORK').then(function(data) {
+         $log.debug("Word dir: " + data);
+         return data.trim();
+     });
+   }
     
    // Reads filesystem directory on server
    var readDir = function(directory) {
@@ -178,24 +194,19 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
    
    // Creates directory on server
    // Publicly available
-   var makeDir = function(dir, callback) {
-      var dirs = [];
+   var makeDir = function(dirList, root, callback) {
       var attrs = {mode: '0775'};
-	  var exists = false;
-         
-      
-      connectionList[getClusterContext()].sftp(function (err, sftp) {
-          var mkdir = function(dir, callback) {   
-              sftp.mkdir(dir, function(err){
-                  callback(err);
-              });
-          };
 
+      connectionList[getClusterContext()].sftp(function (err, sftp) {
+      async.eachSeries(dirList, function(dir, done) {
+          var dirs = [];
+	      var exists = false;
+          dir = './' + path.basename(root) + '/' + path.relative(root,dir);
+          $log.debug("Creating folder: " + dir);
           async.until(function() {
               return exists;
-          }, function(done) {
-
-              sftp.stat(dir, function(err, attr) {
+          }, function(innerDone) {
+              sftp.stat(dir, function(err, stats) {
                   if (err) {
                       $log.debug("STAT :: SFTP :: " + dir);
                       dirs.push(dir);
@@ -203,145 +214,121 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
                   } else {
                       exists = true;
                   }
-                  callback(err);
-                  done();
+                  innerDone();
               });
           }, function(err) {
-              sftp.end();
-
               if (err) {
-                  callback(err);
+                  done(err)
               } else {
-                  async.eachSeries(dirs.reverse(), mkdir, function(err){
-                      callback(err);
+                  async.eachSeries(dirs.reverse(), function(curr, mkdone) {
+                      sftp.mkdir(curr, function(err) {
+                          if(err) $log.debug("curr: " + curr);
+                          mkdone(err);
+                      });
+                  }, function(err){
+                      done(err);
                   });
               }
           });
+      }, function(err) {
+              sftp.end();
+              callback(err);
+      });
       });
    }
+
+    var cp2remote = function (local, remote, callback) {
+        
+};
+
    
-var uploadFile = function (src, dest, callback) {
+    var uploadFile = function (src, dest, callback) {
 
-  var _upload = function(files, callback) {
-    var rootdir = files[0];
-
-    connectionList[getClusterContext()].sftp(function (err, sftp) {
-    async.eachSeries(files, function(fpath, done) {
-      fs.stat(fpath, function(err, stats) {
-        if (err) {
-          $log.debug("fs.stat eachSeries error: " + err.message);
-          done(err);
-          return;
-        }
-        if (stats.isFile()) {
-          var fname = path.relative(rootdir, fpath);
-          $log.debug("Local Path: " + fpath);
-          $log.debug("Remote Path: " + './' + path.join(dest, fname));
-          // Starts the connection
-          //commandSem.take(function() {
-          async.waterfall([
-             function(callback) {
-                 fs.stat(fpath, callback);
-             },
-             function(stat, callback) {
-                 if (stat.isDirectory()) return callback(new Error('Can not upload a directory'));
-                 
-                 // Get the attributes of the source directory
-                 fs.stat(path.dirname(fpath), function(err, dirStat) {
-                     makeDir(path.dirname('./' + path.join(dest, fname)), function(err) {
-                         callback(err, stat);
+        var localFiles = []; 
+        var mkFolders = [];
+        var BFSFolders = function(currDir, callback) {
+            //Recursively builds directory structure
+            fs.readdir(currDir, function(err, files) {
+                async.each(files, function(file, callback) {
+                     fs.stat(currDir + '/' + file, function(err, stats) {
+                         if(err){
+                             callback(err);
+                         } else if (stats.isFile()) {
+                             localFiles.push(currDir + '/' + file);
+                             callback(err);
+                         } else if (stats.isDirectory()) {
+                             if (mkFolders.indexOf(currDir) > -1) {
+                                 mkFolders[mkFolders.indexOf(currDir)] = currDir + '/' + file;
+                             } else {
+                                 mkFolders.push(currDir + '/' + file);
+                             }
+                             BFSFolders(currDir + '/' + file, function(err) {
+                                 callback(err);
+                             });
+                         }
                      });
-                 });
-             },
-             function(stat, callback) {
-                 // Process to console
-                 $log.debug( "SFTP has begun");
-                 $log.debug( "Value of localPath: " + fpath );
-                 $log.debug( "Value of remotePath: " + path.join(dest, fname) );
-         
-                 // Setting the I/O streams
-                 //connectionList[getClusterContext()].sftp(function (err, sftp) {
-                 //if (err) throw err;      // If something happens, kills process kindly
-                 sftp.fastPut(fpath, './' + path.join(dest, fname), {step:function(total_transferred,chunk,total){
-                       callback(total_transferred, chunk, total)
-                    }}, 
-                    function(err){
-                       // Processes errors
-                       if (err) {
-                          $log.debug(err);
-                          //sftp.end();
-                          callback(err);
-                       } else {
-                          $log.debug("SFTP :: fastPut success");
-                          //sftp.end();
-                          callback(null);
-                       }
-                    });
-                  //});
-                 }
-              ], function(err) {
-                  if(err) {
-                     $log.debug(err);
-                  }
-                  done();
-                  //commandSem.leave();
-              });
-          //});
-
-        } else {
-          done();
+                }, function(err) {
+                    callback(err);
+                });
+            });
         }
-      });
-    }, function(err) {
-      // never forget to close the session
-      if (err) {
-          $log.debug("_upload error: ");
-          $log.debug(err);
-      }
-      sftp.end();
-      callback(err);
-    });
-    });
-  };
-  
-  if (src.indexOf('*') === -1) {
-    $log.debug("FileUpload block inside if statement executed");
-    $log.debug("Content of src: " + src);
-    $log.debug("Content of dest: " + dest);
-    fs.stat(src, function(err, stats) {
-      if (err) {
-        callback(err);
-        return;
-      }
-      if (stats.isFile()) {
-        $log.debug("IS A FILE");
-        cp2remote(src, dest, callback);
-      } else if (stats.isDirectory()) {
-        $log.debug("IS A FOLDER");
-        glob(src.replace(/\/$/, '') + '/**/**', function(err, files) {
-          if (err) {
-            $log.debug("IS A FOLDER PROBLEM: " + err);
-            callback(err);
-          } else {
-            $log.debug("IS A FOLDER FILES: ");
-            $log.debug(files);
-            _upload(files, callback);
-          }
-        });
-      } else {
-        callback('unsupported');
-      }
-    });
-  } else {
-    glob(src, function(err, files) {
-      if (err) {
-        callback(err);
-        return;
-      }
-      _upload(files, callback);
-    });
-  }
-}
+        // Starts the connection
+        async.waterfall([
+            function(callback) {
+               fs.stat(src.replace(/\/$/, ''), function(err, stats){
+                   if(stats.isDirectory()){
+                       BFSFolders(src.replace(/\/$/, ''), function(err) {
+                           $log.debug("New Folders: ");
+                           $log.debug(mkFolders);
+                           callback(err);
+                       });
+                   } else if (stats.isFile()) {
+                       
+                   }
+               });
+            },
+            function(callback) {      
+               // Get the attributes of the source directory
+               makeDir(mkFolders, src, function(err) {
+                   callback(err);
+               });
+            },
+            function(callback) {
+               // Setting the I/O streams
+
+               connectionList[getClusterContext()].sftp(function (err, sftp) {
+               async.eachSeries(localFiles, function(file, done) {
+                  // Process to console
+                  $log.debug( "SFTP has begun");
+                  $log.debug( "Value of localPath: " + file );
+               
+                  sftp.fastPut(file, './' + path.basename(src) + '/' + path.relative(src,file), {step:function(total_transferred,chunk,total){
+                       callback(total_transferred, chunk, total)
+                  }}, 
+                  function(err){
+                    // Processes errors
+                    if (err) {
+                       $log.debug("upload error: " + file);
+                       $log.debug(err);
+                       done(err);
+                    } else {
+                       $log.debug("SFTP :: fastPut success");
+                       done(null);
+                    }
+                  });
+               }, function(err) {
+                  sftp.end();
+                  callback(err);
+               });
+               });
+            }], 
+            function(err) {
+                if(err) {
+                    $log.debug(err);
+                }
+       });
+
+    }
 
 
    
@@ -390,7 +377,6 @@ var uploadFile = function (src, dest, callback) {
      
      var Client = require('ssh2').Client;
      var conn = new Client();
-     
      
      conn.on('ready', function() {
       completed(null);
@@ -457,8 +443,7 @@ var uploadFile = function (src, dest, callback) {
          return false;
      }
      $log.debug(connectionList);
-     
-     
+    
    }
 
    }

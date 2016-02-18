@@ -21,7 +21,7 @@ module.exports = function(grunt) {
     },
     shell: {
       start_webkit: {
-        command: 'webkitbuilds/HCCGo/linux64/HCCGo'
+        command: 'webkitbuilds/HCCGo/linux64/HCCGo --force'
       }
     },
     bower: {
