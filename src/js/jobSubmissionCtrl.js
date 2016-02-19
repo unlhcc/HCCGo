@@ -39,6 +39,13 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
       commands: loadedJob.commands
     };
   }
+
+  // load json file
+  var jsonFile;
+  $.getJSON('data/jobHistory.json', function(json) {
+    jsonFile = json;
+  });
+
   $scope.logout = function() {
 
     $location.path("/");
@@ -130,42 +137,26 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
 
       jobFile += "\n" + job.commands + "\n";
 
-    // Debug for job file generation
-    // console.log("The generated file:\n")
-    // console.log("#!/bin/sh\n");
-    // console.log("#SBATCH --time=" + job.runtime + "\n");
-    // console.log("#SBATCH --mem-per-cpu=" + job.memory + "\n");
-    // console.log("#SBATCH --job-name=" + job.jobname + "\n");
-    // console.log("#SBATCH --error=" + job.error + "\n");
-    // console.log("#SBATCH --output=" + job.output + "\n");
-    // if(job.modules != null){
-    //     for(var i = 0; i < job.modules.length; i++) {
-    //         console.log("\nmodule load " + job.modules[i]);
-    //     }
-    //     console.log("\n");
-    // }
-    // console.log("\n");
-    // console.log(job.commands);
-    // console.log("\n");
-
     // Send data to ConnectionService for file upload
     connectionService.uploadJobFile(jobFile, job.location);
     // TODO: use promises to monitor upload/submission success
     connectionService.submitJob(job.location);
 
-    // load json file
-    var jsonFile;
-    $.getJSON('data/jobHistory.json', function(json) {
-      jsonFile = json;
-    });
-
     var now = Date.now();
     // updating job history
     if(loadedJob != null) {
-      jsonFile.jobs[loadedJob.index].timestamp = now;
+      jsonFile.jobs[loadedJob.id].timestamp = now;
+      jsonFile.jobs[loadedJob.id].runtime = job.runtim;
+      jsonFile.jobs[loadedJob.id].memory = job.memory;
+      jsonFile.jobs[loadedJob.id].jobname = job.jobname;
+      jsonFile.jobs[loadedJob.id].location = job.location;
+      jsonFile.jobs[loadedJob.id].error = job.error;
+      jsonFile.jobs[loadedJob.id].output = job.output;
+      jsonFile.jobs[loadedJob.id].modules = ((job.modules != null) ? job.modules : []);
+      jsonFile.jobs[loadedJob.id].commands = job.commands;
     }
     else {
-      var newId = jobs[jobs.length-1].id + 1;
+      var newId = jsonFile.jobs[jsonFile.jobs.length-1].id + 1;
       var newJob = {
         "id": newId,
         "runtime": job.runtime,
@@ -179,8 +170,14 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
         "timestamp": now
       }
       jsonFile.jobs.push(newJob);
-      localStorage.setItem('data/jobHistory.json', JSON.stringify(jsonFile));
     }
+    var fs = require("fs");
+    fs.writeFile("data/jobHistory.json", JSON.stringify(jsonFile), function(err) {
+      if(err) {
+        return console.error(err);
+      }
+      console.log("History written successfully.");
+    });
     $location.path("cluster/" + $scope.params.clusterId);
     toastr.success('Your job was succesfully submitted to the cluster!', 'Job Submitted!');
   }
