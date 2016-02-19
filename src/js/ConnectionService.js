@@ -237,11 +237,6 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
       });
    }
 
-    var cp2remote = function (local, remote, callback) {
-        
-};
-
-   
     var uploadFile = function (src, dest, callback) {
 
         var localFiles = []; 
@@ -280,18 +275,26 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
                        BFSFolders(src.replace(/\/$/, ''), function(err) {
                            $log.debug("New Folders: ");
                            $log.debug(mkFolders);
-                           callback(err);
+                           // Set destination directory setting
+                           dest = dest + path.basename(src) + '/' 
+                           callback(err, true);
                        });
                    } else if (stats.isFile()) {
-                       
+                      localFiles.push(src);
+                      src = path.dirname(src);
+                      callback(err, false);
                    }
                });
             },
-            function(callback) {      
+            function(needMk, callback) {      
                // Get the attributes of the source directory
-               makeDir(mkFolders, src, function(err) {
-                   callback(err);
-               });
+               if (needMk) {
+                   makeDir(mkFolders, src, function(err) {
+                       callback(err);
+                   });
+               } else {
+                   callback(null);
+               }
             },
             function(callback) {
                // Setting the I/O streams
@@ -302,7 +305,7 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
                   $log.debug( "SFTP has begun");
                   $log.debug( "Value of localPath: " + file );
                
-                  sftp.fastPut(file, './' + path.basename(src) + '/' + path.relative(src,file), {step:function(total_transferred,chunk,total){
+                  sftp.fastPut(file, dest + path.relative(src,file), {step:function(total_transferred,chunk,total){
                        callback(total_transferred, chunk, total)
                   }}, 
                   function(err){
@@ -326,6 +329,7 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
                 if(err) {
                     $log.debug(err);
                 }
+                callback(err);
        });
 
     }

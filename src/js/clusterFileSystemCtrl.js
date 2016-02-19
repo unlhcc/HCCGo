@@ -153,7 +153,7 @@ clusterUploadModule.controller('clusterFileSystemCtrl', ['$scope', '$log', '$tim
          filePath += ($scope.wdList[x].path + '/');
       }
       
-      uploadCall(file.path,filePath + file.name); 
+      uploadCall(String(file.path),"./"); 
       resetFileDisplay();
    }
    
@@ -161,63 +161,12 @@ clusterUploadModule.controller('clusterFileSystemCtrl', ['$scope', '$log', '$tim
    $scope.uploadDirectory = function() {
       // Establishes access to object
       var file = $scope.files[0];
-      var activeDir = { path: file.path,
-                     webkitRelativePath: file.webkitRelativePath};
-      
-      /*// Cuts the 'excess' portion off the relative path
-      var loopVal = true;
-      while (loopVal) {
-         if (activeDir.webkitRelativePath.indexOf('/') != -1) {
-            activeDir.webkitRelativePath = activeDir.webkitRelativePath.slice(
-               activeDir.webkitRelativePath.indexOf('/') + 1, 
-               activeDir.webkitRelativePath.length
-               );
-         } else {
-            loopVal = false;
-         }
-      }
-      
-      var fileDir = getFiles(activeDir);
-      $log.debug("fileDir length: " + fileDir.length);
-      // Loops through and uploads files
-      for (var z = 0; z < fileDir.length; z++) {
-         $log.debug("fileDir value");
-         $log.debug(fileDir);
-         $log.debug("fileDir.path: " + fileDir[z].path);
-         $log.debug("fileDir.webkitRelativePath: " + fileDir[z].webkitRelativePath);
-        // uploadCall(String(fileDir[z].path),"./" + String(fileDir[z].webkitRelativePath));
-      }*/
-         uploadCall(String(activeDir.path), "./");
+ 
+     uploadCall(String(file.path), "./", function(err) {
          // Resets file display
          resetFileDisplay();
-   }
-   
-   // pulling all files from a directory
-   var getFiles = function(dir, files_){
-      var fs = require('fs');
-      files_ = files_ || [];
-
-      var files = fs.readdirSync(dir.path);
-      $log.debug("getFiles dir: ");
-      $log.debug(dir);
-      $log.debug("getFiles files: ");
-      $log.debug(files);
-      $log.debug("getFiles files count: " + files.length);
-      for (var x = 0; x < files.length; x++) {
-         var name = {path: dir.path + '/' + files[x],
-               webkitRelativePath: dir.webkitRelativePath + '/' + files[x]};
-         $log.debug("CLUSTERUPLOAD :: NAME :: VALUE :: ITERATION " + x);
-         $log.debug(name);
-       
-         if (fs.statSync(name.path).isDirectory()){
-            connectionService.makeDir(getWD() + '/' + name.webkitRelativePath);
-            files_ = getFiles(name, files_);
-         } else {
-            files_.push(name);
-         }
-      }
-      return files_;
-   }
+     });
+   } 
    
    // get current active directory
    var getWD = function() {
