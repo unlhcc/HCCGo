@@ -1,7 +1,7 @@
 
 jobSubmissionModule = angular.module('HccGoApp.jobSubmissionCtrl', ['ngRoute', 'toastr' ]);
 
-jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout', 'connectionService', '$routeParams', '$location', '$q', 'preferencesManager', 'toastr', 'jobService', function($scope, $log, $timeout, connectionService, $routeParams, $location, $q, preferencesManager, toastr, jobService) {
+jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout', 'connectionService', '$routeParams', '$location', '$q', 'preferencesManager', 'toastr', 'jobService', 'filePathService', function($scope, $log, $timeout, connectionService, $routeParams, $location, $q, preferencesManager, toastr, jobService, filePathService) {
 
   $scope.params = $routeParams;
 
@@ -41,8 +41,9 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
   }
 
   // load json file
+  var filePath = filePathService.getFilePath();
   var jsonFile;
-  $.getJSON('data/jobHistory.json', function(json) {
+  $.getJSON(filePath, function(json) {
     jsonFile = json;
   });
 
@@ -146,7 +147,7 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
     // updating job history
     if(loadedJob != null) {
       jsonFile.jobs[loadedJob.id].timestamp = now;
-      jsonFile.jobs[loadedJob.id].runtime = job.runtim;
+      jsonFile.jobs[loadedJob.id].runtime = job.runtime;
       jsonFile.jobs[loadedJob.id].memory = job.memory;
       jsonFile.jobs[loadedJob.id].jobname = job.jobname;
       jsonFile.jobs[loadedJob.id].location = job.location;
@@ -172,7 +173,7 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
       jsonFile.jobs.push(newJob);
     }
     var fs = require("fs");
-    fs.writeFile("data/jobHistory.json", JSON.stringify(jsonFile), function(err) {
+    fs.writeFile(filePath, JSON.stringify(jsonFile, null, 2), function(err) {
       if(err) {
         return console.error(err);
       }

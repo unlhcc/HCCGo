@@ -16,7 +16,7 @@ jobHistoryModule.service('jobService', function() {
     }
   };
 
-}).controller('jobHistoryCtrl', ['$scope', '$log', '$timeout', 'connectionService', '$routeParams', '$location', '$q', 'preferencesManager', 'jobService', function($scope, $log, $timeout, connectionService, $routeParams, $location, $q, preferencesManager, jobService) {
+}).controller('jobHistoryCtrl', ['$scope', '$log', '$timeout', 'connectionService', '$routeParams', '$location', '$q', 'preferencesManager', 'jobService', 'filePathService', function($scope, $log, $timeout, connectionService, $routeParams, $location, $q, preferencesManager, jobService, filePathService) {
 
   $scope.params = $routeParams;
 
@@ -54,7 +54,8 @@ jobHistoryModule.service('jobService', function() {
   }
 
   // load json file
-  $.getJSON('data/jobHistory.json', function(json) {
+  var filePath = filePathService.getFilePath();
+  $.getJSON(filePath, function(json) {
     $scope.jobs = json.jobs;
   });
 

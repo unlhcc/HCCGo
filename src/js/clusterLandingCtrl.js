@@ -1,10 +1,41 @@
 
 clusterLandingModule = angular.module('HccGoApp.clusterLandingCtrl', ['ngRoute' ]);
 
-clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeout', 'connectionService', '$routeParams', '$location', '$q', 'preferencesManager', function($scope, $log, $timeout, connectionService, $routeParams, $location, $q, preferencesManager) {
+clusterLandingModule.service('filePathService', function() {
+
+  var dataPath = process.env.APPDATA || (process.platform == 'darwin' ? process.env.HOME + '/Library/' : '/var/local');
+  var path = require('path');
+  dataPath = path.join(dataPath, 'HCCGo');
+  var filePath = path.join(dataPath, 'jobHistory.json');
+  return {
+    getFilePath: function() {
+      return filePath;
+    },
+    getDataPath: function() {
+      return dataPath;
+    }
+  };
+
+}).controller('clusterLandingCtrl', ['$scope', '$log', '$timeout', 'connectionService', '$routeParams', '$location', '$q', 'preferencesManager', 'filePathService', function($scope, $log, $timeout, connectionService, $routeParams, $location, $q, preferencesManager, filePathService) {
 
   $scope.params = $routeParams;
   var clusterInterface = null;
+
+  // Check if app data folder is there, if not, create one with default json file
+  var filePath = filePathService.getFilePath();
+  var dataPath = filePathService.getDataPath();
+
+  var fs = require('fs');
+  fs.exists(dataPath, function(exists) {
+    if(!exists) {
+        fs.mkdir(dataPath, function() {
+          fs.exists(filePath, function(fileExists) {
+            if(!fileExists)
+              fs.createReadStream('data/jobHistory.json').pipe(fs.createWriteStream(filePath));
+          });
+        });
+    }
+  });
 
   // Generate empty graphs
   var homeUsageGauge = c3.generate({
