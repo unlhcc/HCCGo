@@ -18,8 +18,6 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
    var fs = require('fs');
    $log.debug(connectionList);
 
-   var homeWD, workWD;
-
    /**
    * To initiate ssh connections to remote clusters.
    *
