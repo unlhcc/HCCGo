@@ -18,8 +18,6 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
    var fs = require('fs');
    $log.debug(connectionList);
 
-   var homeWD, workWD;
-
    /**
    * To initiate ssh connections to remote clusters.
    *
@@ -83,6 +81,48 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
 
    };
 
+  // Functionality to upload a file to the server
+  var uploadJobFile = function(jobFile, remotePath) {
+    // using the 'fs' library for this, temporary until how to pass
+    // process progression data is figured out
+    var fs = require('fs');
+
+    // Starts the connection
+    connectionList[getClusterContext()].sftp(function (err, sftp) {
+      if (err) throw err;		// If something happens, kills process kindly
+
+      // Process to console
+      $log.debug( "SFTP has begun");
+      $log.debug( "Value of remotePath: " + remotePath );
+
+      // Setting the I/O streams
+      var writeStream = sftp.createWriteStream ( remotePath );
+
+      // Sets logic for finishing of process
+      writeStream.on(
+        'close',
+        function () {
+          sftp.end();
+          $log.debug("File has been transferred");
+        }
+      );
+
+      // Does the thing
+      writeStream.write(jobFile);
+    });
+
+    return 0;
+  }
+
+   var submitJob = function(location) {
+      var deferred = $q.defer();
+
+      runCommand('sbatch ' + location).then(function(data) {
+          deferred.resolve();
+      })
+      return deferred.promise;
+   }
+
    var closeStream = function() {
       // Closes the connection stream
       var clusters = ['crane','tusker','sandhills','glidein'];
@@ -143,6 +183,10 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
       return deferred.promise;
     
    }
+
+  var test = function() {
+    alert("Success");
+  }
 
    var getHomeWD = function() {
      runCommand('echo $HOME').then(function(data) {
@@ -374,9 +418,11 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
    getUsername: getUsername,
    uploadFile: uploadFile,
    downloadFile: downloadFile,
+   submitJob: submitJob,
    closeStream: closeStream,
    readDir: readDir,
    makeDir: makeDir,
+   uploadJobFile: uploadJobFile,
    initiateConnection: function initiateConnection(username, password, hostname, cluster, logger, needInput, completed) {
      
      var Client = require('ssh2').Client;
@@ -451,6 +497,5 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
    }
 
    }
-  
   
 }]);

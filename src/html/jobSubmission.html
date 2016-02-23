@@ -1,0 +1,110 @@
+<div class="navbar navbar-hcc">
+  <div class="navbar-header">
+    <a class="navbar-brand">HCC Go</a>
+  </div>
+
+    <div class="navbar-collapse collapse navbar-responsive-collapse">
+
+
+      <ul class="nav navbar-nav navbar-right">
+        <li class="dropdown">
+          <a href="javascript:void(0)" data-target="#" class="dropdown-toggle" data-toggle="dropdown"> {{username}}@{{params.clusterId}} <b class="caret"></b></a>
+          <ul class="dropdown-menu">
+            <li><a ng-click="logout()">Logout</a></li>
+          </ul>
+        </li>
+      </ul>
+
+    </div>
+</div>
+
+<div class="container">
+  <div class="well">
+    <h2 class="text-center">Job Submission Script</h2>
+    <form class="form-horizontal" id="jobscript" name="jobscript" role="form" novalidate>
+      <div class="form-group">
+        <label class="control-label col-sm-2" for="runtime"> Run Time: </label>
+        <div class="col-sm-10">
+          <input type="text" class="form-control" id="runtime" name="runtime" ng-model="job.runtime" ng-pattern="/^[0-9]{1,2}:[0-9]{1,2}:[0-9]{1,2}$/" placeholder="03:15:00 (hh:mm:ss)" autofocus required>
+          <span class="text-danger" ng-show="jobscript.runtime.$touched && jobscript.runtime.$invalid">
+            <span ng-show="jobscript.runtime.$error.required"> Runtime is required. </span>
+            <span ng-show="jobscript.runtime.$error.pattern">Incorrect format. Must be hh:mm:ss </span>
+          </span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="control-label col-sm-2" for="memory"> Memory: </label>
+        <div class="col-sm-10">
+          <input type="text" class="form-control" id="memory" name="memory" ng-model="job.memory" ng-pattern="/^[0-9]{4,5}$/" placeholder="1024 (in megabytes)" required>
+          <span class="text-danger" ng-show="jobscript.memory.$touched && jobscript.memory.$invalid">
+              <span ng-show="jobscript.memory.$error.required"> Memory is required. </span>
+              <span ng-show="jobscript.memory.$error.pattern"> Enter as a 4-5 digit number of megabytes. </span>
+          </span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="control-label col-sm-2" for="jobname"> Job Name: </label>
+        <div class="col-sm-10">
+          <input type="text" class="form-control" id="jobname" name="jobname" ng-model="job.jobname" placeholder="hello-world" required>
+          <span class="text-danger" ng-show="jobscript.jobname.$touched && jobscript.jobname.$invalid">
+              <span ng-show="jobscript.jobname.$error.required"> Job name is required. </span>
+          </span>
+        </div>
+      </div>
+      <div class="form-group">
+          <label class="control-label col-sm-2" for="location"> Locaton </label>
+          <div class="col-sm-10">
+              <input type="text" class="form-control" id="location" name="location" ng-model="job.location" ng-pattern="/^.*\.slurm$/" placeholder="loading work folder" required>
+              <span class="text-danger" ng-show="jobscript.location.$touched && jobscript.location.$invalid">
+                  <span ng-show="jobscript.location.$error.required"> Location is required. </span>
+                  <span ng-show="jobscript.location.$error.pattern"> Must end in .slurm </span>
+              </span>
+          </div>
+      </div>
+      <div class="form-group">
+        <label class="control-label col-sm-2" for="error"> Error: </label>
+        <div class="col-sm-10">
+          <input type="text" class="form-control" id="error" name="error" ng-model="job.error" ng-pattern="/^.*\.err$/" placeholder="loading work folder" required>
+          <span class="text-danger" ng-show="jobscript.error.$touched && jobscript.error.$invalid">
+              <span ng-show="jobscript.error.$error.required"> Error is required. </span>
+              <span ng-show="jobscript.error.$error.pattern"> Must end in .err </span>
+          </span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="control-label col-sm-2" for="output"> Output: </label>
+        <div class="col-sm-10">
+          <input type="text" class="form-control" id="output" name="output" ng-model="job.output" ng-pattern="/^.*\.out$/" placeholder="loading work folder" required>
+          <span class="text-danger" ng-show="jobscript.output.$touched && jobscript.output.$invalid">
+              <span ng-show="jobscript.output.$error.required"> Output is required. </span>
+              <span ng-show="jobscript.output.$error.pattern"> Must end in .out </span>
+          </span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="control-label col-sm-2" for="modules"> Modules: </label>
+        <div class="col-sm-10">
+          <select class="form-control servers" id="modules" ng-model="job.modules">
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="control-label col-sm-2" for="commands"> Commands: </label>
+        <div class="col-sm-10">
+          <textarea class="form-control" rows="5" id="commands" ng-model="job.commands" required></textarea>
+          <span class="text-danger" ng-show="jobscript.commands.$touched && jobscript.commands.$invalid">
+              <span ng-show="jobscript.commands.$error.required"> Commands are required. </span>
+          </span>
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="col-sm-offset-8 col-sm-2">
+          <button type="button" class="btn btn-info" ng-click="cancel()">Cancel</button>
+        </div>
+        <div class="col-sm-2">
+          <button type="submit" class="btn btn-primary" ng-click="writeSubmissionScript(job)" ng-disabled="jobscript.$invalid">Submit</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>

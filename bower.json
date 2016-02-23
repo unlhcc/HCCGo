@@ -18,6 +18,7 @@
     "selectize": "~0.12.1",
     "c3": "~0.4.10",
 	"jquery-file-tree": "~1.0.1"
+    "angular-toastr": "~1.7.0"
   },
   "exportsOverride": {
     "selectize": {

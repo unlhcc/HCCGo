@@ -23,26 +23,26 @@
   text-align: center;
   // .drop-shadow(0, 1px, 2px, 0.4);
   -webkit-app-region: drag;
-  
+
 }
 
 .navbar.navbar-hcc {
   color: @whiteBackground;
   background-color: @headerBackground;
   -webkit-app-region: drag;
-  
+
   &.navbar-welcome {
     float: left;
     padding: 15px;
     text-align: center;
     width: 100%;
-    
+
     .navbar-brand, .navbar-header {
       font-size: xx-large;
       float: none;
     }
   }
-  
+
 }
 
 .card {
@@ -52,36 +52,40 @@
 }
 
 .cluster {
-  
+
   .card();
-  
+
   margin-bottom: 0.5em;
   display: inline-block;
   width: 100%;
-  
+
   h3 {
     text-align: left;
     float: left;
     margin: 0.5em;
   }
-  
+
   button {
     margin-top: 0.5em;
     float: right;
   }
-  
+
   > p {
     display: none;
   }
 }
 
+.usage {
+    margin-bottom: -25px;
+}
+
 .messages{
   .card();
-  
+
 }
 
 .form_sigin{
-  
+
 }
 
 .otherCluster {
@@ -109,6 +113,11 @@
   }
 }
 
+.selectize-dropdown-content {
+    overflow: auto;
+    max-height: 200px;
+}
+
 .selectize-control.single.servers .selectize-input:after {
   content: "\e8ac";
   font-size: 10px;
@@ -128,7 +137,6 @@
 .selectize-control.servers .selectize-input > div .url {
   opacity: 0.8;
 }
-      
 .selectize-control.servers .selectize-input > div .clusterLabel + .url {
   margin-left: 5px;
 }
@@ -136,27 +144,27 @@
 .jobdisplay ul {
   list-style:none;
   overflow-y: scroll;
-  
+
   .running {
     i {
       color: green;
     }
   }
-  
+
   .idle {
     i {
-      
+
     }
   }
-  
+
   .error {
     i {
       color: red;
     }
   }
-  
+
   h3.jobname {
     margin-top: 0px;
   }
-  
+
 }
