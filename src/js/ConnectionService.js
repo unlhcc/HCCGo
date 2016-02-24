@@ -422,6 +422,8 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
    closeStream: closeStream,
    readDir: readDir,
    makeDir: makeDir,
+   getHomeWD: getHomeWD,
+   getWorkWD: getWorkWD,
    uploadJobFile: uploadJobFile,
    initiateConnection: function initiateConnection(username, password, hostname, cluster, logger, needInput, completed) {
      

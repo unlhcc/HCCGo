@@ -32,6 +32,18 @@
                         </div>
                      </td>
                      <td>
+                        <div class="panel panel-default">
+                           <div class="panel-heading">Working Directory:
+                           </div>
+                           <div class="panel-body">Available Folders:
+                              <ul class="jqueryFileTree"
+                                 ng-repeat="">
+                                 <li class="">
+                                    <a ng-click=""></a>
+                                 </li>
+                              </ul>
+                           </div>
+                        </div>
                         <input type="radio" name="radUp" value="folder" checked="false">Upload Folder</input>
                         <input type="radio" name="radUp" value="file" checked="true">Upload File</input>
                         <br />
@@ -51,7 +63,7 @@
                      </td>
                   </tr>
                   <tr>
-                     <td><input type="button" ng-click="uploadDirectory()" value="Upload" /></td>
+                     <td><input type="button" ng-click="uploadCall()" value="Upload" /></td>
                      <td>
                         <div class="progress progress-striped active" ng-show="progressVisible">
                            <div class="progress-bar" style="width: {{progressValue}}%"></div><p>{{progressValue}}%</p>

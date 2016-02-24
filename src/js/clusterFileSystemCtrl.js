@@ -6,6 +6,13 @@ clusterUploadModule.controller('clusterFileSystemCtrl', ['$scope', '$log', '$tim
    $scope.params = $routeParams
    var clusterInterface = null;
    
+   // Gets home directory strings
+   var homeWD = connectionService.getHomeWD();
+   var workWD = connectionService.getWorkWD();
+
+   $log.debug("Home directory: " + homeWD);
+   $log.debug("Work directory: " + workWD);
+
    // Sets initial values
    var wd = {wdClass: "active", name: "Home", path: "."};
    $scope.wdList = [];
@@ -112,9 +119,13 @@ clusterUploadModule.controller('clusterFileSystemCtrl', ['$scope', '$log', '$tim
 
    }
 
-   var uploadCall = function(local, remote) {
+   // Upload entire directory
+   $scope.uploadCall = function() {
+      // Establishes access to object
+      var file = $scope.files[0];
+
       // Runs file upload
-      connectionService.uploadFile(local, remote, function(total_transferred,chunk,total){
+      connectionService.uploadFile(String(file.path), "./", function(total_transferred,chunk,total){
          // Callback function for progress bar
          $log.debug("Total transferred: " + total_transferred);
          $log.debug("Chunks: " + chunk);
@@ -135,37 +146,10 @@ clusterUploadModule.controller('clusterFileSystemCtrl', ['$scope', '$log', '$tim
             }
          });
          
-         });
-   }
+       });
 
-   // Uploads files through SFTPStream
-   $scope.uploadFile = function() {
-
-      // Let's do some debugging
-      var index = 0;
-      var file = $scope.files[index];
-      console.log("Value of file.name: " + file.name);
-      console.log("Value of file.path: " + file.path);
-
-      // Pulls active working directory
-      var filePath = "";
-      for(var x = 0; x < $scope.wdList.length; x++) {
-         filePath += ($scope.wdList[x].path + '/');
-      }
-      
-      uploadCall(String(file.path),"./"); 
-      resetFileDisplay();
-   }
-   
-   // Upload entire directory
-   $scope.uploadDirectory = function() {
-      // Establishes access to object
-      var file = $scope.files[0];
  
-     uploadCall(String(file.path), "./", function(err) {
-         // Resets file display
-         resetFileDisplay();
-     });
+       resetFileDisplay();
    } 
    
    // get current active directory

@@ -2,13 +2,10 @@
 clusterLandingModule = angular.module('HccGoApp.clusterLandingCtrl', ['ngRoute' ]);
 
 clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeout', 'connectionService', '$routeParams', '$location', '$q', 'preferencesManager', function($scope, $log, $timeout, connectionService, $routeParams, $location, $q, preferencesManager) {
-<<<<<<< HEAD
   
-  $scope.params = $routeParams
+  $scope.params = $routeParams;
   var clusterInterface = new GenericClusterInterface(connectionService, $q);  
   
-  function getClusterStats(clusterId) {
-
   // Generate empty graphs
   var homeUsageGauge = c3.generate({
     bindto: '#homeUsageGauge',
@@ -74,6 +71,10 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
 
     $location.path("/");
 
+  }
+
+  $scope.goToUpload = function() {
+    $location.path("cluster/" + $scope.params.clusterId + "/filesystem");
   }
 
   $scope.jobSubmission = function() {
@@ -192,7 +193,7 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
 
     getClusterStats($scope.params.clusterId);
 
-  })
+  });
 
 
 }]);
