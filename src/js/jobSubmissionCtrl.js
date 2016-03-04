@@ -54,7 +54,7 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
   }
 
   $scope.cancel = function() {
-    $location.path("cluster/" + $scope.params.clusterId);
+    $location.path("cluster/" + $scope.params.clusterId + "/jobHistory");
   }
 
   // Get the username
@@ -138,11 +138,6 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
 
       jobFile += "\n" + job.commands + "\n";
 
-    // Send data to ConnectionService for file upload
-    connectionService.uploadJobFile(jobFile, job.location);
-    // TODO: use promises to monitor upload/submission success
-    connectionService.submitJob(job.location);
-
     var now = Date.now();
     // updating job history
     if(loadedJob != null) {
@@ -177,10 +172,25 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
       if(err) {
         return console.error(err);
       }
-      console.log("History written successfully.");
+      else {
+        console.log("History written successfully.");
+      }
     });
-    $location.path("cluster/" + $scope.params.clusterId);
-    toastr.success('Your job was succesfully submitted to the cluster!', 'Job Submitted!');
+
+    // Send data to ConnectionService for file upload
+    connectionService.uploadJobFile(jobFile, job.location).then(function(data) {
+      return connectionService.submitJob(job.location);
+    }).then(function() { //success
+      toastr.success('Your job was succesfully submitted to the cluster!', 'Job Submitted!', {
+        closeButton: true
+      });
+      $location.path("cluster/" + $scope.params.clusterId);
+    }, function() { // error
+      toastr.error('There was an error in submitting your job to the cluster!', 'Job Submission Failed!', {
+        closeButton: true
+      });
+    });
+
   }
 
 

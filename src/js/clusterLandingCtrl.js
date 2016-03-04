@@ -1,22 +1,7 @@
 
 clusterLandingModule = angular.module('HccGoApp.clusterLandingCtrl', ['ngRoute' ]);
 
-clusterLandingModule.service('filePathService', function() {
-
-  var dataPath = process.env.APPDATA || (process.platform == 'darwin' ? process.env.HOME + '/Library/' : '/var/local');
-  var path = require('path');
-  dataPath = path.join(dataPath, 'HCCGo');
-  var filePath = path.join(dataPath, 'jobHistory.json');
-  return {
-    getFilePath: function() {
-      return filePath;
-    },
-    getDataPath: function() {
-      return dataPath;
-    }
-  };
-
-}).controller('clusterLandingCtrl', ['$scope', '$log', '$timeout', 'connectionService', '$routeParams', '$location', '$q', 'preferencesManager', 'filePathService', function($scope, $log, $timeout, connectionService, $routeParams, $location, $q, preferencesManager, filePathService) {
+clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeout', 'connectionService', '$routeParams', '$location', '$q', 'preferencesManager', 'filePathService', function($scope, $log, $timeout, connectionService, $routeParams, $location, $q, preferencesManager, filePathService) {
 
   $scope.params = $routeParams;
   var clusterInterface = null;

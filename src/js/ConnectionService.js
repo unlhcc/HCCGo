@@ -82,13 +82,19 @@ connectionModule.factory('connectionService',['$log', '$q', function($log, $q) {
 
   // Functionality to upload a file to the server
   var uploadJobFile = function(jobFile, remotePath) {
+
+    var deferred = $q.defer();
+
     // using the 'fs' library for this, temporary until how to pass
     // process progression data is figured out
     var fs = require('fs');
 
     // Starts the connection
     connectionList[0].sftp(function (err, sftp) {
-      if (err) throw err;		// If something happens, kills process kindly
+      if (err) {
+        deferred.reject(err);
+        throw err;		// If something happens, kills process kindly
+      }
 
       // Process to console
       $log.debug( "SFTP has begun");
@@ -108,17 +114,19 @@ connectionModule.factory('connectionService',['$log', '$q', function($log, $q) {
 
       // Does the thing
       writeStream.write(jobFile);
+      deferred.resolve("Job successfully uploaded");
     });
-
-    return 0;
+    return deferred.promise;
   }
 
   var submitJob = function(location) {
       var deferred = $q.defer();
 
       runCommand('sbatch ' + location).then(function(data) {
-          deferred.resolve();
-      })
+        deferred.resolve(data);
+      }, function(data) { // thrown on failure
+        return deferred.reject("An error occurred when submitting the job.");
+      });
       return deferred.promise;
   }
 
