@@ -7,13 +7,7 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
                      tusker: null,
                      sandhills: null,
                      glidein: null};
-   var queue = require('queue');
-   var q = queue({
-      concurrency: 5,
-      timeout: 200
-   });
    var async = require('async');
-   var glob = require('glob');
    var path = require('path');
    var fs = require('fs');
    $log.debug(connectionList);
@@ -118,7 +112,7 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
       var deferred = $q.defer();
 
       runCommand('sbatch ' + location).then(function(data) {
-          deferred.resolve();
+          deferred.resolve(data);
       })
       return deferred.promise;
    }
@@ -189,24 +183,28 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
   }
 
    var getHomeWD = function() {
+     var deferred = $q.defer();
      runCommand('echo $HOME').then(function(data) {
          $log.debug("Home dir: " + data);
-         return data.trim();
+         deferred.resolve(data.trim());
      });
+     return deferred.promise;
    }
 
    var getWorkWD = function() {
+     var deferred = $q.defer();
      runCommand('echo $WORK').then(function(data) {
          $log.debug("Word dir: " + data);
-         return data.trim();
+         deferred.resolve(data.trim());
      });
+     return deferred.promise;
    }
     
    // Reads filesystem directory on server
    var readDir = function(directory) {
       var deferred = $q.defer();
       
-      commandSem.take(function () {
+      //commandSem.take(function () {
       // Starts SFTP session
       connectionList[getClusterContext()].sftp(function (err, sftp) {
         if (err) throw err;      // If something happens, kills process kindly
@@ -227,11 +225,11 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
             
             deferred.resolve(list);
             $log.debug("READDIR COMMANDSEM LEAVE");
-            commandSem.leave();
+            //commandSem.leave();
             $log.debug(list);
          });
       });
-      });
+      //});
       
       return deferred.promise;
    }

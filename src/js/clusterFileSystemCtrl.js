@@ -3,34 +3,6 @@ clusterUploadModule = angular.module('HccGoApp.clusterFileSystemCtrl', ['ngRoute
 
 clusterUploadModule.controller('clusterFileSystemCtrl', ['$scope', '$log', '$timeout', 'connectionService', '$routeParams', '$location', '$q', 'preferencesManager', function($scope, $log, $timeout, connectionService, $routeParams, $location, $q, preferencesManager) {
   
-   $scope.params = $routeParams
-   var clusterInterface = null;
-   
-   // Gets home directory strings
-   var homeWD = connectionService.getHomeWD();
-   var workWD = connectionService.getWorkWD();
-
-   $log.debug("Home directory: " + homeWD);
-   $log.debug("Work directory: " + workWD);
-
-   // Sets initial values
-   var wd = {wdClass: "active", name: "Home", path: "."};
-   $scope.wdList = [];
-   $scope.clusterFolder = [];
-   $scope.wdList.push(wd);
-   connectionService.readDir(".").then(function (serverResponse) {
-      // loops through each value returned by the server
-      var tempHolder = {wdClass: "", name: ""};
-      for (var x = 0; x < serverResponse.length; x++) {
-         $log.debug("Server Response: " + serverResponse[x].filename);
-         if (serverResponse[x].longname.charAt(0) == 'd') {
-            tempHolder = {wdClass: "directory", name: serverResponse[x].filename};
-            $scope.clusterFolder.push(tempHolder);
-         } 
-
-      }
-   });
- 
    // Sets default values on load
    $scope.onViewLoad = function () {
       $log.debug("ngView has changed");
@@ -38,85 +10,74 @@ clusterUploadModule.controller('clusterFileSystemCtrl', ['$scope', '$log', '$tim
       $scope.uploadStatus = false;
    }
    
-   // Changes working directory for file upload wd
-   $scope.cdSSHWD = function (data) {
-      $log.debug($scope.wdList);
-      if (data.name != $scope.wdList[$scope.wdList.length - 1].name) {
-         var directoryIndex = 1;      // Sets index of array where working directory exists
-         // loops through array finding wanted previous folder
-         for (var x = 0; x < $scope.wdList.length; x++) {
-            if ($scope.wdList[x].name == data.name) {
-               directoryIndex = x;
-            }
-         }
-         
-         // Sets working directory to desired path
-         $log.debug("wdList before slice");
-         $log.debug($scope.wdList);
-         $scope.wdList = $scope.wdList.slice(0,directoryIndex + 1);
-         $scope.wdList[$scope.wdList.length - 1].wdClass = "active";
-         $log.debug("wdList after slice");
-         $log.debug($scope.wdList);
-      
-         // Resets file listing display
-         
-         resetFileDisplay();
-      } else {
-         $log.debug("Current working directory");
-      }
-      $log.debug($scope.wdList);
-   }
-   
    // Changes working directory from supplied list
    $scope.cdSSH = function (data) {
-      // Establishes object to push into wdList
-      var newWD = {wdClass: "active", name: data.name, path: "/" + data.name + "/"};
+      if (data.name != "..") {
+          $scope.remoteWD = $scope.remoteWD + "/" + data.name;
+      } else {
+          $scope.remoteWD = path.dirname($scope.remoteWD);
+      }
       
-      // Changes wdClass of last object in array
-      $scope.wdList[$scope.wdList.length -1].wdClass = "";
-      
-      // Pushes new directory in wdList
-      $scope.wdList.push(newWD);
-      
+      // loads view
+      remoteRead($scope.remoteWD);
+   }
+
+   // Load Remote view
+   var remoteRead = function(data) {
+      // Clears content of remoteFiles array
+      $scope.remoteFiles = [];
+
       // Resets file directory listing
-      resetFileDisplay();
+      connectionService.readDir(data).then(function (serverResponse) {
+          // loops through each value returned by the server
+          async.each(serverResponse, function(file, callback){
+             $log.debug("Server Response: " + file.filename);
+             if (file.longname.charAt(0) == 'd') {
+                $scope.remoteFiles.unshift({Class: "directory", name: file.filename});
+             } else {
+                $scope.remoteFiles.push({Class: "ext_txt", name: file.filename});
+             } 
+          }, function(err) {
+             $log.debug(err);
+          });
+       });
+   }
+
+   // Changes working directory for local system
+   // Wrapper for local check
+   $scope.cdLocal = function(data) {
+      if (data.name != "..") {
+          $scope.localWD = $scope.localWD + "/" + data.name;
+      } else {
+          $scope.localWD = path.dirname($scope.localWD);
+      }
+
+      // Load display
+      localRead($scope.localWD);
    }  
   
-   // Sets the name of the file to upload in the declaration box
-   $scope.setFiles = function(element) {
-      $scope.$apply(function(scope) {
-         $log.debug('File set: ' + element.files);
-         $log.debug('Number of files: ' + element.files.length);
-         $scope.files = [];
-         for (var i = 0; i < element.files.length; i++) {
-            $scope.files.push(element.files[i]);
-         }
-         $scope.progressValue = 0;
-      })
-   }
-   
-   var resetFileDisplay = function() {
-      // Resets file listing display
-      $log.debug("resetFileDisplay has been called");
-      var filePath = ".";
-      $scope.clusterFolder = [];
-      for(var x = 1; x < $scope.wdList.length; x++) {
-         filePath += $scope.wdList[x].path;
-      }
-      $log.debug($scope.wdList);
-      $log.debug(filePath);
-      connectionService.readDir(filePath).then(function (serverResponse) {
-         // loops through each value returned by the server
-         var tempHolder = {wdClass: "", name: ""};
-         for (var x = 0; x < serverResponse.length; x++) {
-            $log.debug("Server Response: " + serverResponse[x].filename);
-            if (serverResponse[x].longname.charAt(0) == 'd') {
-               tempHolder = {wdClass: "directory", name: serverResponse[x].filename};
-               $scope.clusterFolder.push(tempHolder);
-            } 
-         }
-      });
+   var localRead = function(data) {
+      // Clears content of localFiles array
+      $scope.localFiles = [];
 
+      // Resets file directory listing
+      fs.readdir(data, function(err, files) {
+         async.each(files, function (file, callback) {
+             fs.stat(String($scope.localWD + "/" + file), function (err, stats) {
+                 if (err) {
+                     callback(err);
+                 } else if (stats.isDirectory()) {
+                     $scope.localFiles.unshift({Class: "directory", name: file});
+                 } else if (stats.isFile()) {
+                     $scope.localFiles.push({Class: "ext_txt", name: file});
+                 }
+             });
+         }, function(err) {
+             if (err) {
+                 $log.debug(err);
+             }
+         }); 
+      });
    }
 
    // Upload entire directory
@@ -147,20 +108,28 @@ clusterUploadModule.controller('clusterFileSystemCtrl', ['$scope', '$log', '$tim
          });
          
        });
-
- 
-       resetFileDisplay();
    } 
    
-   // get current active directory
-   var getWD = function() {
-      var path = "";
-      
-      for (var x = 0; x < $scope.wdList.length; x++) {
-         path += $scope.wdList[x].path;
+   // highlight selection and store id
+   var remoteFocus = new String("");    // Stores id of highlight object of remote origin
+   var localFocus = new String("");     // Stores id of highlight object of local origin
+   $scope.remoteHighlight = function(id) {
+      if (localFocus != "") {
+          angular.element("#" + localFocus.replace(/\./g, "\\.")).removeClass('highlight');
+          localFocus = "";
       }
-      $log.debug("Current working directory: " + path);
-      return path;
+      angular.element("#" + remoteFocus.replace(/\./g, "\\.")).removeClass('highlight');
+      remoteFocus = id.name;
+      angular.element("#" + id.name.replace(/\./g, "\\.")).addClass('highlight');
+   }
+   $scope.localHighlight = function(id) {
+      if (remoteFocus != "") {
+          angular.element("#" + remoteFocus.replace(/\./g, "\\.")).removeClass('highlight');
+          remoteFocus = "";
+      }
+      angular.element("#" + localFocus.replace(/\./g, "\\.")).removeClass('highlight');
+      localFocus = id.name;
+      angular.element("#" + id.name.replace(/\./g, "\\.")).addClass('highlight');
    }
 
    preferencesManager.getClusters().then(function(clusters) {
@@ -193,12 +162,39 @@ clusterUploadModule.controller('clusterFileSystemCtrl', ['$scope', '$log', '$tim
            $log.debug("radio is folder");
        }
    });
-   /*
-   angular.element("#btnFile").on('click', function() {
-      angular.element("#btnDirectory").removeClass('active');
-      angular.element("#btnFile").removeClass('active');
-      angular.element("#btnFile").addClass('active');
+
+   // Initialization functions
+   $scope.params = $routeParams
+   var clusterInterface = null;
+   var path = require("path");
+   var fs = require("fs");
+   var async = require("async");
+   $scope.sourceDir = {name: ".."};
+
+   // Gets directory strings from remote server
+   var homeWD, workWD;
+   connectionService.getHomeWD().then(function(data) {
+       $scope.remoteWD = data;
+       homeWD = data;
+       remoteRead($scope.remoteWD);    // Sets remote display
+       $log.debug("Home directory: " + homeWD);
    });
-  */
-  
+   connectionService.getWorkWD().then(function(data) {
+       workWD = data;
+       $log.debug("Work directory: " + workWD);
+   });
+
+   // Gets directory strings from local system
+   if (process.platform === 'win32') {
+       // TODO: Get working directory on windows machines
+       $log.debug("Process env: ");
+       $log.debug(process.env);
+   } else {
+       // Runs for Mac and Linux systems
+       // Establishes Displayed files
+       $log.debug("process working directory: " + process.env.home);
+       $scope.localWD = process.env.HOME;
+       localRead($scope.localWD);    // Sets local display
+   }
+ 
 }]);
