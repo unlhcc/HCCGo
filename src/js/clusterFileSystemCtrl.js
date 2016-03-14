@@ -7,7 +7,10 @@ clusterUploadModule.controller('clusterFileSystemCtrl', ['$scope', '$log', '$tim
    $scope.onViewLoad = function () {
       $log.debug("ngView has changed");
       $scope.progressVisible = false;
+      $scope.tranShow = false;
       $scope.uploadStatus = false;
+      $scope.boolUp = false;
+      $scope.boolDown = false;
    }
    
    // Changes working directory from supplied list
@@ -18,6 +21,9 @@ clusterUploadModule.controller('clusterFileSystemCtrl', ['$scope', '$log', '$tim
           $scope.remoteWD = path.dirname($scope.remoteWD);
       }
       
+      // Hides upload/download buttons
+      $scope.tranShow = false;
+
       // loads view
       remoteRead($scope.remoteWD);
    }
@@ -52,6 +58,9 @@ clusterUploadModule.controller('clusterFileSystemCtrl', ['$scope', '$log', '$tim
           $scope.localWD = path.dirname($scope.localWD);
       }
 
+      // Hides upload/download buttons
+      $scope.tranShow = false;
+
       // Load display
       localRead($scope.localWD);
    }  
@@ -82,15 +91,14 @@ clusterUploadModule.controller('clusterFileSystemCtrl', ['$scope', '$log', '$tim
 
    // Upload entire directory
    $scope.uploadCall = function() {
-      // Establishes access to object
-      var file = $scope.files[0];
-
       // Runs file upload
-      connectionService.uploadFile(String(file.path), "./", function(total_transferred,chunk,total){
+      connectionService.uploadFile(String($scope.localWD + "/" + localFocus), String($scope.remoteWD + "/"), function(total_transferred,chunk,total,counter,filesTotal){
          // Callback function for progress bar
          $log.debug("Total transferred: " + total_transferred);
          $log.debug("Chunks: " + chunk);
          $log.debug("Total: " + total);
+         $scope.filesTotal = filesTotal;
+         $scope.counter = counter;
          
          // Work on progress bar
          $scope.$apply(function(scope) {
@@ -106,30 +114,41 @@ clusterUploadModule.controller('clusterFileSystemCtrl', ['$scope', '$log', '$tim
                $scope.uploadStatus = true;
             }
          });
-         
        });
+   }
+
+   $scope.downloadCall = function () {
+
    } 
    
    // highlight selection and store id
    var remoteFocus = new String("");    // Stores id of highlight object of remote origin
    var localFocus = new String("");     // Stores id of highlight object of local origin
    $scope.remoteHighlight = function(id) {
-      if (localFocus != "") {
-          angular.element("#" + localFocus.replace(/\./g, "\\.")).removeClass('highlight');
-          localFocus = "";
-      }
-      angular.element("#" + remoteFocus.replace(/\./g, "\\.")).removeClass('highlight');
+      $scope.tranShow = true;       // Makes download/upload buttons visible
+      $scope.boolDown = true;       // Shows download button
+      $scope.boolUp = false;        // Hides upload button
+      angular.element("#l" +  localFocus.replace(/\./g, "\\.")).removeClass('highlight');
+      localFocus = "";
+      angular.element("#r" + remoteFocus.replace(/\./g, "\\.")).removeClass('highlight');
       remoteFocus = id.name;
-      angular.element("#" + id.name.replace(/\./g, "\\.")).addClass('highlight');
+      angular.element("#r" + id.name.replace(/\./g, "\\.")).addClass('highlight');
+
+      // Change button context
+      angular.element("#tranContent").text(remoteFocus);
    }
    $scope.localHighlight = function(id) {
-      if (remoteFocus != "") {
-          angular.element("#" + remoteFocus.replace(/\./g, "\\.")).removeClass('highlight');
-          remoteFocus = "";
-      }
-      angular.element("#" + localFocus.replace(/\./g, "\\.")).removeClass('highlight');
+      $scope.tranShow = true;       // Makes download/upload buttons visible
+      $scope.boolDown = false;      // Hides download button
+      $scope.boolUp = true;         // Shows upload button
+      angular.element("#r" + remoteFocus.replace(/\./g, "\\.")).removeClass('highlight');
+      remoteFocus = "";
+      angular.element("#l" + localFocus.replace(/\./g, "\\.")).removeClass('highlight');
       localFocus = id.name;
-      angular.element("#" + id.name.replace(/\./g, "\\.")).addClass('highlight');
+      angular.element("#l" + id.name.replace(/\./g, "\\.")).addClass('highlight');
+
+      // Change button context
+      angular.element("#tranContent").text(localFocus);
    }
 
    preferencesManager.getClusters().then(function(clusters) {

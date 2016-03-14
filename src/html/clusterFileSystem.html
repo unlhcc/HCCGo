@@ -24,23 +24,24 @@
                               <ul class="jqueryFileTree" 
                                  ng-repeat="folder in remoteFiles">
                                  <li ng-switch on="folder.Class" class="{{folder.Class}}">
-                                     <a id="{{folder.name}}" ng-switch-when="directory" ng-click="remoteHighlight(folder)" ng-dblclick="cdSSH(folder)">{{folder.name}}</a>
-                                     <a id="{{folder.name}}" ng-switch-default ng-click="remoteHighlight(folder)" ng-dblclick="">{{folder.name}}</a>
+                                     <a id="r{{folder.name}}" ng-switch-when="directory" ng-click="remoteHighlight(folder)" ng-dblclick="cdSSH(folder)">{{folder.name}}</a>
+                                     <a id="r{{folder.name}}" ng-switch-default ng-click="remoteHighlight(folder)" ng-dblclick="">{{folder.name}}</a>
                                  </li>
                               </ul>
                            </div>
                         </div>
                      </td>
                      <td>
-                        <div class="panel panel-default">
+                        <div ng-show="tranShow" class="panel panel-default">
                            <div class="panel-body">
-                              <button type="button" class="btn btn-primary btn-block">
-                                  <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>Upload
+                              <button ng-show="boolDown" ng-click="downloadCall()" type="button" class="btn btn-primary btn-block">
+                                  <span class="glyphicon glyphicon-arrow-right" aria-hidden="true">Download</span>
+                              </button>
+                              <button ng-show="boolUp" ng-click="uploadCall()" type="button" class="btn btn-primary btn-block">
+                                  <span class="glyphicon glyphicon-arrow-left" aria-hidden="true">Upload</span>
                               </button>
                               <br/>
-                              <button type="button" class="btn btn-primary btn-block">
-                                  <span class="glyphicon glyphicon-arrow-right" aria-hidden="true"></span>Download
-                              </button>
+                              <div id="tranContent"></div>
                            </div>
                         </div>
                      </td>
@@ -62,26 +63,10 @@
                               <ul class="jqueryFileTree"
                                  ng-repeat="folder in localFiles">
                                  <li ng-switch on="folder.Class" class="{{folder.Class}}">
-                                     <a id="{{folder.name}}" ng-switch-when="directory" ng-click="localHighlight(folder)" ng-dblclick="cdLocal(folder)">{{folder.name}}</a>
-                                     <a id="{{folder.name}}" ng-switch-default ng-click="localHighlight(folder)" ng-dblclick="">{{folder.name}}</a>
+                                     <a id="l{{folder.name}}" ng-switch-when="directory" ng-click="localHighlight(folder)" ng-dblclick="cdLocal(folder)">{{folder.name}}</a>
+                                     <a id="l{{folder.name}}" ng-switch-default ng-click="localHighlight(folder)" ng-dblclick="">{{folder.name}}</a>
                                  </li>
                               </ul>
-                           </div>
-                        </div>
-                        <input type="radio" name="radUp" value="folder" checked="false">Upload Folder</input>
-                        <input type="radio" name="radUp" value="file" checked="true">Upload File</input>
-                        <br />
-                        <input type="file" ng-model-instant
-                           id="fileToUpload"
-                           multiple
-                           onchange="angular.element(this).scope().setFiles(this)"></input>
-                        <div ng-show="files.length">
-                           <div ng-repeat="file in files.slice(0)">
-                              <span>{{file.webkitRelativePath || file.name}}</span>
-                              <span ng-switch="file.size > 1024*1024">(
-                                 <span ng-switch-when="true">{{file.size / 1024 / 1024 | number:2}} MB</span>
-                                 <span ng-switch-default>{{file.size / 1024 | number:2}} kB</span>
-                              )</span>
                            </div>
                         </div>
                      </td>
@@ -90,10 +75,10 @@
                      <td><input type="button" ng-click="uploadCall()" value="Upload" /></td>
                      <td>
                         <div class="progress progress-striped active" ng-show="progressVisible">
-                           <div class="progress-bar" style="width: {{progressValue}}%"></div><p>{{progressValue}}%</p>
+                           <div class="progress-bar" style="width: {{progressValue}}%">({{counter}}/{{filesTotal}})</div><p>{{progressValue}}%</p>
                         </div>
                         <div ng-show="uploadStatus">
-                           <p>Done!</p>
+                           <p>({{counter}}/{{filesTotal}}) Done!</p>
                         </div>
                      </td>
                   </tr>

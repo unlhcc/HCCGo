@@ -283,16 +283,19 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
 
         var localFiles = []; 
         var mkFolders = [];
-        var BFSFolders = function(currDir, callback) {
+        var filesTotal = 0;
+        var counter = 0;
+        var BFSFolders = function(currDir, bfs) {
             //Recursively builds directory structure
             fs.readdir(currDir, function(err, files) {
-                async.each(files, function(file, callback) {
+                async.each(files, function(file, bfs) {
                      fs.stat(currDir + '/' + file, function(err, stats) {
                          if(err){
-                             callback(err);
+                             bfs(err);
                          } else if (stats.isFile()) {
                              localFiles.push(currDir + '/' + file);
-                             callback(err);
+                             filesTotal += 1;
+                             bfs(err);
                          } else if (stats.isDirectory()) {
                              if (mkFolders.indexOf(currDir) > -1) {
                                  mkFolders[mkFolders.indexOf(currDir)] = currDir + '/' + file;
@@ -300,18 +303,18 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
                                  mkFolders.push(currDir + '/' + file);
                              }
                              BFSFolders(currDir + '/' + file, function(err) {
-                                 callback(err);
+                                 bfs(err);
                              });
                          }
                      });
                 }, function(err) {
-                    callback(err);
+                    bfs(err);
                 });
             });
         }
         // Starts the connection
         async.waterfall([
-            function(callback) {
+            function(water) {
                fs.stat(src.replace(/\/$/, ''), function(err, stats){
                    if(stats.isDirectory()){
                        BFSFolders(src.replace(/\/$/, ''), function(err) {
@@ -319,26 +322,26 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
                            $log.debug(mkFolders);
                            // Set destination directory setting
                            dest = dest + path.basename(src) + '/' 
-                           callback(err, true);
+                           water(err, true);
                        });
                    } else if (stats.isFile()) {
                       localFiles.push(src);
                       src = path.dirname(src);
-                      callback(err, false);
+                      water(err, false);
                    }
                });
             },
-            function(needMk, callback) {      
+            function(needMk, water) {      
                // Get the attributes of the source directory
                if (needMk) {
                    makeDir(mkFolders, src, function(err) {
-                       callback(err);
+                       water(err);
                    });
                } else {
-                   callback(null);
+                   water(null);
                }
             },
-            function(callback) {
+            function(water) {
                // Setting the I/O streams
 
                connectionList[getClusterContext()].sftp(function (err, sftp) {
@@ -348,7 +351,7 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
                   $log.debug( "Value of localPath: " + file );
                
                   sftp.fastPut(file, dest + path.relative(src,file), {step:function(total_transferred,chunk,total){
-                       callback(total_transferred, chunk, total)
+                       callback(total_transferred, chunk, total, counter, filesTotal)
                   }}, 
                   function(err){
                     // Processes errors
@@ -358,20 +361,21 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
                        done(err);
                     } else {
                        $log.debug("SFTP :: fastPut success");
+                       counter += 1;
                        done(null);
                     }
                   });
                }, function(err) {
                   sftp.end();
-                  callback(err);
+                  water(err);
                });
                });
             }], 
             function(err) {
                 if(err) {
                     $log.debug(err);
+                    callback(err);
                 }
-                callback(err);
        });
 
     }
