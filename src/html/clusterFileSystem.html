@@ -32,7 +32,7 @@
                         </div>
                      </td>
                      <td>
-                        <div ng-show="tranShow" class="panel panel-default">
+                        <div class="panel panel-default">
                            <div class="panel-body">
                               <button ng-show="boolDown" ng-click="downloadCall()" type="button" class="btn btn-primary btn-block">
                                   <span class="glyphicon glyphicon-arrow-right" aria-hidden="true">Download</span>
@@ -75,7 +75,7 @@
                      <td><input type="button" ng-click="uploadCall()" value="Upload" /></td>
                      <td>
                         <div class="progress progress-striped active" ng-show="progressVisible">
-                           <div class="progress-bar" style="width: {{progressValue}}%">({{counter}}/{{filesTotal}})</div><p>{{progressValue}}%</p>
+                           <div class="progress-bar" style="width: {{progressValue}}%"></div><p>{{progressValue}}% ({{counter}}/{{filesTotal}}) </p>
                         </div>
                         <div ng-show="uploadStatus">
                            <p>({{counter}}/{{filesTotal}}) Done!</p>

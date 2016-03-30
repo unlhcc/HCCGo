@@ -31,7 +31,7 @@
            "css"	: ["**/*.css","**/*.map"],
             "js" 	: "**/*.js",
             "less" 	: "**/*.less",
-            "fonts"	: ["**/*.eot","**/*.svg","**/*.ttf","**/*.woff"]
+            "fonts"	: ["**/*.eot","**/*.svg","**/*.ttf","**/*.woff","**/*.woff2"]
     },
         "bootstrap-material-design": {
             ""	: ["**/*.css","**/*.map","**/*.js",

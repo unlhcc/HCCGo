@@ -7,9 +7,8 @@ clusterUploadModule.controller('clusterFileSystemCtrl', ['$scope', '$log', '$tim
    $scope.onViewLoad = function () {
       $log.debug("ngView has changed");
       $scope.progressVisible = false;
-      $scope.tranShow = false;
       $scope.uploadStatus = false;
-      $scope.boolUp = false;
+      $scope.boolUp = true;
       $scope.boolDown = false;
    }
    
@@ -20,9 +19,6 @@ clusterUploadModule.controller('clusterFileSystemCtrl', ['$scope', '$log', '$tim
       } else {
           $scope.remoteWD = path.dirname($scope.remoteWD);
       }
-      
-      // Hides upload/download buttons
-      $scope.tranShow = false;
 
       // loads view
       remoteRead($scope.remoteWD);
@@ -42,9 +38,12 @@ clusterUploadModule.controller('clusterFileSystemCtrl', ['$scope', '$log', '$tim
                 $scope.remoteFiles.unshift({Class: "directory", name: file.filename});
              } else {
                 $scope.remoteFiles.push({Class: "ext_txt", name: file.filename});
-             } 
+             }
+ 
+             // Indicates iteree is over
+             callback(null); 
           }, function(err) {
-             $log.debug(err);
+             if(err) $log.debug(err);
           });
        });
    }
@@ -57,9 +56,6 @@ clusterUploadModule.controller('clusterFileSystemCtrl', ['$scope', '$log', '$tim
       } else {
           $scope.localWD = path.dirname($scope.localWD);
       }
-
-      // Hides upload/download buttons
-      $scope.tranShow = false;
 
       // Load display
       localRead($scope.localWD);
@@ -81,10 +77,13 @@ clusterUploadModule.controller('clusterFileSystemCtrl', ['$scope', '$log', '$tim
                      $scope.localFiles.push({Class: "ext_txt", name: file});
                  }
              });
+
+             // Indicates code completion for this iteree
+             callback(null);
          }, function(err) {
-             if (err) {
-                 $log.debug(err);
-             }
+             $timeout(function() {
+                 if(err) $log.debug(err);
+             }, 300);
          }); 
       });
    }
@@ -94,24 +93,24 @@ clusterUploadModule.controller('clusterFileSystemCtrl', ['$scope', '$log', '$tim
       // Runs file upload
       connectionService.uploadFile(String($scope.localWD + "/" + localFocus), String($scope.remoteWD + "/"), function(total_transferred,chunk,total,counter,filesTotal){
          // Callback function for progress bar
-         $log.debug("Total transferred: " + total_transferred);
-         $log.debug("Chunks: " + chunk);
-         $log.debug("Total: " + total);
+         //$log.debug("Total transferred: " + total_transferred);
+         //$log.debug("Chunks: " + chunk);
+         //$log.debug("Total: " + total);
          $scope.filesTotal = filesTotal;
          $scope.counter = counter;
          
          // Work on progress bar
          $scope.$apply(function(scope) {
-            $scope.progressVisible = true;
-            $scope.uploadStatus = false;
-            $scope.max = total;
-            $scope.progressValue = Math.floor((total_transferred/total)*100);
-            $scope.progressVisible = true;
-            $log.debug("Progress: " + ((total_transferred/total)*100) + "%");
+            scope.progressVisible = true;
+            scope.uploadStatus = false;
+            scope.max = total;
+            scope.progressValue = Math.floor((total_transferred/total)*100);
+            scope.progressVisible = true;
+            //$log.debug("Progress: " + ((total_transferred/total)*100) + "%");
             
-            if($scope.progressValue == 100) {
-               $scope.progressVisible = false;
-               $scope.uploadStatus = true;
+            if(scope.progressValue == 100) {
+               scope.progressVisible = false;
+               scope.uploadStatus = true;
             }
          });
        });
@@ -125,7 +124,6 @@ clusterUploadModule.controller('clusterFileSystemCtrl', ['$scope', '$log', '$tim
    var remoteFocus = new String("");    // Stores id of highlight object of remote origin
    var localFocus = new String("");     // Stores id of highlight object of local origin
    $scope.remoteHighlight = function(id) {
-      $scope.tranShow = true;       // Makes download/upload buttons visible
       $scope.boolDown = true;       // Shows download button
       $scope.boolUp = false;        // Hides upload button
       angular.element("#l" +  localFocus.replace(/\./g, "\\.")).removeClass('highlight');
@@ -138,7 +136,6 @@ clusterUploadModule.controller('clusterFileSystemCtrl', ['$scope', '$log', '$tim
       angular.element("#tranContent").text(remoteFocus);
    }
    $scope.localHighlight = function(id) {
-      $scope.tranShow = true;       // Makes download/upload buttons visible
       $scope.boolDown = false;      // Hides download button
       $scope.boolUp = true;         // Shows upload button
       angular.element("#r" + remoteFocus.replace(/\./g, "\\.")).removeClass('highlight');
@@ -189,6 +186,8 @@ clusterUploadModule.controller('clusterFileSystemCtrl', ['$scope', '$log', '$tim
    var fs = require("fs");
    var async = require("async");
    $scope.sourceDir = {name: ".."};
+   $scope.localFiles = [];
+   $scope.remoteFiles = [];
 
    // Gets directory strings from remote server
    var homeWD, workWD;
@@ -201,6 +200,11 @@ clusterUploadModule.controller('clusterFileSystemCtrl', ['$scope', '$log', '$tim
    connectionService.getWorkWD().then(function(data) {
        workWD = data;
        $log.debug("Work directory: " + workWD);
+   });
+
+   $scope.$watch('localFiles', function(newValue, oldValue) {
+       $log.debug("old Local: " + oldValue);
+       $log.debug("new Local: " + newValue);
    });
 
    // Gets directory strings from local system
