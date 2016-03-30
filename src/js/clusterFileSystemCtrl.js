@@ -22,6 +22,10 @@ clusterUploadModule.controller('clusterFileSystemCtrl', ['$scope', '$log', '$tim
 
       // loads view
       remoteRead($scope.remoteWD);
+
+      // Hides download button
+      angular.element('#btnDownload').attr('disabled', '');
+      angular.element('#tranContent').text('');
    }
 
    // Load Remote view
@@ -59,6 +63,10 @@ clusterUploadModule.controller('clusterFileSystemCtrl', ['$scope', '$log', '$tim
 
       // Load display
       localRead($scope.localWD);
+
+      // Hides upload button
+      angular.element('#btnUpload').attr('disabled', '');
+      angular.element('#tranContent').text('');
    }  
   
    var localRead = function(data) {
@@ -124,8 +132,8 @@ clusterUploadModule.controller('clusterFileSystemCtrl', ['$scope', '$log', '$tim
    var remoteFocus = new String("");    // Stores id of highlight object of remote origin
    var localFocus = new String("");     // Stores id of highlight object of local origin
    $scope.remoteHighlight = function(id) {
-      $scope.boolDown = true;       // Shows download button
-      $scope.boolUp = false;        // Hides upload button
+      angular.element("#btnDownload").removeAttr('disabled');       // Shows download button
+      angular.element("#btnUpload").attr('disabled', '');           // Hides upload button
       angular.element("#l" +  localFocus.replace(/\./g, "\\.")).removeClass('highlight');
       localFocus = "";
       angular.element("#r" + remoteFocus.replace(/\./g, "\\.")).removeClass('highlight');
@@ -133,11 +141,11 @@ clusterUploadModule.controller('clusterFileSystemCtrl', ['$scope', '$log', '$tim
       angular.element("#r" + id.name.replace(/\./g, "\\.")).addClass('highlight');
 
       // Change button context
-      angular.element("#tranContent").text(remoteFocus);
+      angular.element("#tranContent").text("Download: " + remoteFocus);
    }
    $scope.localHighlight = function(id) {
-      $scope.boolDown = false;      // Hides download button
-      $scope.boolUp = true;         // Shows upload button
+      angular.element("#btnDownload").attr('disabled', '');         // Hides download button
+      angular.element("#btnUpload").removeAttr('disabled');         // Shows upload button
       angular.element("#r" + remoteFocus.replace(/\./g, "\\.")).removeClass('highlight');
       remoteFocus = "";
       angular.element("#l" + localFocus.replace(/\./g, "\\.")).removeClass('highlight');
@@ -145,7 +153,7 @@ clusterUploadModule.controller('clusterFileSystemCtrl', ['$scope', '$log', '$tim
       angular.element("#l" + id.name.replace(/\./g, "\\.")).addClass('highlight');
 
       // Change button context
-      angular.element("#tranContent").text(localFocus);
+      angular.element("#tranContent").text("Upload: " + localFocus);
    }
 
    preferencesManager.getClusters().then(function(clusters) {
