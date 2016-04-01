@@ -23,20 +23,21 @@
     <div class="well clearfix col-sm-12">
       <h2 class="text-center"> Job History </h2>
         <div class="panel-group" id="accordion">
-         <div class="panel panel-default" ng-repeat="job in jobs | orderBy:'-timestamp'">
+         <div class="panel panel-default" ng-attr-id="{{ 'panel' + job.id }}" ng-repeat="job in jobs | orderBy:'-timestamp'">
            <div class="panel-heading jobhistory">
              <div class="row">
                <div class="col-sm-4">
                  <h4 class="panel-title jobhistory">{{ job.jobname }}<small class="jobdate"> {{ job.timestamp | date:'M-d-yyyy' }} </small></h4>
                </div>
-               <div class="col-sm-2 col-sm-offset-6">
-                 <button class="btn btn-sm btn-info pull-right loadbutton" ng-click="loadJob(job)">Load Job</button>
+               <div class="col-sm-4 col-sm-offset-4">
+                 <button class="btn btn-sm btn-danger pull-right delbutton" ng-click="deleteJob(job)">Delete</button>
+                 <button class="btn btn-sm btn-info pull-right loadbutton" ng-click="loadJob(job)">Load</button>
                </div>
              </div>
              <div class="row">
                <div class="col-sm-12">
                  <div class="historyinfo">
-                   <button class="btn btn-block btn-sm jobhistory" data-toggle="collapse" 0data-parent="#accordion" ng-attr-href="{{ '#collapse' + $index }}">
+                   <button class="btn btn-block btn-sm jobhistory" data-toggle="collapse" data-parent="#accordion" ng-attr-href="{{ '#collapse' + $index }}">
                      <span class="text-lowercase"><span class="caret"></span> click to expand <span class="caret"></span></span>
                    </button>
                  </div>
