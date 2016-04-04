@@ -204,7 +204,6 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
    var readDir = function(directory) {
       var deferred = $q.defer();
       
-      //commandSem.take(function () {
       // Starts SFTP session
       connectionList[getClusterContext()].sftp(function (err, sftp) {
         if (err) throw err;      // If something happens, kills process kindly
@@ -216,6 +215,7 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
          // Read directory
          sftp.readdir(directory, function(err, list) {
             if (err) {
+               $log.debug("Failure on directory: " + directory);
                $log.debug(err);
                sftp.end();
             } else {
@@ -224,12 +224,9 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
             }
             
             deferred.resolve(list);
-            $log.debug("READDIR COMMANDSEM LEAVE");
-            //commandSem.leave();
             $log.debug(list);
          });
       });
-      //});
       
       return deferred.promise;
    }

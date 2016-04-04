@@ -20,7 +20,7 @@
                                    </ul>
                                </nav>
                           </div>
-                           <div class="panel-body">Available Folders:
+                           <div class="panel-body scroll">Available Folders:
                               <ul class="jqueryFileTree" 
                                  ng-repeat="folder in remoteFiles">
                                  <li ng-switch on="folder.Class" class="{{folder.Class}}">
@@ -59,7 +59,7 @@
                                    </ul>
                                </nav>
                            </div>
-                           <div class="panel-body">Available Folders:
+                           <div class="panel-body scroll" >Available Folders:
                               <ul class="jqueryFileTree"
                                  ng-repeat="folder in localFiles">
                                  <li ng-switch on="folder.Class" class="{{folder.Class}}">
@@ -72,7 +72,6 @@
                      </td>
                   </tr>
                   <tr>
-                     <td><input type="button" ng-click="uploadCall()" value="Upload" /></td>
                      <td>
                         <div class="progress progress-striped active" ng-show="progressVisible">
                            <div class="progress-bar" style="width: {{progressValue}}%"></div><p>{{progressValue}}% ({{counter}}/{{filesTotal}}) </p>
