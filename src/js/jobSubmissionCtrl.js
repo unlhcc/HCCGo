@@ -109,12 +109,21 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
   getModules().then(function(modules) {
     selectize.addOption(modules);
     if(loadedJob != null) {
-      for (var i = 0; i < loadedJob.modules.length; i++) {
-        selectize.addItem(loadedJob.modules[i])
-      }
+      
+      // Put adding items in a $timeout to avoid $digest issues when the
+      // select element issues a 'change' event. 
+      $timeout(function() {
+        
+        angular.forEach(loadedJob.modules, function(module){
+          selectize.addItem(module);
+        });
+        selectize.refreshOptions(false);
+        selectize.refreshItems();
+        
+      }, 0);
+
     }
-    selectize.refreshOptions(false);
-    selectize.refreshItems();
+    
   });
 
   // Write a job submission script, pass in form data
