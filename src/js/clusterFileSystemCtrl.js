@@ -2,7 +2,14 @@
 clusterUploadModule = angular.module('HccGoApp.clusterFileSystemCtrl', ['ngRoute' ]);
 
 clusterUploadModule.controller('clusterFileSystemCtrl', ['$scope', '$log', '$timeout', 'connectionService', '$routeParams', '$location', '$q', 'preferencesManager', function($scope, $log, $timeout, connectionService, $routeParams, $location, $q, preferencesManager) {
-  
+ $scope.logout = function() {
+
+    $location.path("/");
+
+  }
+connectionService.getUsername().then(function(username) {
+    $scope.username = username;
+}); 
    // Sets default values on load
    $scope.onViewLoad = function () {
       $log.debug("ngView has changed");
