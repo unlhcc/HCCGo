@@ -11,6 +11,17 @@ clusterUploadModule.controller('clusterFileSystemCtrl', ['$scope', '$log', '$tim
       $scope.boolUp = true;
       $scope.boolDown = false;
    }
+
+   $scope.wdSwitcher = function(dir) {
+      if(dir.indexOf(workWD) > -1) {
+          $scope.remoteWD = homeWD;
+      } else {
+          $scope.remoteWD = workWD;
+      }
+
+      // Update view
+      remoteRead($scope.remoteWD);
+   }
    
    // Changes working directory from supplied list
    $scope.cdSSH = function (data) {
@@ -65,8 +76,8 @@ clusterUploadModule.controller('clusterFileSystemCtrl', ['$scope', '$log', '$tim
       localRead($scope.localWD);
 
       // Hides upload button
-      angular.element('#btnUpload').attr('disabled', '');
       angular.element('#tranContent').text('');
+      angular.element('#btnUpload').attr('disabled', '');
    }  
   
    var localRead = function(data) {
@@ -98,6 +109,9 @@ clusterUploadModule.controller('clusterFileSystemCtrl', ['$scope', '$log', '$tim
 
    // Upload entire directory
    $scope.uploadCall = function() {
+      // Disable upload button to prevent double clicking
+      angular.element('#btnUpload').attr('disabled', '');
+
       // Runs file upload
       connectionService.uploadFile(String($scope.localWD + "/" + localFocus), String($scope.remoteWD + "/"), function(total_transferred,chunk,total,counter,filesTotal){
          // Callback function for progress bar
@@ -121,6 +135,9 @@ clusterUploadModule.controller('clusterFileSystemCtrl', ['$scope', '$log', '$tim
                scope.uploadStatus = true;
             }
          });
+       }, function() {
+         // update view
+         remoteRead($scope.remoteWD);
        });
    }
 

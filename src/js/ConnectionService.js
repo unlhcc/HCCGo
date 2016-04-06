@@ -233,14 +233,14 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
    
    // Creates directory on server
    // Publicly available
-   var makeDir = function(dirList, root, callback) {
+   var makeDir = function(dirList, root, dest, callback) {
       var attrs = {mode: '0775'};
 
       connectionList[getClusterContext()].sftp(function (err, sftp) {
       async.eachSeries(dirList, function(dir, done) {
           var dirs = [];
 	      var exists = false;
-          dir = './' + path.basename(root) + '/' + path.relative(root,dir);
+          dir = dest + path.relative(root,dir);
           $log.debug("Creating folder: " + dir);
           async.until(function() {
               return exists;
@@ -276,23 +276,23 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
       });
    }
 
-    var uploadFile = function (src, dest, callback) {
+    var uploadFile = function (src, dest, callback, finished) {
 
         var localFiles = []; 
         var mkFolders = [];
         var filesTotal = 0;
-        var counter = 0;
+        var counter = 1;
         var BFSFolders = function(currDir, bfs) {
             //Recursively builds directory structure
             fs.readdir(currDir, function(err, files) {
-                async.each(files, function(file, bfs) {
+                async.each(files, function(file, done) {
                      fs.stat(currDir + '/' + file, function(err, stats) {
                          if(err){
-                             bfs(err);
+                             done(err);
                          } else if (stats.isFile()) {
                              localFiles.push(currDir + '/' + file);
                              filesTotal += 1;
-                             bfs(err);
+                             done(null);
                          } else if (stats.isDirectory()) {
                              if (mkFolders.indexOf(currDir) > -1) {
                                  mkFolders[mkFolders.indexOf(currDir)] = currDir + '/' + file;
@@ -300,8 +300,12 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
                                  mkFolders.push(currDir + '/' + file);
                              }
                              BFSFolders(currDir + '/' + file, function(err) {
-                                 bfs(err);
+                                 if(err) {
+                                     $log.debug("BFS Error on: " + currDir + "/" + file);
+                                     $log.debug(err);
+                                 }
                              });
+                             done(null);
                          }
                      });
                 }, function(err) {
@@ -312,31 +316,19 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
         // Starts the connection
         async.waterfall([
             function(water) {
-               fs.stat(src.replace(/\/$/, ''), function(err, stats){
-                   if(stats.isDirectory()){
-                       BFSFolders(src.replace(/\/$/, ''), function(err) {
-                           $log.debug("New Folders: ");
-                           $log.debug(mkFolders);
-                           // Set destination directory setting
-                           dest = dest + path.basename(src) + '/' 
-                           water(err, true);
-                       });
-                   } else if (stats.isFile()) {
-                      localFiles.push(src);
-                      src = path.dirname(src);
-                      water(err, false);
-                   }
+               BFSFolders(src.replace(/\/$/, ''), function(err) {
+                   $log.debug("New Folders: ");
+                   $log.debug(mkFolders);
+                   // Set destination directory setting
+                   dest = dest + path.basename(src) + '/' 
+                   water(err);
                });
             },
-            function(needMk, water) {      
+            function(water) {      
                // Get the attributes of the source directory
-               if (needMk) {
-                   makeDir(mkFolders, src, function(err) {
-                       water(err);
-                   });
-               } else {
-                   water(null);
-               }
+               makeDir(mkFolders, src, dest, function(err) {
+                   water(err);
+               });
             },
             function(water) {
                // Setting the I/O streams
@@ -354,6 +346,7 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
                     // Processes errors
                     if (err) {
                        $log.debug("upload error: " + file);
+                       $log.debug("dest + path.relative(src,file): " + dest + path.relative(src,file));
                        $log.debug(err);
                        done(err);
                     } else {
@@ -373,6 +366,7 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
                     $log.debug(err);
                     callback(err);
                 }
+                finished();
        });
 
     }
