@@ -109,27 +109,16 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
   getModules().then(function(modules) {
     selectize.addOption(modules);
     if(loadedJob != null) {
-      
-      // Put adding items in a $timeout to avoid $digest issues when the
-      // select element issues a 'change' event. 
-      $timeout(function() {
-        
-        angular.forEach(loadedJob.modules, function(module){
-          selectize.addItem(module);
-        });
-        selectize.refreshOptions(false);
-        selectize.refreshItems();
-        
-      }, 0);
-
+      for (var i = 0; i < loadedJob.modules.length; i++) {
+        selectize.addItem(loadedJob.modules[i])
+      }
     }
-    
+    selectize.refreshOptions(false);
+    selectize.refreshItems();
   });
 
   // Write a job submission script, pass in form data
   $scope.writeSubmissionScript = function(job) {
-
-    var filepath = "files/job.slurm";
 
     // Create string for file
     var jobFile =
@@ -185,17 +174,24 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
         console.log("History written successfully.");
       }
     });
-
     // Send data to ConnectionService for file upload
-    connectionService.uploadJobFile(jobFile, job.location).then(function(data) {
-      return connectionService.submitJob(job.location);
-    }).then(function() { //success
-      toastr.success('Your job was succesfully submitted to the cluster!', 'Job Submitted!', {
-        closeButton: true
+    connectionService.uploadJobFile(jobFile, job.location).then(function() {
+      // file upload success
+      connectionService.submitJob(job.location).then(function() {
+        // job submission success
+        toastr.success('Your job was succesfully submitted to the cluster!', 'Job Submitted!', {
+          closeButton: true
+        });
+        $location.path("cluster/" + $scope.params.clusterId);
+      }, function() {
+        // job submission error
+        toastr.error('There was an error in submitting your job to the cluster!', 'Job Submission Failed!', {
+          closeButton: true
+        });
       });
-      $location.path("cluster/" + $scope.params.clusterId);
-    }, function() { // error
-      toastr.error('There was an error in submitting your job to the cluster!', 'Job Submission Failed!', {
+    }, function() {
+      // file upload error
+      toastr.error('There was an error in uploading your job to the cluster!', 'Job Submission Failed!', {
         closeButton: true
       });
     });
