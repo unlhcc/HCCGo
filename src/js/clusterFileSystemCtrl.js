@@ -1,7 +1,7 @@
 
 clusterUploadModule = angular.module('HccGoApp.clusterFileSystemCtrl', ['ngRoute' ]);
 
-clusterUploadModule.controller('clusterFileSystemCtrl', ['$scope', '$log', '$timeout', 'connectionService', '$routeParams', '$location', '$q', 'preferencesManager', function($scope, $log, $timeout, connectionService, $routeParams, $location, $q, preferencesManager) {
+clusterUploadModule.controller('clusterFileSystemCtrl', ['$scope', '$log', '$timeout', 'connectionService', '$routeParams', '$location', '$q', 'preferencesManager', 'toastr', function($scope, $log, $timeout, connectionService, $routeParams, $location, $q, preferencesManager, toastr) {
  $scope.logout = function() {
 
     $location.path("/");
@@ -144,7 +144,11 @@ connectionService.getUsername().then(function(username) {
          });
        }, function() {
          // update view
+         toastr.success('Your file transfer was succesfully!', 'Files Transfer!', {
+           closeButton: true
+         });
          remoteRead($scope.remoteWD);
+         
        });
    }
 
