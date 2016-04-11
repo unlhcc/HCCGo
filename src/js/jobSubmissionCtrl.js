@@ -187,25 +187,20 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
     // Send data to ConnectionService for file upload
     connectionService.uploadJobFile(jobFile, job.location).then(function() {
       // file upload success
-      alert("upload success");
       connectionService.submitJob(job.location).then(function() {
         // job submission success
-        alert("job submission success");
-        // thrown here
         toastr.success('Your job was succesfully submitted to the cluster!', 'Job Submitted!', {
           closeButton: true
         });
         $location.path("cluster/" + $scope.params.clusterId);
       }, function() {
         // job submission error
-        alert("job submission error");
         toastr.error('There was an error in submitting your job to the cluster!', 'Job Submission Failed!', {
           closeButton: true
         });
       });
     }, function() {
       // file upload error
-      alert("upload error");
       toastr.error('There was an error in uploading your job to the cluster!', 'Job Submission Failed!', {
         closeButton: true
       });
