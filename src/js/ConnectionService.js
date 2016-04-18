@@ -93,7 +93,6 @@ connectionModule.factory('connectionService',['$log', '$q', function($log, $q) {
     connectionList[0].sftp(function (err, sftp) {
       if (err) {
         deferred.reject(err);
-        throw err;		// If something happens, kills process kindly
       }
 
       // Process to console
@@ -102,7 +101,10 @@ connectionModule.factory('connectionService',['$log', '$q', function($log, $q) {
 
       // Setting the I/O streams
       var writeStream = sftp.createWriteStream ( remotePath );
-
+      // Catch writestream erros
+      writeStream.on('error', function (err) {
+        deferred.reject(err);
+      });
       // Sets logic for finishing of process
       writeStream.on(
         'close',
@@ -113,7 +115,11 @@ connectionModule.factory('connectionService',['$log', '$q', function($log, $q) {
       );
 
       // Does the thing
-      writeStream.write(jobFile);
+      writeStream.write(jobFile, function(err) {
+        if (err) {
+          deferred.reject(err);
+        }
+      });
       deferred.resolve("Job successfully uploaded");
     });
     return deferred.promise;
