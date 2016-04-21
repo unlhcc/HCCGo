@@ -94,33 +94,36 @@ connectionModule.factory('connectionService',['$log', '$q', function($log, $q) {
       if (err) {
         deferred.reject(err);
       }
+      else {
+        // Process to console
+        $log.debug( "SFTP has begun");
+        $log.debug( "Value of remotePath: " + remotePath );
 
-      // Process to console
-      $log.debug( "SFTP has begun");
-      $log.debug( "Value of remotePath: " + remotePath );
-
-      // Setting the I/O streams
-      var writeStream = sftp.createWriteStream ( remotePath );
-      // Catch writestream erros
-      writeStream.on('error', function (err) {
-        deferred.reject(err);
-      });
-      // Sets logic for finishing of process
-      writeStream.on(
-        'close',
-        function () {
-          sftp.end();
-          $log.debug("File has been transferred");
-        }
-      );
-
-      // Does the thing
-      writeStream.write(jobFile, function(err) {
-        if (err) {
+        // Setting the I/O streams
+        var writeStream = sftp.createWriteStream ( remotePath );
+        // Catch writestream erros
+        writeStream.on('error', function (err) {
           deferred.reject(err);
-        }
-      });
-      deferred.resolve("Job successfully uploaded");
+        });
+        // Sets logic for finishing of process
+        writeStream.on(
+          'close',
+          function () {
+            sftp.end();
+            $log.debug("File has been transferred");
+          }
+        );
+
+        // Does the thing
+        writeStream.write(jobFile, function(err) {
+          if (err) {
+            deferred.reject(err);
+          }
+          else {
+            deferred.resolve("Job successfully uploaded");
+          }
+        });
+      }
     });
     return deferred.promise;
   }
