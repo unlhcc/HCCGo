@@ -13,7 +13,6 @@ connectionService.getUsername().then(function(username) {
    // Sets default values on load
    $scope.onViewLoad = function () {
       $log.debug("ngView has changed");
-      $scope.progressVisible = false;
       $scope.uploadStatus = false;
       $scope.boolUp = true;
       $scope.boolDown = false;
@@ -149,11 +148,44 @@ connectionService.getUsername().then(function(username) {
          });
          remoteRead($scope.remoteWD);
          
+       }, function(err) {
+         // Error occured in ConnectionService
        });
    }
 
    $scope.downloadCall = function () {
+      angular.element('#btnDownload').attr('disabled', '');
 
+      // Runs file upload
+      connectionService.downloadFile(String($scope.localWD + "/"), String($scope.remoteWD + "/" + remoteFocus), function(total_transferred,chunk,total,counter,filesTotal){
+         // Callback function for progress bar
+         //$log.debug("Total transferred: " + total_transferred);
+         //$log.debug("Chunks: " + chunk);
+         //$log.debug("Total: " + total);
+         $scope.filesTotal = filesTotal;
+         $scope.counter = counter;
+         
+         // Work on progress bar
+         $scope.$apply(function(scope) {
+            scope.uploadStatus = true;
+            scope.max = total;
+            scope.progressValue = Math.floor((total_transferred/total)*100);
+            //$log.debug("Progress: " + ((total_transferred/total)*100) + "%");
+            
+            if(scope.progressValue == 100) {
+               scope.uploadStatus = true;
+            }
+         });
+       }, function() {
+         // update view
+         toastr.success('Your file transfer was succesfully!', 'Files Transfer!', {
+           closeButton: true
+         });
+         remoteRead($scope.remoteWD);
+         
+       }, function(err) {
+         // Error occured in ConnectionService
+       });
    } 
    
    // highlight selection and store id
