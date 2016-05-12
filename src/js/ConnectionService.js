@@ -379,7 +379,7 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
                        filesTotal += 1;
                        src = path.dirname(src);
                        water(err, false);
-                   }
+                  }
                });
             },
             function(arg, water) {
@@ -493,20 +493,36 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
         // Starts the connection
         async.waterfall([
             function(water) {
-               mkFolders.push(remotePath);
-               BFSFolders(remotePath.replace(/\/$/, ''), function(err) {
-                   $log.debug("New Folders: ");
-                   $log.debug(mkFolders);
-                   // Set destination directory setting
-                   localPath = localPath + path.basename(remotePath) + '/'; 
-                   water(err);
+               connectionList[getClusterContext()].sftp(function (err, sftp) {
+                   sftp.stat(remotePath.replace(/\/$/, ''), function (err, stats) {
+                       sftp.end();
+                       if (stats.isDirectory()) {
+                           mkFolders.push(remotePath);
+                           BFSFolders(remotePath.replace(/\/$/, ''), function(err) {
+                               $log.debug("New Folders: ");
+                               $log.debug(mkFolders);
+                               // Set destination directory setting
+                               localPath = localPath + path.basename(remotePath) + '/'; 
+                               water(err, true);
+                           });
+                       } else if (stats.isFile()) {
+                           remoteFiles.push(remotePath);
+                           filesTotal += 1;
+                           remotePath = path.dirname(remotePath);
+                           water(err, false);
+                       }
+                   });
                });
             },
-            function(water) {      
-               // Get the attributes of the source directory
-               lmakeDir(mkFolders, remotePath, localPath, function(err) {
-                   water(err);
-               });
+            function(arg, water) {
+               if (arg) {      
+                   // Get the attributes of the source directory
+                   lmakeDir(mkFolders, remotePath, localPath, function(err) {
+                       water(err);
+                   });
+               } else {
+                   water(null);
+               }
             },
             function(water) {
                // Setting the I/O streams
