@@ -212,7 +212,7 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
          // Read directory
          sftp.readdir(task.name, function(err, list) {
             if (err) {
-               $log.debug("Failure on directory: " + directory);
+               $log.debug("Failure on directory: " + task.name);
                $log.debug(err);
                sftp.end();
             } else {
@@ -363,19 +363,32 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
         // Starts the connection
         async.waterfall([
             function(water) {
-               BFSFolders(src.replace(/\/$/, ''), function(err) {
-                   $log.debug("New Folders: ");
-                   $log.debug(mkFolders);
-                   // Set destination directory setting
-                   dest = dest + path.basename(src) + '/'; 
-                   water(err);
+               fs.stat(src.replace(/\/$/, ''), function(err, stats) {
+                   if(stats.isDirectory()){
+                       BFSFolders(src.replace(/\/$/, ''), function(err) {
+                           $log.debug("New Folders: ");
+                           $log.debug(mkFolders);
+                           // Set destination directory setting
+                           dest = dest + path.basename(src) + '/'; 
+                           water(err, true);
+                       });
+                   } else if (stats.isFile()) {
+                       localFiles.push(src);
+                       filesTotal += 1;
+                       src = path.dirname(src);
+                       water(err, false);
+                   }
                });
             },
-            function(water) {      
-               // Get the attributes of the source directory
-               makeDir(mkFolders, src, dest, function(err) {
-                   water(err);
-               });
+            function(arg, water) {
+               if (arg) {
+                   // Get the attributes of the source directory
+                   makeDir(mkFolders, src, dest, function(err) {
+                       water(err);
+                   });
+               } else {
+                   water(null);
+               }
             },
             function(water) {
                // Setting the I/O streams
@@ -507,7 +520,7 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
                   function(err){
                     // Processes errors
                     if (err) {
-                       $log.debug("upload error: " + file);
+                       $log.debug("download error: " + file);
                        $log.debug("dest + path.relative(src,file): " + localPath + path.relative(remoteFiles,file));
                        $log.debug(err);
                        done(err);
