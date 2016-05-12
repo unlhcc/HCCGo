@@ -365,6 +365,8 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
             function(water) {
                fs.stat(src.replace(/\/$/, ''), function(err, stats) {
                    if(stats.isDirectory()){
+                       mkFolders.push(src);
+
                        BFSFolders(src.replace(/\/$/, ''), function(err) {
                            $log.debug("New Folders: ");
                            $log.debug(mkFolders);
@@ -491,6 +493,7 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
         // Starts the connection
         async.waterfall([
             function(water) {
+               mkFolders.push(remotePath);
                BFSFolders(remotePath.replace(/\/$/, ''), function(err) {
                    $log.debug("New Folders: ");
                    $log.debug(mkFolders);
