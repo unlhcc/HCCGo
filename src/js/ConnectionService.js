@@ -328,6 +328,8 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
         var localFiles = []; 
         var mkFolders = [];
         var filesTotal = 0;
+        var currentTotal = 0;
+        var sizeTotal = 0;
         var counter = 1;
         var BFSFolders = function(currDir, bfs) {
             //Recursively builds directory structure
@@ -338,6 +340,7 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
                              done(err);
                          } else if (stats.isFile()) {
                              localFiles.push(currDir + '/' + file);
+                             sizeTotal += stats.size;
                              filesTotal += 1;
                              done(null);
                          } else if (stats.isDirectory()) {
@@ -394,7 +397,7 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
             },
             function(water) {
                // Setting the I/O streams
-
+               var currentVal = 0;
                connectionList[getClusterContext()].sftp(function (err, sftp) {
                async.eachSeries(localFiles, function(file, done) {
                   // Process to console
@@ -402,7 +405,8 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
                   $log.debug( "Value of localPath: " + file );
                
                   sftp.fastPut(file, dest + path.relative(src,file), {step:function(total_transferred,chunk,total){
-                       callback(total_transferred, chunk, total, counter, filesTotal)
+                       currentVal = total;
+                       callback(total_transferred, chunk, total, counter, filesTotal, currentTotal, sizeTotal);
                   }}, 
                   function(err){
                     // Processes errors
@@ -412,6 +416,7 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
                        $log.debug(err);
                        done(err);
                     } else {
+                       currentTotal += currentVal;
                        $log.debug("SFTP :: fastPut success");
                        counter += 1;
                        done(null);
