@@ -16,6 +16,7 @@ connectionService.getUsername().then(function(username) {
       $scope.uploadStatus = false;
       $scope.boolUp = true;
       $scope.boolDown = false;
+      $scope.processStatus = true;
    }
 
    $scope.wdSwitcher = function(dir) {
@@ -117,6 +118,7 @@ connectionService.getUsername().then(function(username) {
    $scope.uploadCall = function() {
       // Disable upload button to prevent double clicking
       angular.element('#btnUpload').attr('disabled', '');
+      $scope.processStatus = true;
 
       // Runs file upload
       connectionService.uploadFile(String($scope.localWD + "/" + localFocus), String($scope.remoteWD + "/"), function(total_transferred,chunk,total,counter,filesTotal){
@@ -124,20 +126,20 @@ connectionService.getUsername().then(function(username) {
          //$log.debug("Total transferred: " + total_transferred);
          //$log.debug("Chunks: " + chunk);
          //$log.debug("Total: " + total);
+         $scope.processStatus = false;
+         
          $scope.filesTotal = filesTotal;
          $scope.counter = counter;
          
          // Work on progress bar
          $scope.$apply(function(scope) {
-            scope.progressVisible = true;
-            scope.uploadStatus = false;
+            scope.uploadStatus = true;
             scope.max = total;
             scope.progressValue = Math.floor((total_transferred/total)*100);
             scope.progressVisible = true;
             //$log.debug("Progress: " + ((total_transferred/total)*100) + "%");
             
             if(scope.progressValue == 100) {
-               scope.progressVisible = false;
                scope.uploadStatus = true;
             }
          });
@@ -155,6 +157,7 @@ connectionService.getUsername().then(function(username) {
 
    $scope.downloadCall = function () {
       angular.element('#btnDownload').attr('disabled', '');
+      $scope.processStatus = true;
 
       // Runs file upload
       connectionService.downloadFile(String($scope.localWD + "/"), String($scope.remoteWD + "/" + remoteFocus), function(total_transferred,chunk,total,counter,filesTotal){
@@ -162,6 +165,8 @@ connectionService.getUsername().then(function(username) {
          //$log.debug("Total transferred: " + total_transferred);
          //$log.debug("Chunks: " + chunk);
          //$log.debug("Total: " + total);
+         $scope.processStatus = false;     // Rotating processing indicator no longer needed
+
          $scope.filesTotal = filesTotal;
          $scope.counter = counter;
          
@@ -181,7 +186,8 @@ connectionService.getUsername().then(function(username) {
          toastr.success('Your file transfer was succesfully!', 'Files Transfer!', {
            closeButton: true
          });
-         remoteRead($scope.remoteWD);
+         $scope.processFinished = true;   // Show finished message
+         localRead($scope.localWD);
          
        }, function(err) {
          // Error occured in ConnectionService
@@ -202,6 +208,11 @@ connectionService.getUsername().then(function(username) {
 
       // Change button context
       angular.element("#tranContent").text("Download: " + remoteFocus);
+
+      // Sets all 'processing' displays to be hidden
+      $scope.processStatus = false;
+      $scope.uploadStatus = false;
+      $scope.processFinished = false;
    }
    $scope.localHighlight = function(id) {
       angular.element("#btnDownload").attr('disabled', '');         // Hides download button
@@ -214,6 +225,11 @@ connectionService.getUsername().then(function(username) {
 
       // Change button context
       angular.element("#tranContent").text("Upload: " + localFocus);
+
+      // Sets all 'processing' displays to be hidden
+      $scope.processStatus = false;
+      $scope.uploadStatus = false;
+      $scope.processFinished = false;
    }
 
    preferencesManager.getClusters().then(function(clusters) {
@@ -232,7 +248,7 @@ connectionService.getUsername().then(function(username) {
    });
    
    // jQuery controls
-   
+  /* 
    angular.element('input[type=radio][name=radUp]').change(function() {
        if(this.value == 'file') {
            angular.element("#fileToUpload").removeAttr('directory');
@@ -246,7 +262,7 @@ connectionService.getUsername().then(function(username) {
            $log.debug("radio is folder");
        }
    });
-
+*/
    // Initialization functions
    $scope.params = $routeParams
    var clusterInterface = null;
@@ -283,7 +299,7 @@ connectionService.getUsername().then(function(username) {
    } else {
        // Runs for Mac and Linux systems
        // Establishes Displayed files
-       $log.debug("process working directory: " + process.env.home);
+       $log.debug("process working directory: " + process.env.HOME);
        $scope.localWD = process.env.HOME;
        localRead($scope.localWD);    // Sets local display
    }

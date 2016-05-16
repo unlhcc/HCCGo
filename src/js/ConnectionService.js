@@ -351,8 +351,8 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
                                      $log.debug("BFS Error on: " + currDir + "/" + file);
                                      $log.debug(err);
                                  }
+                                 done(null);
                              });
-                             done(null);
                          }
                      });
                 }, function(err) {
@@ -379,7 +379,7 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
                        filesTotal += 1;
                        src = path.dirname(src);
                        water(err, false);
-                  }
+                   }
                });
             },
             function(arg, water) {
@@ -440,23 +440,7 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
         var mkFolders = [];
         var filesTotal = 0;
         var counter = 1;
-        var q = async.queue(function (task, callback) {
-            $log.debug('hello ' + task.name);
-            BFSFolders(task.name, function(err) {
-                if(err) {
-                    $log.debug("BFS Error on: " + task.name);
-                    $log.debug(err);
-                }
-
-                callback();
-            });
-        }, 2);
         
-        // assign a callback
-        q.drain = function() {
-            console.log('all items have been processed');
-        }
-
         var BFSFolders = function(currDir, bfs) {
             readDir(currDir).then(function(data) {
                 async.each(data, function(file, done) {
@@ -479,11 +463,6 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
 
                             done(null);
                         });
-                    /*q.push({name: currDir + '/' + file.filename}, function(err) {
-                        $log.debug(err);
-                        $log.debug('finished processing ' + currDir + '/' + file.filename);
-                        done(null);
-                    });*/
                     }
                 }, function(err) {
                     bfs(err);

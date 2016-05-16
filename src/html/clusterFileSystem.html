@@ -26,7 +26,7 @@
                      <td>
                         <div class="panel panel-default">
                           <div class="panel-heading">Remote Working Directory: 
-                               <div>{{remoteWD}}</div>
+                               <div id="divremoteDir">{{remoteWD}}</div>
                                <nav>
                                    <ul id="remote-directories" class="pager">
                                        <li class="previous">
@@ -54,7 +54,7 @@
                         </div>
                      </td>
                      <td>
-                        <div class="panel panel-default">
+                        <div class="panel panel-default width-control">
                            <div class="panel-body">
                               <button id="btnDownload" disabled ng-click="downloadCall()" type="button" class="btn btn-primary btn-block">
                                   <span class="glyphicon glyphicon-arrow-right" aria-hidden="true">Download</span>
@@ -68,9 +68,9 @@
                         </div>
                      </td>
                      <td>
-                        <div class="panel panel-default">
+                        <div class="panel panel-default width-control">
                            <div class="panel-heading">Local Working Directory:
-                               <div>{{localWD}}</div>
+                               <div id="divlocalDir">{{localWD}}</div>
                                <nav>
                                    <ul class="pager">
                                        <li class="previous">
@@ -95,11 +95,19 @@
                   </tr>
                   <tr>
                      <td colspan="3">
-                        <div class="progress progress-striped active" ng-show="uploadStatus">
-                           <div class="progress-bar" style="width: {{progressValue}}%"></div><p>{{progressValue}}% ({{counter}}/{{filesTotal}}) </p>
+                        <div ng-show="processStatus">
+                            <span class="glyphicon glyphicon-refresh glyphicon-animate">
+                            </span>
+                            Processing...
                         </div>
                         <div ng-show="uploadStatus">
-                           <p>({{counter}}/{{filesTotal}}) Done!</p>
+                           <div class="progress progress-striped active" ng-show="uploadStatus">
+                              <div class="progress-bar" style="width: {{progressValue}}%"></div>
+                           </div>
+                           <p>{{progressValue}}% ({{counter}}/{{filesTotal}}) </p>
+                        </div>
+                        <div ng-show="processFinished">
+                           Done!
                         </div>
                      </td>
                   </tr>
