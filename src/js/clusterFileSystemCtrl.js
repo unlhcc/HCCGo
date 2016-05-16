@@ -148,6 +148,7 @@ connectionService.getUsername().then(function(username) {
          toastr.success('Your file transfer was succesfully!', 'Files Transfer!', {
            closeButton: true
          });
+         $scope.processFinished = true;
          remoteRead($scope.remoteWD);
          
        }, function(err) {
