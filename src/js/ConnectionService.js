@@ -230,7 +230,7 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
    var readDir = function(directory) {
       var deferred = $q.defer();
       
-      readDirQueue.push({name: directory}, function(err, list) {
+      readDirQueue.push({name: directory}, function(err) {
           deferred.resolve(err);
       });
       
@@ -324,7 +324,6 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
    }
 
     var uploadFile = function (src, dest, callback, finished, error) {
-
         var localFiles = []; 
         var mkFolders = [];
         var filesTotal = 0;
@@ -379,6 +378,7 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
                        });
                    } else if (stats.isFile()) {
                        localFiles.push(src);
+                       sizeTotal += stats.size;
                        filesTotal += 1;
                        src = path.dirname(src);
                        water(err, false);
@@ -438,37 +438,77 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
        });
 
     }
-   
+
+   var remoteStatQueue = async.queue(function (task, callback) {
+      // Starts SFTP session
+      connectionList[getClusterContext()].sftp(function (err, sftp) {
+        if (err) throw err;      // If something happens, kills process kindly
+         
+         // Debug to console
+         $log.debug("SFTP Stat has begun");
+         $log.debug("Reading server file");
+         
+         // Read directory
+         sftp.stat(task.name, function(err, stats) {
+            if (err) {
+               $log.debug("Failure on directory: " + task.name);
+               $log.debug(err);
+               sftp.end();
+            } else {
+               $log.debug("SFTP :: readdir success");
+               sftp.end();
+            }
+            callback(stats);
+            //deferred.resolve(list);
+            $log.debug(stats);
+         });
+      });
+   }, 3);
+ 
+   // Reads filesystem directory on server
+   var remoteStat = function(directory) {
+      var deferred = $q.defer();
+      
+      remoteStatQueue.push({name: directory}, function(err) {
+          deferred.resolve(err);
+      });
+      
+      return deferred.promise;
+   }
+
    // Functionality to download a file from the server
    var downloadFile = function(localPath, remotePath, callback, finished, error) {
         var remoteFiles = []; 
         var mkFolders = [];
         var filesTotal = 0;
+        var currentTotal = 0;
+        var sizeTotal = 0;
         var counter = 1;
         
         var BFSFolders = function(currDir, bfs) {
             readDir(currDir).then(function(data) {
                 async.each(data, function(file, done) {
-                    if (file.longname.charAt(0) != 'd') {
+                 remoteStat(currDir + '/' + file.filename).then(function(data) {
+                    if (data.isFile()) {
                         remoteFiles.push(currDir + '/' + file.filename);
+                        sizeTotal += data.size;
                         filesTotal += 1;
                         done(null);
-                    } else if (file.longname.charAt(0) == 'd') {
+                    } else if (data.isDirectory()) {
                         if (mkFolders.indexOf(currDir) > -1) {
                             mkFolders[mkFolders.indexOf(currDir)] = currDir + '/' + file.filename;
                         } else {
                             mkFolders.push(currDir + '/' + file.filename);
                         }
-                    
                         BFSFolders(currDir + '/' + file.filename, function(err) {
                             if(err) {
                                 $log.debug("BFS Error on: " + currDir + '/' + file.filename);
                                 $log.debug(err);
                             }
-
                             done(null);
                         });
                     }
+                  });
                 }, function(err) {
                     bfs(err);
                 });
@@ -491,6 +531,7 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
                            });
                        } else if (stats.isFile()) {
                            remoteFiles.push(remotePath);
+                           sizeTotal += stats.size;
                            filesTotal += 1;
                            remotePath = path.dirname(remotePath);
                            water(err, false);
@@ -510,7 +551,7 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
             },
             function(water) {
                // Setting the I/O streams
-
+               var currentVal = 0;
                connectionList[getClusterContext()].sftp(function (err, sftp) {
                async.eachSeries(remoteFiles, function(file, done) {
                   // Process to console
@@ -518,7 +559,8 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
                   //$log.debug( "Value of localPath: " + file );
                
                   sftp.fastGet(file, localPath + path.relative(remotePath,file), {step:function(total_transferred,chunk,total){
-                       callback(total_transferred, chunk, total, counter, filesTotal)
+                       currentVal = total;
+                       callback(total_transferred, chunk, total, counter, filesTotal, currentTotal, sizeTotal);
                   }}, 
                   function(err){
                     // Processes errors
@@ -529,6 +571,7 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
                        done(err);
                     } else {
                        //$log.debug("SFTP :: fastPut success");
+                       currentTotal += currentVal;
                        counter += 1;
                        done(null);
                     }

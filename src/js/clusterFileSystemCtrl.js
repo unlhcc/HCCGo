@@ -121,7 +121,7 @@ connectionService.getUsername().then(function(username) {
       $scope.processStatus = true;
 
       // Runs file upload
-      connectionService.uploadFile(String($scope.localWD + "/" + localFocus), String($scope.remoteWD + "/"), function(total_transferred,chunk,total,counter,filesTotal, currentTotal, sizeTotal){
+      connectionService.uploadFile(String($scope.localWD + "/" + localFocus), String($scope.remoteWD + "/"), function(total_transferred,chunk,total,counter,filesTotal,currentTotal,sizeTotal){
          // Callback function for progress bar
          //$log.debug("Total transferred: " + total_transferred);
          //$log.debug("Chunks: " + chunk);
@@ -135,14 +135,10 @@ connectionService.getUsername().then(function(username) {
          $scope.$apply(function(scope) {
             scope.uploadStatus = true;
             scope.max = total;
-            scope.totalProgress = Math.floor((currentTotal/sizeTotal)*100);
             scope.progressValue = Math.floor((total_transferred/total)*100);
-            scope.progressVisible = true;
+            scope.totalProgress = Math.floor((currentTotal/sizeTotal)*100);
             //$log.debug("Progress: " + ((total_transferred/total)*100) + "%");
             
-            if(scope.progressValue == 100) {
-               scope.uploadStatus = true;
-            }
          });
        }, function() {
          // update view
@@ -162,7 +158,7 @@ connectionService.getUsername().then(function(username) {
       $scope.processStatus = true;
 
       // Runs file upload
-      connectionService.downloadFile(String($scope.localWD + "/"), String($scope.remoteWD + "/" + remoteFocus), function(total_transferred,chunk,total,counter,filesTotal){
+      connectionService.downloadFile(String($scope.localWD + "/"), String($scope.remoteWD + "/" + remoteFocus), function(total_transferred,chunk,total,counter,filesTotal,currentTotal,sizeTotal){
          // Callback function for progress bar
          //$log.debug("Total transferred: " + total_transferred);
          //$log.debug("Chunks: " + chunk);
@@ -176,12 +172,9 @@ connectionService.getUsername().then(function(username) {
          $scope.$apply(function(scope) {
             scope.uploadStatus = true;
             scope.max = total;
+            scope.totalProgress = Math.floor((currentTotal/sizeTotal)*100);
             scope.progressValue = Math.floor((total_transferred/total)*100);
             //$log.debug("Progress: " + ((total_transferred/total)*100) + "%");
-            
-            if(scope.progressValue == 100) {
-               scope.uploadStatus = true;
-            }
          });
        }, function() {
          // update view
