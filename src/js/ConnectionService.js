@@ -130,11 +130,37 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
 
    var commandSem = require('semaphore')(1);
 
+   var runCommandQueue = async.queue(function (task, callback) {
+      // Starts Command session
+      connectionList[getClusterContext()].exec(task.name, function(err, stream) {
+         
+         cumulData = "";
+         
+         if (err) {
+           $log.error("Error running command " + task.name + ": "+ err);
+           callback(err, cumulData);
+           return;
+         }
+         
+         stream.on('data', function(data) {
+           
+           $log.debug("Got data: " + data);
+           cumulData += data;
+           
+         }).on('close', function(code, signal) {
+           
+           $log.debug('Stream :: close :: code: ' + code + ', signal: ' + signal);
+           callback(null, cumulData);   // Once the command actually completes full data stored here
+           
+         });
+      });
+   }, 1);
+ 
    var runCommand = function(command) {
 
       var deferred = $q.defer();         // Used to return promise data
       
-      commandSem.take(function() {
+      /*commandSem.take(function() {
 
         // Run a command remotely
         connectionList[getClusterContext()].exec(command, function(err, stream) {
@@ -161,6 +187,14 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
            
          });
         });
+      });*/
+
+      runCommandQueue.push({name: command}, function(err, cumulData) {
+          if (err) {
+              deferred.reject("Error running command " + command + ": " + err);
+          } else {
+              deferred.resolve(cumulData);
+          }
       });
 
       return deferred.promise;   // Asynchronous command, doesn't really return anything until deferred.resolve is called
@@ -203,11 +237,9 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
    var readDirQueue = async.queue(function (task, callback) {
       // Starts SFTP session
       connectionList[getClusterContext()].sftp(function (err, sftp) {
-        if (err) throw err;      // If something happens, kills process kindly
-         
          // Debug to console
-         $log.debug("SFTP has begun");
-         $log.debug("Reading server");
+         // $log.debug("SFTP has begun");
+         // $log.debug("Reading server");
          
          // Read directory
          sftp.readdir(task.name, function(err, list) {
@@ -216,12 +248,12 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
                $log.debug(err);
                sftp.end();
             } else {
-               $log.debug("SFTP :: readdir success");
+               // $log.debug("SFTP :: readdir success");
                sftp.end();
             }
             callback(list);
             //deferred.resolve(list);
-            $log.debug(list);
+            // $log.debug(list);
          });
       });
    }, 3);
@@ -343,12 +375,11 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
                 $log.debug("task.remote: " + task.remote);
                 $log.debug(err);
                 sftp.end();
-                callback(err);
+                callback(err, 0);
             } else {
                 //$log.debug("SFTP :: fastPut success");
                 sftp.end();
-                task.finisher(totalCollector);
-                callback(null);
+                callback(null, totalCollector);
             }
         });
       });
@@ -439,12 +470,10 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
                       data: function(total_transferred) {
                           callback(total_transferred, counter, filesTotal, currentTotal, sizeTotal);
                           return 0;
-                      }, 
-                      finisher: function(finishTotal) {
+                      }}, function(data) {
                           currentTotal += finishTotal;
                           counter += 1;
-                          return 0;
-                      }}, function(data) {
+                          callback(0, counter, filesTotal, currentTotal, sizeTotal);
                           done(data);
                       });
 
@@ -466,11 +495,9 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
    var remoteStatQueue = async.queue(function (task, callback) {
       // Starts SFTP session
       connectionList[getClusterContext()].sftp(function (err, sftp) {
-         if (err) throw err;      // If something happens, kills process kindly
-         
          // Debug to console
-         $log.debug("SFTP Stat has begun");
-         $log.debug("Reading server file");
+         // $log.debug("SFTP Stat has begun");
+         // $log.debug("Reading server file");
          
          // Read directory
          sftp.stat(task.name, function(err, stats) {
@@ -479,12 +506,12 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
                $log.debug(err);
                sftp.end();
             } else {
-               $log.debug("SFTP :: readdir success");
+               // $log.debug("SFTP :: readdir success");
                sftp.end();
             }
             callback(stats);
             //deferred.resolve(list);
-            $log.debug(stats);
+            // $log.debug(stats);
          });
       });
    }, 3);
@@ -520,12 +547,11 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
                 $log.debug("task.remote: " + task.remote);
                 $log.debug(err);
                 sftp.end();
-                callback(err);
+                callback(err, 0);
             } else {
                 //$log.debug("SFTP :: fastPut success");
                 sftp.end();
-                task.finisher(totalCollector);
-                callback(null);
+                callback(null, totalCollector);
             }
         });
       });
@@ -543,13 +569,14 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
         var BFSFolders = function(currDir, bfs) {
             readDir(currDir).then(function(data) {
                 async.each(data, function(file, done) {
-                 remoteStat(currDir + '/' + file.filename).then(function(stats) {
-                    if (stats.isFile()) {
-                        remoteFiles.push(currDir + '/' + file.filename);
-                        sizeTotal += stats.size;
-                        filesTotal += 1;
-                        done(null);
-                    } else if (stats.isDirectory()) {
+                    if (file.longname.charAt(0) != 'd') {
+                        remoteStat(currDir + '/' + file.filename).then(function(stats) {
+                            remoteFiles.push(currDir + '/' + file.filename);
+                            sizeTotal += stats.size;
+                            filesTotal += 1;
+                            done(null);
+                        });
+                    } else if (file.longname.charAt(0) == 'd') {
                         if (mkFolders.indexOf(currDir) > -1) {
                             mkFolders[mkFolders.indexOf(currDir)] = currDir + '/' + file.filename;
                         } else {
@@ -563,7 +590,6 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
                             done(null);
                         });
                     }
-                  });
                 }, function(err) {
                     bfs(err);
                 });
@@ -572,25 +598,23 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
         // Starts the connection
         async.waterfall([
             function(water) {
-               connectionList[getClusterContext()].sftp(function (err, sftp) {
-                   remoteStat(remotePath.replace(/\/$/, '')).then(function(data) {
-                       if (data.isDirectory()) {
-                           mkFolders.push(remotePath);
-                           BFSFolders(remotePath.replace(/\/$/, ''), function(err) {
-                               $log.debug("New Folders: ");
-                               $log.debug(mkFolders);
-                               // Set destination directory setting
-                               localPath = localPath + path.basename(remotePath) + '/'; 
-                               water(err, true);
-                           });
-                       } else if (data.isFile()) {
-                           remoteFiles.push(remotePath);
-                           sizeTotal += data.size;
-                           filesTotal += 1;
-                           remotePath = path.dirname(remotePath);
-                           water(err, false);
-                       }
-                   });
+               remoteStat(remotePath.replace(/\/$/, '')).then(function(data) {
+                   if (data.isDirectory()) {
+                       mkFolders.push(remotePath);
+                       BFSFolders(remotePath.replace(/\/$/, ''), function(err) {
+                           $log.debug("New Folders: ");
+                           $log.debug(mkFolders);
+                           // Set destination directory setting
+                           localPath = localPath + path.basename(remotePath) + '/'; 
+                           water(err, true);
+                       });
+                   } else if (data.isFile()) {
+                       remoteFiles.push(remotePath);
+                       sizeTotal += data.size;
+                       filesTotal += 1;
+                       remotePath = path.dirname(remotePath);
+                       water(err, false);
+                   }
                });
             },
             function(arg, water) {
@@ -618,12 +642,10 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
                       data: function(total_transferred) {
                           callback(total_transferred, counter, filesTotal, currentTotal, sizeTotal);
                           return 0;
-                      }, 
-                      finisher: function(finishTotal) {
+                      }}, function(data, finishTotal) {
                           currentTotal += finishTotal;
                           counter += 1;
-                          return 0;
-                      }}, function(data) {
+                          callback(0, counter, filesTotal, currentTotal, sizeTotal);
                           done(data);
                       });
                }, function(err) {
