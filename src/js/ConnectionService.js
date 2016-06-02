@@ -234,7 +234,7 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
      return deferred.promise;
    }
    
-   var readDirQueue = async.queue(function (task, callback) {
+   var readDirQueue = async.cargo(function (task, callback) {
       // Starts SFTP session
       connectionList[getClusterContext()].sftp(function (err, sftp) {
          // Debug to console
@@ -242,28 +242,40 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
          // $log.debug("Reading server");
          
          // Read directory
-         sftp.readdir(task.name, function(err, list) {
+         async.each(task, function(worker, done) {
+            sftp.readdir(worker.name, function(err, list) {
+               if (err) {
+                  $log.debug("Failure on directory: " + task.name);
+                  $log.debug(err);
+                  done(err);
+               } else {
+                  worker.caller(list);
+                  done(null);
+               }
+            });
+         }, function(err){
+            sftp.end();
             if (err) {
-               $log.debug("Failure on directory: " + task.name);
-               $log.debug(err);
-               sftp.end();
+                callback(err);
             } else {
-               // $log.debug("SFTP :: readdir success");
-               sftp.end();
+                callback(null);
             }
-            callback(list);
-            //deferred.resolve(list);
-            // $log.debug(list);
          });
       });
-   }, 3);
+   }, 20);
  
    // Reads filesystem directory on server
    var readDir = function(directory) {
       var deferred = $q.defer();
       
-      readDirQueue.push({name: directory}, function(err) {
-          deferred.resolve(err);
+      readDirQueue.push({name: directory, 
+          caller: function(dir) {
+              deferred.resolve(dir);
+              return 0;
+          }}, function(err) {
+              if (err) {
+                  deferred.reject(err);
+              }
       });
       
       return deferred.promise;
@@ -492,7 +504,7 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
 
     }
 
-   var remoteStatQueue = async.queue(function (task, callback) {
+   var remoteStatQueue = async.cargo(function (task, callback) {
       // Starts SFTP session
       connectionList[getClusterContext()].sftp(function (err, sftp) {
          // Debug to console
@@ -500,62 +512,81 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
          // $log.debug("Reading server file");
          
          // Read directory
-         sftp.stat(task.name, function(err, stats) {
+         async.each(task, function(worker, done) {
+            sftp.stat(worker.name, function(err, stats) {
+               if (err) {
+                  $log.debug("Failure on directory: " + task.name);
+                  $log.debug(err);
+                  done(err);
+               } else {
+                  worker.caller(stats);
+                  done(null);
+               }
+            });
+         }, function(err) {
+            sftp.end();
             if (err) {
-               $log.debug("Failure on directory: " + task.name);
-               $log.debug(err);
-               sftp.end();
+                callback(err);
             } else {
-               // $log.debug("SFTP :: readdir success");
-               sftp.end();
+                callback(null);
             }
-            callback(stats);
-            //deferred.resolve(list);
-            // $log.debug(stats);
          });
       });
-   }, 3);
+   }, 20);
  
    // Reads filesystem directory on server
    var remoteStat = function(directory) {
       var deferred = $q.defer();
       
-      remoteStatQueue.push({name: directory}, function(err) {
-          deferred.resolve(err);
+      remoteStatQueue.push({name: directory,
+          caller: function(stat){
+              deferred.resolve(stat);
+              return 0;
+          }}, function(err) {
+              if (err) {
+                  deferred.reject(err);
+              }
       });
       
       return deferred.promise;
    }
 
-    var downloaderQueue = async.queue(function (task, callback) {
+    var downloaderQueue = async.cargo(function (task, callback) {
       // Starts SFTP session
-      var totalCollector = 0;
-      var parityCheck = true;
-      connectionList[getClusterContext()].sftp(function (err, sftp) {
-        sftp.fastGet(task.local, task.remote, {step:function(total_transferred,chunk,total){
+     connectionList[getClusterContext()].sftp(function (err, sftp) {
+        async.each(task, function(worker, done) {
+          var totalCollector = 0;
+          var parityCheck = true;
+          sftp.fastGet(worker.local, worker.remote, 
+             {step:function(total_transferred,chunk,total){
                        if (parityCheck) {
                            totalCollector = total;
                            parityCheck = false;
                        }
-                       task.data(total_transferred);
-        },concurrency:10}, 
-        function(err){
-            // Processes errors
-            if (err) {
-                $log.debug("download error: " + task.name);
-                $log.debug("task.local: " + task.local);
-                $log.debug("task.remote: " + task.remote);
-                $log.debug(err);
-                sftp.end();
-                callback(err, 0);
-            } else {
-                //$log.debug("SFTP :: fastPut success");
-                sftp.end();
-                callback(null, totalCollector);
-            }
+                       worker.data(total_transferred);
+             },concurrency:25}, 
+             function(err){
+                // Finishes processing and sends total
+                worker.finish(totalCollector);
+
+                // Processes errors
+                if (err) {
+                   $log.debug("download error: " + worker.name);
+                   $log.debug("task.local: " + worker.local);
+                   $log.debug("task.remote: " + worker.remote);
+                   $log.debug(err);
+                   done(err);
+                } else {
+                   //$log.debug("SFTP :: fastPut success");
+                   done(null);
+                }
+          });
+        }, function(err) {
+            sftp.end();
+            callback(err);
         });
       });
-   }, 4);
+   }, 10);
 
    // Functionality to download a file from the server
    var downloadFile = function(localPath, remotePath, callback, finished, error) {
@@ -564,7 +595,7 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
         var filesTotal = 0;
         var currentTotal = 0;
         var sizeTotal = 0;
-        var counter = 1;
+        var counter = 0;
         
         var BFSFolders = function(currDir, bfs) {
             readDir(currDir).then(function(data) {
@@ -629,8 +660,6 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
             },
             function(water) {
                // Setting the I/O streams
-               var currentVal = 0;
-               connectionList[getClusterContext()].sftp(function (err, sftp) {
                async.each(remoteFiles, function(file, done) {
                   // Process to console
                   //$log.debug( "SFTP has begun");
@@ -642,16 +671,16 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
                       data: function(total_transferred) {
                           callback(total_transferred, counter, filesTotal, currentTotal, sizeTotal);
                           return 0;
-                      }}, function(data, finishTotal) {
+                      }, finish: function(finishTotal) {
                           currentTotal += finishTotal;
                           counter += 1;
                           callback(0, counter, filesTotal, currentTotal, sizeTotal);
-                          done(data);
+                      }}, function(err) {
+                          done(err);
                       });
                }, function(err) {
                   //sftp.end();
                   water(err);
-               });
                });
             }], 
             function(err) {
