@@ -367,35 +367,42 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
       });
    }
 
-   var uploaderQueue = async.queue(function (task, callback) {
+   var uploaderQueue = async.cargo(function (task, callback) {
       // Starts SFTP session
-      var totalCollector = 0;
-      var parityCheck = true;
       connectionList[getClusterContext()].sftp(function (err, sftp) {
-        sftp.fastPut(task.local, task.remote, {step:function(total_transferred,chunk,total){
+        async.each(task, function(worker, done) {
+            var parityCheck = true;
+            var totalCollector = 0;
+            sftp.fastPut(worker.local, worker.remote, 
+                {step:function(total_transferred,chunk,total){
                        if (parityCheck) {
                            totalCollector = total;
                            parityCheck = false;
                        }
-                       task.data(total_transferred);
-        },concurrency:10}, 
-        function(err){
-            // Processes errors
-            if (err) {
-                $log.debug("download error: " + task.name);
-                $log.debug("task.local: " + task.local);
-                $log.debug("task.remote: " + task.remote);
-                $log.debug(err);
-                sftp.end();
-                callback(err, 0);
-            } else {
-                //$log.debug("SFTP :: fastPut success");
-                sftp.end();
-                callback(null, totalCollector);
-            }
+                       worker.data(total_transferred);
+            },concurrency:25}, 
+            function(err){
+                // Cleans up processing
+                worker.finish(totalCollector);
+
+                // Processes errors
+                if (err) {
+                    $log.debug("download error: " + worker.name);
+                    $log.debug("worker.local: " + worker.local);
+                    $log.debug("worker.remote: " + worker.remote);
+                    $log.debug(err);
+                    done(err);
+                } else {
+                    //$log.debug("SFTP :: fastPut success");
+                    done(null);
+                }
+            });
+        }, function(err) {
+            sftp.end();
+            callback(err);
         });
       });
-   }, 4);
+   }, 10);
 
     var uploadFile = function (src, dest, callback, finished, error) {
         var localFiles = []; 
@@ -403,7 +410,7 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
         var filesTotal = 0;
         var currentTotal = 0;
         var sizeTotal = 0;
-        var counter = 1;
+        var counter = 0;
         var BFSFolders = function(currDir, bfs) {
             //Recursively builds directory structure
             fs.readdir(currDir, function(err, files) {
@@ -482,11 +489,12 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
                       data: function(total_transferred) {
                           callback(total_transferred, counter, filesTotal, currentTotal, sizeTotal);
                           return 0;
-                      }}, function(data) {
+                      }, finish: function(finishTotal) {
                           currentTotal += finishTotal;
                           counter += 1;
                           callback(0, counter, filesTotal, currentTotal, sizeTotal);
-                          done(data);
+                      }}, function(err) {
+                          done(err);
                       });
 
                }, function(err) {
@@ -675,6 +683,7 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
                           currentTotal += finishTotal;
                           counter += 1;
                           callback(0, counter, filesTotal, currentTotal, sizeTotal);
+                          return 0;
                       }}, function(err) {
                           done(err);
                       });
