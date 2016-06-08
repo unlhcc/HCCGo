@@ -56,7 +56,7 @@
                      <td>
                         <div class="panel panel-default width-control">
                            <div class="panel-body">
-                              <button id="btnDownload" disabled ng-click="downloadCall()" type="button" class="btn btn-primary btn-block">
+                              <button id="btnDownload" disabled ng-click="verifyDownload()" type="button" class="btn btn-primary btn-block">
                                   <span class="glyphicon glyphicon-arrow-right" aria-hidden="true">Download</span>
                               </button>
                               <button id="btnUpload" disabled ng-click="uploadCall()" type="button" class="btn btn-primary btn-block">
@@ -67,20 +67,42 @@
                            </div>
                         </div>
                        <div class="panel panel-default width-control">
-                           <div class="panel-body" ng-show="processStatus">
-                               <span class="glyphicon glyphicon-refresh glyphicon-animate">
-                               </span>
-                               Processing...
-                           </div>
-                          <div class="panel-body" ng-show="uploadStatus">
-                              <div class="progress progress-striped active" style="height: 20px">
-                              <div class="progress-bar" style="width: {{totalProgress}}%"></div>
-                              </div>
-                              <br />
-                              Total progress: {{totalProgress}}% ({{counter}}/{{filesTotal}})
+                         <div class="panel-body" ng-show="processStatus">
+                             <span class="glyphicon glyphicon-refresh glyphicon-animate">
+                             </span>
+                             Processing...
+                         </div>
+                         <div class="panel-body" ng-show="uploadStatus">
+                             <div class="progress progress-striped active" style="height: 20px">
+                                <div class="progress-bar" style="width: {{totalProgress}}%">
+                                </div>
+                             </div>
+                             <br />
+                             Total progress: {{totalProgress}}% ({{counter}}/{{filesTotal}})
                          </div>
                          <div class="panel-body" ng-show="processFinished">
                              Done!
+                         </div>
+                         <div class="panel-body" ng-show="userUpAuth">
+                              <p>Upload action will send <span ng-if="accuSize > 1024*1024*1024">{{accuSize / 1024 / 1024 / 1024 | number:2}} GB</span>
+                                                         <span ng-if="accuSize < 1024*1024*1024 && accuSize > 1024*1024">{{accuSize / 1024 / 1024 | number:2}} MB</span>
+                                                         <span ng-if="accuSize < 1024*1024">{{accuSize / 1024 | number:2}} KB</span>
+                                of file(s) to {{remoteWD}}. Proceed?
+                             </p>                            
+                         </div>
+                         <div class="panel-body" ng-show="userDownAuth">
+                             <p>Download action will bring <span ng-if="accuSize > 1024*1024*1024">{{accuSize / 1024 / 1024 / 1024 | number:2}} GB</span>
+                                                           <span ng-if="accuSize < 1024*1024*1024 && accuSize > 1024*1024">{{accuSize / 1024 / 1024 | number:2}} MB</span>
+                                                           <span ng-if="accuSize < 1024*1024">{{accuSize / 1024 | number:2}} KB</span>
+                                of file(s) to {{localWD}}. Proceed?
+                                <br />
+                                <button id="downConfirm" ng-click="downloadCall()" type="button" class="btn btn-primary btn-block">
+                                    <span aria-hidden="true">Confirm</span>
+                                </button>
+                                <button id="downDeny" ng-click="verifyDownloadCancel()" type="button" class="btn btn-primary btn-block">
+                                    <span aria-hidden="true">Cancel</span>
+                                </button>
+                             </p>
                          </div>
                        </div>
                      </td>

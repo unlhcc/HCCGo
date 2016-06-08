@@ -652,7 +652,7 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
                        sizeTotal += data.size;
                        filesTotal += 1;
                        remotePath = path.dirname(remotePath);
-                       water(err, false);
+                       water(null, false);
                    }
                });
             },
@@ -670,9 +670,6 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
                // Setting the I/O streams
                async.each(remoteFiles, function(file, done) {
                   // Process to console
-                  //$log.debug( "SFTP has begun");
-                  //$log.debug( "Value of localPath: " + file );
-               
                   downloaderQueue.push({
                       name: file, local: file, 
                       remote: localPath + path.relative(remotePath,file), 

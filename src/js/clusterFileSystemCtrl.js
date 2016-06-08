@@ -149,12 +149,31 @@ connectionService.getUsername().then(function(username) {
        });
    }
 
-   $scope.downloadCall = function () {
+   $scope.verifyDownload = function () {
       angular.element('#btnDownload').attr('disabled', '');
+      $scope.userDownAuth = true;
+
+      connectionService.runCommand("du -sb " + String($scope.remoteWD + "/" + remoteFocus)).then(function (data) {
+          var data_response = data.split(/[	]+/); //NOTE: Matches tab spaces
+          //$log.debug("Folder size: ");
+          //$log.debug(data_response);
+          $scope.accuSize = data_response[0];
+      });
+   }
+
+   $scope.verifyDownloadCancel = function () {
+      $scope.userDownAuth = false;
+      toastr.warning('Action cancelled by user.');
+   }
+
+   $scope.downloadCall = function () {
       $scope.processStatus = true;
+      $scope.userDownAuth = false;
 
       // Runs file upload
-      connectionService.downloadFile(String($scope.localWD + "/"), String($scope.remoteWD + "/" + remoteFocus), function(total_transferred,counter,filesTotal,currentTotal,sizeTotal){
+      connectionService.downloadFile(String($scope.localWD + "/"), 
+        String($scope.remoteWD + "/" + remoteFocus),
+        function(total_transferred,counter,filesTotal,currentTotal,sizeTotal){
          // Callback function for progress bar
          //$log.debug("Total transferred: " + total_transferred);
          //$log.debug("Chunks: " + chunk);
@@ -276,12 +295,7 @@ connectionService.getUsername().then(function(username) {
        workWD = data;
        $log.debug("Work directory: " + workWD);
    });
-
-   $scope.$watch('localFiles', function(newValue, oldValue) {
-       $log.debug("old Local: " + oldValue);
-       $log.debug("new Local: " + newValue);
-   });
-
+var disk = require('diskusage');
    // Gets directory strings from local system
    if (process.platform === 'win32') {
        // TODO: Get working directory on windows machines
@@ -292,7 +306,17 @@ connectionService.getUsername().then(function(username) {
        // Establishes Displayed files
        $log.debug("process working directory: " + process.env.HOME);
        $scope.localWD = process.env.HOME;
+       $log.debug(process);
        localRead($scope.localWD);    // Sets local display
+       disk.check($scope.localWD, function(err, info) {
+           if (err) {
+               $log.debug(err);
+           } else {
+               $log.debug(info.available);
+               $log.debug(info.free);
+               $log.debug(info.total);
+           }
+       });
    }
  
 }]);
