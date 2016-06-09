@@ -20,7 +20,7 @@ SlurmClusterInterface.prototype.getJobs = function() {
   // return a promise if the jobs info are found
   var deferred = this.$q.defer();
   
-  var promise = this.connectionService.runCommand("squeue -u `whoami`")
+  var promise = this.connectionService.runCommand("squeue -u `whoami` -o '%i,%P,%j,%u,%t,%M,%D,%S,%R'");
   promise.then(function(data) {
     console.log("Got data: " + data);
     
@@ -29,15 +29,34 @@ SlurmClusterInterface.prototype.getJobs = function() {
       numRunning: 0,
       numIdle: 0
     };
-    for (var i = 0; i < lines.length; i++) {
-      split_line = lines[i].split(/[ ]+/);
-      if (split_line[5] == 'R') {
+    
+    csv_parse = require("csv-parse/lib/sync");
+    records = csv_parse(data, {columns: true});
+    jobs = [];
+    
+    records.forEach(function(entry) {
+      curJob = {};
+      curJob.jobId = entry.JOBID;
+      curJob.jobName = entry.NAME;
+      
+      curJob.idle = curJob.running = curJob.error = false;
+      
+      if (entry['ST'] == "R") {
+        curJob.running = true;
         returnData.numRunning += 1;
-      } else if (split_line[5] == 'PD') {
+      } else {
+        curJob.idle = true;
         returnData.numIdle += 1;
       }
-    }
+      
+      curJob.runTime = entry.TIME;
+      curJob.startTime = entry.START_TIME;
+      jobs.push(curJob);
+    });
+    
+    
     returnData.data = data;
+    returnData.jobs = jobs
     deferred.resolve(returnData);
     
   }, function(reason) {

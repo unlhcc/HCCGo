@@ -53,6 +53,8 @@ connectionModule.factory('connectionService',['$log', '$q', function($log, $q) {
           commandSem.leave();
           deferred.resolve(cumulData);
 
+        }).stderr.on('data', function(data) {
+          $log.error('STDERR: ' + data);
         });
 
 
@@ -130,10 +132,11 @@ connectionModule.factory('connectionService',['$log', '$q', function($log, $q) {
 
   var submitJob = function(location) {
       var deferred = $q.defer();
-
+      $log.debug("Running command: " + 'sbatch ' + location);
       runCommand('sbatch ' + location).then(function(data) {
         deferred.resolve(data);
       }, function(data) { // thrown on failure
+        logger.log("Error log: " + data)
         return deferred.reject("An error occurred when submitting the job.");
       });
       return deferred.promise;

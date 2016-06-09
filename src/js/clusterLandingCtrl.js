@@ -94,9 +94,17 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
     $location.path("cluster/" + $scope.params.clusterId + "/jobHistory");
 
   }
+  
+  $scope.refreshCluster = function() {
+    getClusterStats($scope.params.clusterId);
+    
+  }
 
   function getClusterStats(clusterId) {
 
+    // Begin spinning the refresh image
+    $(".mdi-action-autorenew").addClass("spinning-image");
+    
     // Query the connection service for the cluster
     clusterInterface.getJobs().then(function(data) {
       // Process the data
@@ -105,7 +113,7 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
       $scope.numIdle = data.numIdle;
       $scope.numError = data.numError;
       $scope.jobs = data.jobs;
-
+      $(".mdi-action-autorenew").removeClass("spinning-image");
 
     }, function(error) {
       console.log("Error in CTRL: " + error);
@@ -203,7 +211,27 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
     }
 
     getClusterStats($scope.params.clusterId);
-
+    
+    // Update the cluster every 15 seconds
+    var refreshingPromise; 
+    var isRefreshing = false;
+    $scope.startRefreshing = function(){
+      if(isRefreshing) return;
+      isRefreshing = true;
+      (function refreshEvery(){
+        //Do refresh
+        getClusterStats($scope.params.clusterId);
+        //If async in then in callback do...
+        refreshingPromise = $timeout(refreshEvery,15000)
+      }());
+    };
+    $scope.$on('$destroy',function(){
+      if(refreshingPromise) {
+        $timeout.cancel(refreshingPromise);
+      }
+    });
+    
+    $scope.startRefreshing();
   })
 
 
