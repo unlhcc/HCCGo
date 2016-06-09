@@ -1,7 +1,7 @@
 
 clusterLandingModule = angular.module('HccGoApp.clusterLandingCtrl', ['ngRoute' ]);
 
-clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeout', 'connectionService', '$routeParams', '$location', '$q', 'preferencesManager', 'filePathService', '$interval', function($scope, $log, $timeout, connectionService, $routeParams, $location, $q, preferencesManager, filePathService, $interval) {
+clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeout', 'connectionService', '$routeParams', '$location', '$q', 'preferencesManager', 'filePathService', function($scope, $log, $timeout, connectionService, $routeParams, $location, $q, preferencesManager, filePathService) {
 
   $scope.params = $routeParams;
   var clusterInterface = null;
@@ -213,10 +213,25 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
     getClusterStats($scope.params.clusterId);
     
     // Update the cluster every 15 seconds
-    $interval(function() {
-      getClusterStats($scope.params.clusterId);
-    }, 15000);
-
+    var refreshingPromise; 
+    var isRefreshing = false;
+    $scope.startRefreshing = function(){
+      if(isRefreshing) return;
+      isRefreshing = true;
+      (function refreshEvery(){
+        //Do refresh
+        getClusterStats($scope.params.clusterId);
+        //If async in then in callback do...
+        refreshingPromise = $timeout(refreshEvery,15000)
+      }());
+    };
+    $scope.$on('$destroy',function(){
+      if(refreshingPromise) {
+        $timeout.cancel(refreshingPromise);
+      }
+    });
+    
+    $scope.startRefreshing();
   })
 
 
