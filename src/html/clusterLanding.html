@@ -81,6 +81,8 @@
     <div class="col-md-8 jobdisplay">
       <div class="card">
         <input type="search" ng-model="q" placeholder="filter jobs..." />
+        <a class="pull-right" href="javascript:void(0)" ng-click="refreshCluster()"><i class="mdi-action-autorenew"></i></a>
+        <hr />
         <ul>
           <li class="animate-repeat" ng-repeat="job in jobs | filter:q as results" ng-class="{running: job.running, idle: job.idle, error: job.error}">
             <div class="row">

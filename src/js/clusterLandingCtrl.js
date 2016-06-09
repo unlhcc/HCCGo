@@ -1,7 +1,7 @@
 
 clusterLandingModule = angular.module('HccGoApp.clusterLandingCtrl', ['ngRoute' ]);
 
-clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeout', 'connectionService', '$routeParams', '$location', '$q', 'preferencesManager', 'filePathService', function($scope, $log, $timeout, connectionService, $routeParams, $location, $q, preferencesManager, filePathService) {
+clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeout', 'connectionService', '$routeParams', '$location', '$q', 'preferencesManager', 'filePathService', '$interval', function($scope, $log, $timeout, connectionService, $routeParams, $location, $q, preferencesManager, filePathService, $interval) {
 
   $scope.params = $routeParams;
   var clusterInterface = null;
@@ -94,9 +94,17 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
     $location.path("cluster/" + $scope.params.clusterId + "/jobHistory");
 
   }
+  
+  $scope.refreshCluster = function() {
+    getClusterStats($scope.params.clusterId);
+    
+  }
 
   function getClusterStats(clusterId) {
 
+    // Begin spinning the refresh image
+    $(".mdi-action-autorenew").addClass("spinning-image");
+    
     // Query the connection service for the cluster
     clusterInterface.getJobs().then(function(data) {
       // Process the data
@@ -105,7 +113,7 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
       $scope.numIdle = data.numIdle;
       $scope.numError = data.numError;
       $scope.jobs = data.jobs;
-
+      $(".mdi-action-autorenew").removeClass("spinning-image");
 
     }, function(error) {
       console.log("Error in CTRL: " + error);
@@ -203,6 +211,11 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
     }
 
     getClusterStats($scope.params.clusterId);
+    
+    // Update the cluster every 15 seconds
+    $interval(function() {
+      getClusterStats($scope.params.clusterId);
+    }, 15000);
 
   })
 
