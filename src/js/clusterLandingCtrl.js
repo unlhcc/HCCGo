@@ -94,7 +94,6 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
   }
 
   $scope.jobHistory = function() {
-
     $location.path("cluster/" + $scope.params.clusterId + "/jobHistory");
 
   }

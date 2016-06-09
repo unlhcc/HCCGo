@@ -42,7 +42,6 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
 
   // load json file
   var filePath = filePathService.getFilePath();
-  $log.debug("filePath: " + filePath);
   var jsonFile;
   $.getJSON(filePath, function(json) {
     jsonFile = json;
