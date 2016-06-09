@@ -80,21 +80,6 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
 
     var deferred = $q.defer();
 
-    runCommand('whoami').then(function(data) {
-
-      deferred.resolve(data.trim());
-
-    })
-
-    return deferred.promise;
-
-  }
-
-  // Functionality to upload a file to the server
-  var uploadJobFile = function(jobFile, remotePath) {
-
-    var deferred = $q.defer();
-
     // using the 'fs' library for this, temporary until how to pass
     // process progression data is figured out
     var fs = require('fs');
