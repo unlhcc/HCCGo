@@ -27,24 +27,24 @@ module.exports = function(grunt) {
       }
     },
 
-    
+
     shell: {
       start_webkit: {
         command: 'open webkitbuilds/HCCGo/osx64/HCCGo.app'
       }
     },
-    
+
     bower: {
       install: {
         options: {
           targetDir: 'src/lib',
-          layout: 'byType',
+          layout: 'byComponent',
           install: true,
           verbose: true
         }
       }
     }
-    
+
   });
 
   grunt.loadNpmTasks('grunt-node-webkit-builder');

@@ -1,0 +1,65 @@
+<div class="navbar navbar-hcc">
+  <div class="navbar-header">
+    <a class="navbar-brand">HCC Go</a>
+  </div>
+
+    <div class="navbar-collapse collapse navbar-responsive-collapse">
+
+
+      <ul class="nav navbar-nav navbar-right">
+        <li class="dropdown">
+          <a href="javascript:void(0)" data-target="#" class="dropdown-toggle" data-toggle="dropdown"> {{username}}@{{params.clusterId}} <b class="caret"></b></a>
+          <ul class="dropdown-menu">
+            <li><a ng-click="logout()">Logout</a></li>
+          </ul>
+        </li>
+      </ul>
+
+    </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <div class="well clearfix col-sm-12">
+      <h2 class="text-center"> Job History </h2>
+        <div class="panel-group" id="accordion">
+         <div class="panel panel-default" ng-attr-id="{{ 'panel' + job.id }}" ng-repeat="job in jobs | orderBy:'-timestamp'">
+           <div class="panel-heading jobhistory">
+             <div class="row">
+               <div class="col-sm-4">
+                 <h4 class="panel-title jobhistory">{{ job.jobname }}<small class="jobdate"> {{ job.timestamp | date:'M-d-yyyy' }} </small></h4>
+               </div>
+               <div class="col-sm-4 col-sm-offset-4">
+                 <button class="btn btn-sm btn-danger pull-right delbutton" ng-click="deleteJob(job)">Delete</button>
+                 <button class="btn btn-sm btn-info pull-right loadbutton" ng-click="loadJob(job)">Load</button>
+               </div>
+             </div>
+             <div class="row">
+               <div class="col-sm-12">
+                 <div class="historyinfo">
+                   <button class="btn btn-block btn-sm jobhistory" data-toggle="collapse" data-parent="#accordion" ng-attr-href="{{ '#collapse' + $index }}">
+                     <span class="text-lowercase"><span class="caret"></span> click to expand <span class="caret"></span></span>
+                   </button>
+                 </div>
+               </div>
+             </div>
+           </div>
+           <div ng-attr-id="{{ 'collapse' + $index}}" class="panel-collapse collapse">
+             <div class="panel-body">
+               <p> Runtime: {{ job.runtime }} </p>
+               <p> Memory: {{ job.memory }} </p>
+               <p> Jobname: {{ job.jobname }} </p>
+               <p> Location: {{ job.location }} </p>
+               <p> Error: {{ job.error }} </p>
+               <p> Output: {{ job.output }} </p>
+               <p> Modules: <span ng-repeat="module in job.modules"> {{module}} </span></p>
+               <p> Commands: {{ job.commands }} </p>
+             </div>
+           </div>
+         </div>
+       </div>
+      <button type="button" class="btn btn-info" ng-click="cancel()">Cancel</button>
+      <button type="button" class="btn btn-primary pull-right" ng-click="loadDefault()">Create New Job</button>
+    </div>
+  </div>
+</div>

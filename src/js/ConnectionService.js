@@ -82,43 +82,60 @@ connectionModule.factory('connectionService',['$log', '$q', function($log, $q) {
 
   // Functionality to upload a file to the server
   var uploadJobFile = function(jobFile, remotePath) {
+
+    var deferred = $q.defer();
+
     // using the 'fs' library for this, temporary until how to pass
     // process progression data is figured out
     var fs = require('fs');
 
     // Starts the connection
     connectionList[0].sftp(function (err, sftp) {
-      if (err) throw err;		// If something happens, kills process kindly
+      if (err) {
+        deferred.reject(err);
+      }
+      else {
+        // Process to console
+        $log.debug( "SFTP has begun");
+        $log.debug( "Value of remotePath: " + remotePath );
 
-      // Process to console
-      $log.debug( "SFTP has begun");
-      $log.debug( "Value of remotePath: " + remotePath );
+        // Setting the I/O streams
+        var writeStream = sftp.createWriteStream ( remotePath );
+        // Catch writestream erros
+        writeStream.on('error', function (err) {
+          deferred.reject(err);
+        });
+        // Sets logic for finishing of process
+        writeStream.on(
+          'close',
+          function () {
+            sftp.end();
+            $log.debug("File has been transferred");
+          }
+        );
 
-      // Setting the I/O streams
-      var writeStream = sftp.createWriteStream ( remotePath );
-
-      // Sets logic for finishing of process
-      writeStream.on(
-        'close',
-        function () {
-          sftp.end();
-          $log.debug("File has been transferred");
-        }
-      );
-
-      // Does the thing
-      writeStream.write(jobFile);
+        // Does the thing
+        writeStream.write(jobFile, function(err) {
+          if (err) {
+            deferred.reject(err);
+          }
+          else {
+            deferred.resolve("Job successfully uploaded");
+          }
+        });
+      }
     });
-
-    return 0;
+    return deferred.promise;
   }
 
   var submitJob = function(location) {
       var deferred = $q.defer();
 
       runCommand('sbatch ' + location).then(function(data) {
-          deferred.resolve();
-      })
+        deferred.resolve(data);
+      }, function(data) { // thrown on failure
+        return deferred.reject("An error occurred when submitting the job.");
+      });
       return deferred.promise;
   }
 
