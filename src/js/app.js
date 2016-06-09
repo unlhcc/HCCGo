@@ -2,9 +2,11 @@ var app = angular.module('HccGoApp', ['HccGoApp.WelcomeCtrl',
                               'ngRoute', 
                               'ConnectionServiceModule', 
                               'HccGoApp.clusterLandingCtrl', 
-                              'PreferencesManager',
+                              'PreferencesManager', 
                               'HccGoApp.clusterFileSystemCtrl',
-                              'HccGoApp.jobSubmissionCtrl']).config([
+                              'HccGoApp.jobSubmissionCtrl', 
+                              'HccGoApp.jobHistoryCtrl', 
+                              'filePathService']).config([
   '$routeProvider', function($routeProvider) {
     return $routeProvider.when('/', {
       templateUrl: 'html/welcome.html',
@@ -18,6 +20,9 @@ var app = angular.module('HccGoApp', ['HccGoApp.WelcomeCtrl',
     }).when('/cluster/:clusterId/jobSubmission', {
       templateUrl: 'html/jobSubmission.html',
       controller: 'jobSubmissionCtrl'
+    }).when('/cluster/:clusterId/jobHistory', {
+      templateUrl: 'html/jobHistory.html',
+      controller: 'jobHistoryCtrl'
     }).otherwise({
       redirectTo: '/'
     });

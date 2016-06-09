@@ -1,7 +1,7 @@
 
 jobSubmissionModule = angular.module('HccGoApp.jobSubmissionCtrl', ['ngRoute', 'toastr' ]);
 
-jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout', 'connectionService', '$routeParams', '$location', '$q', 'preferencesManager', 'toastr', function($scope, $log, $timeout, connectionService, $routeParams, $location, $q, preferencesManager, toastr) {
+jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout', 'connectionService', '$routeParams', '$location', '$q', 'preferencesManager', 'toastr', 'jobService', 'filePathService', function($scope, $log, $timeout, connectionService, $routeParams, $location, $q, preferencesManager, toastr, jobService, filePathService) {
 
   $scope.params = $routeParams;
 
@@ -19,9 +19,33 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
 
   }
 
-  getWork().then(function(workPath) {
-    workPath = workPath + "/";
-    $scope.job = {location: workPath, error: workPath, output: workPath};
+  var loadedJob = jobService.getJob();
+
+  if(loadedJob == null) {
+    getWork().then(function(workPath) {
+      workPath = workPath + "/";
+      $scope.job = {location: workPath, error: workPath, output: workPath};
+    });
+  }
+  else {
+    $scope.job =
+    {
+      runtime: loadedJob.runtime,
+      memory: loadedJob.memory,
+      jobname: loadedJob.jobname,
+      location: loadedJob.location,
+      error: loadedJob.error,
+      output: loadedJob.output,
+      commands: loadedJob.commands
+    };
+  }
+
+  // load json file
+  var filePath = filePathService.getFilePath();
+  $log.debug("filePath: " + filePath);
+  var jsonFile;
+  $.getJSON(filePath, function(json) {
+    jsonFile = json;
   });
 
   $scope.logout = function() {
@@ -31,7 +55,7 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
   }
 
   $scope.cancel = function() {
-    $location.path("cluster/" + $scope.params.clusterId);
+    $location.path("cluster/" + $scope.params.clusterId + "/jobHistory");
   }
 
   // Get the username
@@ -71,13 +95,13 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
 
   // Selectize field for selecting modules
   var $select = $('#modules').selectize({
-      plugins: ['remove_button'],
-      labelField: 'label',
-      searchField: 'label',
-      valueField: 'label',
-      maxItems: 30,
-      delimiter: ',',
-      selectOnTab: true,
+    plugins: ['remove_button'],
+    labelField: 'label',
+    searchField: 'label',
+    valueField: 'label',
+    maxItems: 30,
+    delimiter: ',',
+    selectOnTab: true,
   });
 
   var selectize = $select[0].selectize;
@@ -85,14 +109,25 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
   // Add options
   getModules().then(function(modules) {
     selectize.addOption(modules);
-    selectize.refreshOptions(false);
-    selectize.refreshItems();
+    if(loadedJob != null) {
+
+      // Put adding items in a $timeout to avoid $digest issues when the
+      // select element issues a 'change' event.
+      $timeout(function() {
+
+        angular.forEach(loadedJob.modules, function(module){
+          selectize.addItem(module);
+        });
+        selectize.refreshOptions(false);
+        selectize.refreshItems();
+
+      }, 0);
+
+    }
   });
 
   // Write a job submission script, pass in form data
   $scope.writeSubmissionScript = function(job) {
-
-    var filepath = "files/job.slurm";
 
     // Create string for file
     var jobFile =
@@ -110,27 +145,66 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
 
       jobFile += "\n" + job.commands + "\n";
 
-    console.log("The generated file:\n")
-    console.log("#!/bin/sh\n");
-    console.log("#SBATCH --time=" + job.runtime + "\n");
-    console.log("#SBATCH --mem-per-cpu=" + job.memory + "\n");
-    console.log("#SBATCH --job-name=" + job.jobname + "\n");
-    console.log("#SBATCH --error=" + job.error + "\n");
-    console.log("#SBATCH --output=" + job.output + "\n");
-    if(job.modules != null){
-        for(var i = 0; i < job.modules.length; i++) {
-            console.log("\nmodule load " + job.modules[i]);
-        }
-        console.log("\n");
+    var now = Date.now();
+    // updating job history
+    if(loadedJob != null) {
+      jsonFile.jobs[loadedJob.id].timestamp = now;
+      jsonFile.jobs[loadedJob.id].runtime = job.runtime;
+      jsonFile.jobs[loadedJob.id].memory = job.memory;
+      jsonFile.jobs[loadedJob.id].jobname = job.jobname;
+      jsonFile.jobs[loadedJob.id].location = job.location;
+      jsonFile.jobs[loadedJob.id].error = job.error;
+      jsonFile.jobs[loadedJob.id].output = job.output;
+      jsonFile.jobs[loadedJob.id].modules = ((job.modules != null) ? job.modules : []);
+      jsonFile.jobs[loadedJob.id].commands = job.commands;
     }
-    console.log("\n");
-    console.log(job.commands);
-    console.log("\n");
+    else {
+      var newId = jsonFile.jobs[jsonFile.jobs.length-1].id + 1;
+      var newJob = {
+        "id": newId,
+        "runtime": job.runtime,
+        "memory": job.memory,
+        "jobname": job.jobname,
+        "location": job.location,
+        "error": job.error,
+        "output": job.output,
+        "modules": ((job.modules != null) ? job.modules : []),
+        "commands": job.commands,
+        "timestamp": now
+      }
+      jsonFile.jobs.push(newJob);
+    }
+    var fs = require("fs");
+    fs.writeFile(filePath, JSON.stringify(jsonFile, null, 2), function(err) {
+      if(err) {
+        return console.error(err);
+      }
+      else {
+        console.log("History written successfully.");
+      }
+    });
     // Send data to ConnectionService for file upload
-    connectionService.uploadJobFile(jobFile, job.location);
-    connectionService.submitJob(job.location);
-    $location.path("cluster/" + $scope.params.clusterId);
-    toastr.success('Your job was succesfully submitted to the cluster!', 'Job Submitted!');
+    connectionService.uploadJobFile(jobFile, job.location).then(function(data) {
+      // file upload success
+      connectionService.submitJob(job.location).then(function(data) {
+        // job submission success
+        toastr.success('Your job was succesfully submitted to the cluster!', 'Job Submitted!', {
+          closeButton: true
+        });
+        $location.path("cluster/" + $scope.params.clusterId);
+      }, function(data) {
+        // job submission error
+        toastr.error('There was an error in submitting your job to the cluster!', 'Job Submission Failed!', {
+          closeButton: true
+        });
+      });
+    }, function(data) {
+      // file upload error
+      toastr.error('There was an error in uploading your job to the cluster! Check file paths', 'Job Submission Failed!', {
+        closeButton: true
+      });
+    });
+
   }
 
 
