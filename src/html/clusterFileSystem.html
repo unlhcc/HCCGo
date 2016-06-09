@@ -59,7 +59,7 @@
                               <button id="btnDownload" disabled ng-click="verifyDownload()" type="button" class="btn btn-primary btn-block">
                                   <span class="glyphicon glyphicon-arrow-right" aria-hidden="true">Download</span>
                               </button>
-                              <button id="btnUpload" disabled ng-click="uploadCall()" type="button" class="btn btn-primary btn-block">
+                              <button id="btnUpload" disabled ng-click="verifyUpload()" type="button" class="btn btn-primary btn-block">
                                   <span class="glyphicon glyphicon-arrow-left" aria-hidden="true">Upload</span>
                               </button>
                               <br/>
@@ -88,6 +88,13 @@
                                                          <span ng-if="accuSize < 1024*1024*1024 && accuSize > 1024*1024">{{accuSize / 1024 / 1024 | number:2}} MB</span>
                                                          <span ng-if="accuSize < 1024*1024">{{accuSize / 1024 | number:2}} KB</span>
                                 of file(s) to {{remoteWD}}. Proceed?
+                                <br />
+                                <button id="upConfirm" ng-click="uploadCall()" type="button" class="btn btn-primary btn-block">
+                                    <span aria-hidden="true">Confirm</span>
+                                </button>
+                                <button id="upDeny" ng-click="verifyUploadCancel()" type="button" class="btn btn-primary btn-block">
+                                    <span aria-hidden="true">Cancel</span>
+                                </button>
                              </p>                            
                          </div>
                          <div class="panel-body" ng-show="userDownAuth">

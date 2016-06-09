@@ -367,6 +367,48 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
       });
    }
 
+   var localSize = function(dir) {
+        //Recursively builds directory structure
+        var deferred = $q.defer();
+        var sizeTotal = 0;
+        var BFSCounter = function(currDir, bfs) {
+            fs.readdir(currDir, function(err, files) {
+                async.each(files, function(file, done) {
+                    fs.stat(currDir + '/' + file, function(err, stats) {
+                        if(err){
+                            done(err);
+                        } else if (stats.isFile()) {
+                            sizeTotal += stats.size;
+                            done(null);
+                        } else if (stats.isDirectory()) {
+                            BFSCounter(currDir + '/' + file, function(err) {
+                                if(err) {
+                                    $log.debug("BFS Error on: " + currDir + "/" + file);
+                                    $log.debug(err);
+                                }
+                                done(null);
+                            });
+                        }
+                    });
+                }, function(err) {
+                    bfs(err);
+                });
+            });
+        };
+        fs.stat(dir, function(err, stats) {
+            if (stats.isFile()) {
+                deferred.resolve(stats.size);
+            } else if (stats.isDirectory()) {
+                BFSCounter(dir, function(err) {
+                    if (err) throw err;
+                    deferred.resolve(sizeTotal);
+                });
+            }
+        });
+
+        return deferred.promise;
+   }
+
    var uploaderQueue = async.cargo(function (task, callback) {
       // Starts SFTP session
       connectionList[getClusterContext()].sftp(function (err, sftp) {
@@ -710,6 +752,7 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
    closeStream: closeStream,
    readDir: readDir,
    makeDir: makeDir,
+   localSize: localSize,
    getHomeWD: getHomeWD,
    getWorkWD: getWorkWD,
    uploadJobFile: uploadJobFile,

@@ -9,7 +9,19 @@ clusterUploadModule.controller('clusterFileSystemCtrl', ['$scope', '$log', '$tim
   }
 connectionService.getUsername().then(function(username) {
     $scope.username = username;
-}); 
+});
+
+   // Initialization functions
+   var disk = require('diskusage');
+   $scope.params = $routeParams
+   var clusterInterface = null;
+   var path = require("path");
+   var fs = require("fs");
+   var async = require("async");
+   $scope.sourceDir = {name: ".."};
+   $scope.localFiles = [];
+   $scope.remoteFiles = [];
+
    // Sets default values on load
    $scope.onViewLoad = function () {
       $log.debug("ngView has changed");
@@ -114,11 +126,27 @@ connectionService.getUsername().then(function(username) {
       });
    }
 
+   $scope.verifyUpload = function () {
+      angular.element('#btnUpload').attr('disabled', '');
+      $scope.userUpAuth = true;
+      $scope.processStatus = true;
+
+      connectionService.localSize(String($scope.localWD + "/" + localFocus)).then( function(data) {
+          $scope.processStatus = false;
+          $scope.accuSize = data;
+      });
+   }
+
+   $scope.verifyUploadCancel = function () {
+      $scope.userUpAuth = false;
+      toastr.warning('Action cancelled by user.');
+   }
+
    // Upload entire directory
    $scope.uploadCall = function() {
       // Disable upload button to prevent double clicking
-      angular.element('#btnUpload').attr('disabled', '');
       $scope.processStatus = true;
+      $scope.userUpAuth = false;
 
       // Runs file upload
       connectionService.uploadFile(String($scope.localWD + "/" + localFocus), String($scope.remoteWD + "/"), function(total_transferred,counter,filesTotal,currentTotal,sizeTotal){
@@ -152,8 +180,10 @@ connectionService.getUsername().then(function(username) {
    $scope.verifyDownload = function () {
       angular.element('#btnDownload').attr('disabled', '');
       $scope.userDownAuth = true;
+      $scope.processStatus = true;
 
       connectionService.runCommand("du -sb " + String($scope.remoteWD + "/" + remoteFocus)).then(function (data) {
+          $scope.processStatus = false;
           var data_response = data.split(/[	]+/); //NOTE: Matches tab spaces
           //$log.debug("Folder size: ");
           //$log.debug(data_response);
@@ -223,6 +253,8 @@ connectionService.getUsername().then(function(username) {
       $scope.processStatus = false;
       $scope.uploadStatus = false;
       $scope.processFinished = false;
+      $scope.userUpAuth = false;
+      $scope.userDownAuth = false;
    }
    $scope.localHighlight = function(id) {
       angular.element("#btnDownload").attr('disabled', '');         // Hides download button
@@ -240,6 +272,8 @@ connectionService.getUsername().then(function(username) {
       $scope.processStatus = false;
       $scope.uploadStatus = false;
       $scope.processFinished = false;
+      $scope.userUpAuth = false;
+      $scope.userDownAuth = false;
    }
 
    preferencesManager.getClusters().then(function(clusters) {
@@ -273,16 +307,6 @@ connectionService.getUsername().then(function(username) {
        }
    });
 */
-   // Initialization functions
-   $scope.params = $routeParams
-   var clusterInterface = null;
-   var path = require("path");
-   var fs = require("fs");
-   var async = require("async");
-   $scope.sourceDir = {name: ".."};
-   $scope.localFiles = [];
-   $scope.remoteFiles = [];
-
    // Gets directory strings from remote server
    var homeWD, workWD;
    connectionService.getHomeWD().then(function(data) {
@@ -295,7 +319,7 @@ connectionService.getUsername().then(function(username) {
        workWD = data;
        $log.debug("Work directory: " + workWD);
    });
-var disk = require('diskusage');
+
    // Gets directory strings from local system
    if (process.platform === 'win32') {
        // TODO: Get working directory on windows machines
