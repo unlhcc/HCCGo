@@ -127,7 +127,9 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
 
   // Write a job submission script, pass in form data
   $scope.writeSubmissionScript = function(job) {
-
+    
+    $("#submitbtn").prop('disabled', true);
+    
     // Create string for file
     var jobFile =
       "#!/bin/sh\n" +
@@ -182,27 +184,52 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
         console.log("History written successfully.");
       }
     });
-    // Send data to ConnectionService for file upload
-    connectionService.uploadJobFile(jobFile, job.location).then(function(data) {
-      // file upload success
-      connectionService.submitJob(job.location).then(function(data) {
-        // job submission success
+    
+    async = require("async");
+    // Call the series of actions to submit a job
+    async.series([
+      function(callback) {
+        // Transfer the input file
+        var curValue = 33;
+        $('#submitprogress').css('width', curValue+'%').attr('aria-valuenow', curValue);
+        $('progresssummary').text("Transferring job file...");
+        connectionService.uploadJobFile(jobFile, job.location).then(function(data) {
+          callback(null);
+        }, function(err) {
+          callback(new Erorr("Upload of file failed!"));
+        });
+      },
+      function(callback) {
+        // Submit the job
+        var curValue = 66;
+        $('#submitprogress').css('width', curValue+'%').attr('aria-valuenow', curValue);
+        $('progresssummary').text("Submitting Job...");
+        connectionService.submitJob(job.location).then(function(data) {
+          callback(null);
+        }, function(err) {
+          callback(new Error("Job submission failed!"))
+        });
+        
+      }
+      
+    ], function(err, result) {
+      // If there has been an error in the series
+      if (err) {
+        toastr.error('There was an error in submitting your job to the cluster!', 'Job Submission Failed!', {
+          closeButton: true
+        });
+        $("#submitbtn").prop('disabled', false);
+        var curValue = 0;
+        $('#submitprogress').css('width', curValue+'%').attr('aria-valuenow', curValue);
+      } else {
+        // Everything was successful!
         toastr.success('Your job was succesfully submitted to the cluster!', 'Job Submitted!', {
           closeButton: true
         });
         $location.path("cluster/" + $scope.params.clusterId);
-      }, function(data) {
-        // job submission error
-        toastr.error('There was an error in submitting your job to the cluster!', 'Job Submission Failed!', {
-          closeButton: true
-        });
-      });
-    }, function(data) {
-      // file upload error
-      toastr.error('There was an error in uploading your job to the cluster! Check file paths', 'Job Submission Failed!', {
-        closeButton: true
-      });
+      }
     });
+    
 
   }
 
