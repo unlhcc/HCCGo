@@ -84,32 +84,47 @@
                              Done!
                          </div>
                          <div class="panel-body" ng-show="userUpAuth">
-                              <p>Upload action will send <span ng-if="accuSize > 1024*1024*1024">{{accuSize / 1024 / 1024 / 1024 | number:2}} GB</span>
-                                                         <span ng-if="accuSize < 1024*1024*1024 && accuSize > 1024*1024">{{accuSize / 1024 / 1024 | number:2}} MB</span>
-                                                         <span ng-if="accuSize < 1024*1024">{{accuSize / 1024 | number:2}} KB</span>
-                                of file(s) to {{remoteWD}}. Proceed?
-                                <br />
-                                <button id="upConfirm" ng-click="uploadCall()" type="button" class="btn btn-primary btn-block">
-                                    <span aria-hidden="true">Confirm</span>
-                                </button>
-                                <button id="upDeny" ng-click="verifyUploadCancel()" type="button" class="btn btn-primary btn-block">
+                          <table style="width: 100%">
+                              <tr>
+                                <div>Upload location: {{remoteWD}}</div>
+                                <div>Upload size: <span ng-if="accuSize > 1024*1024*1024">{{accuSize / 1024 / 1024 / 1024 | number:2}} GB</span><span ng-if="accuSize < 1024*1024*1024 && accuSize > 1024*1024">{{accuSize / 1024 / 1024 | number:2}} MB</span><span ng-if="accuSize < 1024*1024">{{accuSize / 1024 | number:2}} KB</span></div>
+                                <div>Available space on remote disk: {{diskAvail}}%</div>
+                                <div>Percent of space to be taken: {{diskQuota}}%</div>
+                                <td>
+                                   <button id="upDeny" ng-click="verifyUploadCancel()" type="button" class="btn btn-primary btn-block" style="background-color: #FF0000;">
                                     <span aria-hidden="true">Cancel</span>
-                                </button>
-                             </p>                            
+                                   </button>
+                                </td>
+                                <td style="width: 20%"></td>
+                                <td>
+                                   <button id="upConfirm" ng-click="uploadCall()" type="button" class="btn btn-primary btn-block">
+                                    <span aria-hidden="true">Confirm</span>
+                                   </button>
+                                </td>
+                             </tr>
+                          </table>
                          </div>
                          <div class="panel-body" ng-show="userDownAuth">
-                             <p>Download action will bring <span ng-if="accuSize > 1024*1024*1024">{{accuSize / 1024 / 1024 / 1024 | number:2}} GB</span>
-                                                           <span ng-if="accuSize < 1024*1024*1024 && accuSize > 1024*1024">{{accuSize / 1024 / 1024 | number:2}} MB</span>
-                                                           <span ng-if="accuSize < 1024*1024">{{accuSize / 1024 | number:2}} KB</span>
-                                of file(s) to {{localWD}}. Proceed?
-                                <br />
-                                <button id="downConfirm" ng-click="downloadCall()" type="button" class="btn btn-primary btn-block">
+                          <table style="width: 100%">
+                             <tr>
+                                <div>Download location: {{localWD}}</div>
+                                <div>Download size: <span ng-if="accuSize > 1024*1024*1024">{{accuSize / 1024 / 1024 / 1024 | number:2}} GB</span><span ng-if="accuSize < 1024*1024*1024 && accuSize > 1024*1024">{{accuSize / 1024 / 1024 | number:2}} MB</span><span ng-if="accuSize < 1024*1024">{{accuSize / 1024 | number:2}} KB</span>
+                                </div>
+                                <div>Available space on disk: {{diskAvail}}%</div>
+                                <div>Percent of space to be taken: {{diskQuota}}%</div>
+                                <td>
+                                <button id="downConfirm" ng-click="downloadCall()" type="button" class="btn btn-primary btn-block" style="">
                                     <span aria-hidden="true">Confirm</span>
                                 </button>
-                                <button id="downDeny" ng-click="verifyDownloadCancel()" type="button" class="btn btn-primary btn-block">
+                                </td>
+                                <td style="width: 20%"></td>
+                                <td>
+                                <button id="downDeny" ng-click="verifyDownloadCancel()" type="button" class="btn btn-primary btn-block" style="background-color: #FF0000;">
                                     <span aria-hidden="true">Cancel</span>
                                 </button>
-                             </p>
+                                </td>
+                             </tr>
+                          </table>
                          </div>
                        </div>
                      </td>

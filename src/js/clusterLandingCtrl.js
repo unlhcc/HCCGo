@@ -170,7 +170,7 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
                 return value.toFixed(2);
             }
           },
-          max: data[1].blocksQuota,
+          max: data[1].blocksLimit,
 
         },
         color: {

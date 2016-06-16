@@ -146,8 +146,6 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
       }
    };
 
-   var commandSem = require('semaphore')(1);
-
    var runCommandQueue = async.queue(function (task, callback) {
       // Starts Command session
       connectionList[getClusterContext()].exec(task.name, function(err, stream) {
@@ -178,35 +176,6 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
 
       var deferred = $q.defer();         // Used to return promise data
       
-      /*commandSem.take(function() {
-
-        // Run a command remotely
-        connectionList[getClusterContext()].exec(command, function(err, stream) {
-         
-         cumulData = "";
-         
-         if (err) {
-           $log.error("Error running command " + command + ": "+ err);
-           commandSem.leave();
-           deferred.reject("Error running command " + command + ": "+ err);
-           return;
-         }
-         
-         stream.on('data', function(data) {
-           
-           $log.debug("Got data: " + data);
-           cumulData += data;
-           
-         }).on('close', function(code, signal) {
-           
-           $log.debug('Stream :: close :: code: ' + code + ', signal: ' + signal);
-           commandSem.leave();
-           deferred.resolve(cumulData);   // Once the command actually completes full data stored here
-           
-         });
-        });
-      });*/
-
       runCommandQueue.push({name: command}, function(err, cumulData) {
           if (err) {
               deferred.reject("Error running command " + command + ": " + err);

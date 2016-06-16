@@ -38,6 +38,9 @@ connectionService.getUsername().then(function(username) {
           $scope.remoteWD = workWD;
       }
 
+      $scope.userDownAuth = false;
+      $scope.userUpAuth = false;
+
       // Update view
       remoteRead($scope.remoteWD);
    }
@@ -131,9 +134,28 @@ connectionService.getUsername().then(function(username) {
       $scope.userUpAuth = true;
       $scope.processStatus = true;
 
-      connectionService.localSize(String($scope.localWD + "/" + localFocus)).then( function(data) {
-          $scope.processStatus = false;
-          $scope.accuSize = data;
+      connectionService.localSize(String($scope.localWD + "/" + localFocus)).then( function(ldata) {
+          if ($scope.remoteWD.indexOf(workWD) > -1) {
+              connectionService.runCommand("lfs quota -g `id -g` /work").then(function(data) {
+                  $scope.processStatus = false;
+                  $scope.accuSize = ldata;
+
+                  reported_output = data.split("\n")[2];
+                  split_output = $.trim(reported_output).split(/[ ]+/);
+                  $scope.diskAvail = Math.floor(((split_output[3] - split_output[1]) / split_output[3])*100);
+                  $scope.diskQuota = Math.floor(((ldata / Math.pow(1024, 1)) / split_output[3])*100);
+              });
+          } else {
+              connectionService.runCommand("quota -w -f /home").then(function(data) {
+                  $scope.processStatus = false;
+                  $scope.accuSize = ldata;
+
+                  reported_output = data.split("\n")[2];              
+                  split_output = reported_output.split(/[ ]+/);
+                  $scope.diskAvail = Math.floor(((split_output[2] - split_output[1]) / split_output[2])*100);
+                  $scope.diskQuota = Math.floor(((ldata / Math.pow(1024, 1)) / split_output[2])*100);
+              });
+          }
       });
    }
 
@@ -185,9 +207,11 @@ connectionService.getUsername().then(function(username) {
       connectionService.runCommand("du -sb " + String($scope.remoteWD + "/" + remoteFocus)).then(function (data) {
           $scope.processStatus = false;
           var data_response = data.split(/[	]+/); //NOTE: Matches tab spaces
-          //$log.debug("Folder size: ");
-          //$log.debug(data_response);
           $scope.accuSize = data_response[0];
+          disk.check($scope.localWD, function(err, info) {
+              $scope.diskQuota = Math.floor((data_response[0]/info.available)*100);
+              $scope.diskAvail = Math.floor((info.free/info.total)*100);
+          });
       });
    }
 

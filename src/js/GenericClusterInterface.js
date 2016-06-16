@@ -61,7 +61,7 @@ GenericClusterInterface.prototype.getStorageInfo = function() {
     home.blocksLimit = KilobytestoGigabytes(split_output[3]);
     returnData.push(home);
     
-    connectionService.runCommand("lfs quota -u `whoami` /work").then(function(data) {
+    connectionService.runCommand("lfs quota -g `id -g` /work").then(function(data) {
       // Split the output
       reported_output = data.split("\n")[2];
       
