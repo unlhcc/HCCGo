@@ -7,14 +7,14 @@
     <title>HCC Go</title>
 
     <!-- Bootstrap -->
-    <!-- <link href="css/bootstrap-theme.css" rel="stylesheet"> -->
-    <link href="lib/css/bootstrap/bootstrap.css" rel="stylesheet">
+    <!--<link href="lib/css/bootstrap/bootstrap-theme.css" rel="stylesheet">-->
+    <link href="lib/bootstrap/css/bootstrap.css" rel="stylesheet">
     <link href="lib/bootstrap-material-design/material.css" rel="stylesheet">
     <link href="lib/bootstrap-material-design/ripples.css" rel="stylesheet">
-    <link href="lib/c3/c3.css" rel="stylesheet" />
+    <link href="lib/c3/c3.css" rel="stylesheet">
+    <link href="lib/jquery-file-tree/css/jqueryFileTree.min.css" rel="stylesheet">
+    <!-- <link href="lib/selectize/selectize.bootstrap3.css" rel="stylesheet"> -->
     <link href="lib/angular-toastr/angular-toastr.css" rel="stylesheet" />
-
-    <!--<link href="lib/selectize/selectize.bootstrap3.css" rel="stylesheet">-->
     <link href="css/application.css" rel="stylesheet">
 
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
@@ -24,26 +24,17 @@
       <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
 
-
-  </head>
-  <body>
-    <div ng-view>
-    </div>
-
-
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="lib/jquery/jquery.js"></script>
     <!-- Include all compiled plugins (below), or include individual files as needed -->
     <script src="lib/angular/angular.js"></script>
     <script src="lib/angular-route/angular-route.js"></script>
     <script src="lib/angular-resource/angular-resource.js"></script>
-    <script src="lib/js/bootstrap/bootstrap.js"></script>
+    <script src="lib/bootstrap/js/bootstrap.js"></script>
     <script src="lib/bootstrap-material-design/material.js"></script>
     <script src="lib/bootstrap-material-design/ripples.js"></script>
     <script src="lib/d3/d3.js"></script>
     <script src="lib/c3/c3.js"></script>
-
-
     <script src="lib/microplugin/microplugin.js"></script>
     <script src="lib/sifter/sifter.js"></script>
     <script src="lib/selectize/selectize.js"></script>
@@ -55,18 +46,24 @@
     <script src="js/ConnectionService.js"></script>
     <script src="js/filePathService.js"></script>
     <script src="js/clusterLandingCtrl.js"></script>
+    <script src="js/clusterFileSystemCtrl.js"></script>
     <script src="js/jobSubmissionCtrl.js"></script>
     <script src="js/jobHistoryCtrl.js"></script>
     <script src="js/GenericClusterInterface.js"></script>
     <script src="js/SlurmClusterInterface.js"></script>
     <script src="js/CondorClusterInterface.js"></script>
     <script src="js/PreferencesManager.js"></script>
+    <script src="js/navbar.js"></script>
     <script src="js/app.js"></script>
     <script>
       $.material.init();
       $.material.input();
       //process.on("uncaughtException", function(e) { //console.log(e); });
     </script>
-
+    
+  </head>
+  <body ng-app="HccGoApp">
+    <div ng-view>
+    </div>
   </body>
 </html>

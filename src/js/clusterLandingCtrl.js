@@ -89,8 +89,11 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
 
   }
 
-  $scope.jobHistory = function() {
+  $scope.goToUpload = function() {
+    $location.path("cluster/" + $scope.params.clusterId + "/filesystem");
+  }
 
+  $scope.jobHistory = function() {
     $location.path("cluster/" + $scope.params.clusterId + "/jobHistory");
 
   }
@@ -167,7 +170,7 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
                 return value.toFixed(2);
             }
           },
-          max: data[1].blocksQuota,
+          max: data[1].blocksLimit,
 
         },
         color: {
@@ -186,7 +189,7 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
 
 
   }
-
+  
   // Get the username
   function getUsername() {
 
@@ -197,6 +200,7 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
   }
 
   getUsername();
+  
   preferencesManager.getClusters().then(function(clusters) {
     // Get the cluster type
     var clusterType = $.grep(clusters, function(e) {return e.label == $scope.params.clusterId})[0].type;
