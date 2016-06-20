@@ -6,17 +6,16 @@
   <div class="navbar-collapse collapse navbar-responsive-collapse">
   <!--File Management Dropdown -->
     <ul class="nav navbar-nav">
-        <button type="button" ng-click="jobHistory()" class="navbar-left btn btn-default navbar-btn btn-primary">Submit</button>
-        <li class="dropdown">
-            <a class="dropdown-toggle" data-target="#" data-toggle="dropdown" href="javascript:void(0)">File Management<span class="caret"></span></a>
-            <ul class="dropdown-menu">
-                <li>
-                    <a ng-click="goToSCP()" href="javascript:void(0)">
-                        SCP Service
-                    </a>
-                </li>
-            </ul>
-        </li>
+       <button type="button" 
+           ng-click="jobHistory()" 
+           class="navbar-left btn btn-default navbar-btn btn-primary">
+               Submit
+       </button>
+       <button type="button" 
+           ng-click="goToSCP()" 
+           class="navbar-left btn btn-default navbar-btn btn-primary">
+               File Management
+       </button>
 
     </ul>
    
