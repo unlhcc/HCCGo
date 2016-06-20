@@ -25,6 +25,11 @@ navBar.controller('NavCtrl', ['$route', '$scope', '$routeParams', '$location', '
       $scope.username = username;
    })
    
+   // Nav to jobHistory
+   $scope.jobHistory = function() {
+      $location.path("cluster/" + $scope.params.clusterId + "/jobHistory");
+   }
+
    /* For Reference
    $scope.onViewLoad = function viewLoad() {
       $log.debug("ngView has changed");

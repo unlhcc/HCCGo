@@ -83,21 +83,7 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
 
   });
 
-  $scope.logout = function() {
 
-    $location.path("/");
-
-  }
-
-  $scope.goToUpload = function() {
-    $location.path("cluster/" + $scope.params.clusterId + "/filesystem");
-  }
-
-  $scope.jobHistory = function() {
-    $location.path("cluster/" + $scope.params.clusterId + "/jobHistory");
-
-  }
-  
   $scope.refreshCluster = function() {
     getClusterStats($scope.params.clusterId);
     
@@ -189,17 +175,6 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
 
 
   }
-  
-  // Get the username
-  function getUsername() {
-
-    connectionService.getUsername().then(function(username) {
-      $scope.username = username;
-    })
-
-  }
-
-  getUsername();
   
   preferencesManager.getClusters().then(function(clusters) {
     // Get the cluster type
