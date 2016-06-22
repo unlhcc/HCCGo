@@ -1,10 +1,24 @@
 <div class="navbar navbar-hcc" ng-controller="NavCtrl">
   <div class="navbar-header">
-    <a class="navbar-brand">HCC Go</a>
+    <a ng-click="goHome()" class="navbar-brand" href="javascript:void(0)">HCC Go</a>
   </div>
   
   <div class="navbar-collapse collapse navbar-responsive-collapse">
-    
+  <!--File Management Dropdown -->
+    <ul class="nav navbar-nav">
+       <button type="button" 
+           ng-click="jobHistory()" 
+           class="navbar-left btn btn-success navbar-btn btn-primary">
+               Submit
+       </button>
+       <button type="button" 
+           ng-click="goToSCP()" 
+           class="navbar-left btn btn-secondary navbar-btn btn-primary">
+               File Management
+       </button>
+
+    </ul>
+   
     
     <ul class="nav navbar-nav navbar-right">
       <li class="dropdown">
@@ -14,6 +28,9 @@
         </ul>
       </li>
     </ul>
+
+   
+ 
     
   </div>
 </div>

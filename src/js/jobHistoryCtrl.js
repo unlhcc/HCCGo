@@ -20,22 +20,6 @@ jobHistoryModule.service('jobService', function() {
 
   $scope.params = $routeParams;
 
-  // Get the username
-  function getUsername() {
-
-    connectionService.getUsername().then(function(username) {
-      $scope.username = username;
-    });
-
-  }
-  getUsername();
-
-  $scope.logout = function() {
-
-    $location.path("/");
-
-  }
-
   $scope.cancel = function() {
     $location.path("cluster/" + $scope.params.clusterId);
   }

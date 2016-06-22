@@ -2,14 +2,6 @@
 clusterUploadModule = angular.module('HccGoApp.clusterFileSystemCtrl', ['ngRoute' ]);
 
 clusterUploadModule.controller('clusterFileSystemCtrl', ['$scope', '$log', '$timeout', 'connectionService', '$routeParams', '$location', '$q', 'preferencesManager', 'toastr', function($scope, $log, $timeout, connectionService, $routeParams, $location, $q, preferencesManager, toastr) {
- $scope.logout = function() {
-
-    $location.path("/");
-
-  }
-connectionService.getUsername().then(function(username) {
-    $scope.username = username;
-});
 
    // Initialization functions
    var disk = require('diskusage');
