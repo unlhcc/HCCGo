@@ -5,6 +5,7 @@ webkitbuilds/*
 
 .DS_Store
 
+npm-debug.log
 
 src/css/application.css
 bower_components/*
