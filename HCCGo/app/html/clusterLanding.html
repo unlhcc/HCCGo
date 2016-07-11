@@ -1,23 +1,4 @@
-<div class="navbar navbar-hcc">
-  <div class="navbar-header">
-    <a class="navbar-brand">HCC Go</a>
-  </div>
-
-  <div class="navbar-collapse collapse navbar-responsive-collapse">
-
-
-    <ul class="nav navbar-nav navbar-right">
-      <li class="dropdown">
-        <a href="javascript:void(0)" data-target="#" class="dropdown-toggle" data-toggle="dropdown"> {{username}}@{{params.clusterId}} <b class="caret"></b></a>
-        <ul class="dropdown-menu">
-          <li><a ng-click="logout()">Logout</a></li>
-        </ul>
-      </li>
-    </ul>
-
-  </div>
-</div>
-
+<div ng-include="'html/navbar.html'"></div>
 
 <div class="container">
 
@@ -44,11 +25,11 @@
               </tbody>
 
             </table>
-            <a href="javascript:void(0)" class="btn btn-primary btn-lg" ng-click="jobHistory()"> Submit Job <i class="mdi-navigation-chevron-right"></i></a>
-
-         <button ng-click="goToUpload()" class="btn btn-primary">Upload <i class="mdi-navigation-chevron-right"></i></button>
-      </div>
-      </div>
+          
+            <!--<button href="javascript:void(0)" class="btn btn-primary btn-lg">Submit Job <i class="mdi-navigation-chevron-right"></i></a>
+         <button ng-click="goToUpload()" class="btn btn-primary">Upload <i class="mdi-navigation-chevron-right"></i></a>-->
+        </div>
+        </div>
       </div>
       <div class="row">
         <div class="card">

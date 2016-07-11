@@ -6,7 +6,8 @@ var app = angular.module('HccGoApp', ['HccGoApp.WelcomeCtrl',
                               'HccGoApp.clusterFileSystemCtrl',
                               'HccGoApp.jobSubmissionCtrl', 
                               'HccGoApp.jobHistoryCtrl', 
-                              'filePathService']).config([
+                              'filePathService',
+                              'HccGoApp.NavCtrl']).config([
   '$routeProvider', function($routeProvider) {
     return $routeProvider.when('/', {
       templateUrl: 'html/welcome.html',

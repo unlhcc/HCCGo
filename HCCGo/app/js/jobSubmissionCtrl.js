@@ -47,25 +47,9 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
     jsonFile = json;
   });
 
-  $scope.logout = function() {
-
-    $location.path("/");
-
-  }
-
   $scope.cancel = function() {
     $location.path("cluster/" + $scope.params.clusterId + "/jobHistory");
   }
-
-  // Get the username
-  function getUsername() {
-
-    connectionService.getUsername().then(function(username) {
-      $scope.username = username;
-    });
-
-  }
-  getUsername();
 
   // Get available modules
   function getModules() {

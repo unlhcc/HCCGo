@@ -3,12 +3,9 @@
   <div class="navbar-header">
     <a class="navbar-brand">HCC Go</a>
   </div>
-
-
 </div>
 
 <div class="container">
-
   <div class="row">
     <div class="col-md-6 col-md-offset-3">
       <div class="well" id="loginForm">
@@ -21,7 +18,6 @@
                 <select class="form-control servers" id="clusterSelect">
                 </select>
               </div>
-
             </div>
             <div class="form-group">
                 <label for="inputUsername" class=" control-label col-lg-2">Username</label>
@@ -38,15 +34,10 @@
             <div class="col-md-8 col-md-offset-4">
               <button type="submit" class="btn btn-primary" id="loginSubmit">Submit</button>
             </div>
-
           </fieldset>
         </form>
       </div>
     </div>
-
-
-
-
   </div>
 
   <div class="row">
@@ -57,13 +48,10 @@
     </div>
   </div>
 
-
   <div class="modal" id="promptModal">
     <div class="modal-dialog">
         <div class="modal-content">
           <form ng-submit="promptComplete()">
-
-
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
                 <h4 class="modal-title">Server Challenge</h4>
@@ -71,11 +59,7 @@
             <div class="modal-body">
                 <p><pre>{{ userPrompt }}</pre></p>
                 <input type="text" ng-model="userResponse" id="userPromptInput" placeholder="response" class="form-control empty"></input>
-
             </div>
-
-
-
             <div class="modal-footer">
                 <button type="submit" class="btn btn-primary">Submit</button>
             </div>

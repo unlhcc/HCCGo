@@ -69,17 +69,9 @@ welcomeModule.controller('welcomeCtrl', ['$scope', '$log', '$timeout', 'connecti
           $location.path("/cluster/" + $scope.selectedCluster.label);
         $log.debug("Cluster label: " + $scope.selectedCluster.label);
           
-        }
-        
-        
+        }      
       });
-      
-      
-      
     });
-    
-    
-    
   };
   
   $scope.transformCustom = function(customUrl) {
@@ -111,7 +103,5 @@ welcomeModule.controller('welcomeCtrl', ['$scope', '$log', '$timeout', 'connecti
     $scope.finishFunc($scope.userResponse);
     
   };
-  
-  
   
 }]);
