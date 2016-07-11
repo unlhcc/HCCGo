@@ -11,7 +11,9 @@ preferencesModule.factory('preferencesManager',['$log', '$q', function($log, $q)
     readClustersDefer = $q.defer();
     clustersDefer = readClustersDefer.promise;
     var fs = require("fs");
-    fs.readFile("data/clusters.json", function(err, data) {
+    var path = require("path");
+    var clusters = path.join(__dirname, 'data/clusters.json');
+    fs.readFile(clusters, function(err, data) {
       if(err) {
         $log.error(err);
         readClustersDefer.reject(err);

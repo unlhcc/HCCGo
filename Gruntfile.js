@@ -1,14 +1,6 @@
 module.exports = function(grunt) {
   var destinationFolder = './dist';
   grunt.initConfig({
-    nwjs: {
-       options: {
-       	build_dir: './webkitbuilds',
-        platforms: ['linux', 'win', 'osx64'],
-        version: '0.15.4'
-       },
-       src: ['HCCGo/app/**']
-    },
     less: {
       production: {
         options: {
@@ -25,7 +17,6 @@ module.exports = function(grunt) {
       }
     },
     auto_install: {
-      local: {},
       subdir: {
         options: {
           cwd: 'HCCGo/',
@@ -49,10 +40,9 @@ module.exports = function(grunt) {
     }
   });
   grunt.loadNpmTasks('grunt-auto-install');
-  grunt.loadNpmTasks('grunt-nw-builder');
   grunt.loadNpmTasks('grunt-contrib-less');
   grunt.loadNpmTasks('grunt-shell');
   grunt.loadNpmTasks('grunt-bower-task');
-  grunt.registerTask('default', ['less', 'bower', 'auto_install', 'nwjs']);
-  grunt.registerTask('run', ['less', 'bower', 'nwjs', 'shell:start_webkit'])
+  grunt.registerTask('default', ['less', 'bower', 'auto_install']);
+  grunt.registerTask('run', ['less', 'bower', 'shell:start_webkit'])
 };
