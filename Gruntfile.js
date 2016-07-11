@@ -12,8 +12,11 @@ module.exports = function(grunt) {
       }
     },
     shell: {
-      start_webkit: {
-        command: 'webkitbuilds/HCCGo/linux64/HCCGo --force'
+      start_electron: {
+        command: 'cd HCCGo/ && npm start'
+      },
+      build_electron: {
+        command: 'cd HCCGo/ && npm run-script packageWin'
       }
     },
     auto_install: {
@@ -23,7 +26,7 @@ module.exports = function(grunt) {
 	  stdout: true,
 	  stderr: true,
 	  failOnError: true,
-	  npm: '--development'
+	  npm: '--production'
 	}
       }
     },
@@ -43,6 +46,15 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-less');
   grunt.loadNpmTasks('grunt-shell');
   grunt.loadNpmTasks('grunt-bower-task');
-  grunt.registerTask('default', ['less', 'bower', 'auto_install']);
-  grunt.registerTask('run', ['less', 'bower', 'shell:start_webkit'])
+  grunt.registerTask('default', ['less', 
+                                 'bower', 
+				 'auto_install']);
+  grunt.registerTask('run', ['less', 
+                             'bower', 
+			     'auto_install', 
+			     'shell:start_electron']);
+  grunt.registerTask('package', ['less',
+                                 'bower',
+				 'auto_install',
+				 'shell:build_electron']);
 };

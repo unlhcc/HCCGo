@@ -11,6 +11,8 @@ HCCGo/app/css/application.css
 bower_components/*
 HCCGo/app/lib/*
 HCCGo/node_modules/*
-package/*
+packageWin/*
+packageOsx/*
+packageNix/*
 
 *.swp
