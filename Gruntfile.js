@@ -12,10 +12,10 @@ module.exports = function(grunt) {
     less: {
       production: {
         options: {
-          paths: ["src/css"]
+          paths: ["HCCGo/app/css"]
         },
         files: {
-          "src/css/application.css": "src/css/application.less"
+          "HCCGo/app/css/application.css": "HCCGo/app/css/application.less"
         }
       }
     },
@@ -27,7 +27,7 @@ module.exports = function(grunt) {
     bower: {
       install: {
         options: {
-          targetDir: 'src/lib',
+          targetDir: 'HCCGo/app/lib',
           layout: 'byComponent',
           install: true,
           verbose: true,
