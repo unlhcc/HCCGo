@@ -4,7 +4,11 @@
   "main": "main.js",
   "description": "Interface for HCC Resouces",
   "scripts": {
-    "start": "electron ."
+    "start": "electron .",
+    "packageWin": "",
+    "packageOsx": "",
+    "packageNix": "",
+    "postinstall": "postinstall.js"
   },
   "keywords": [
     "HCC"
