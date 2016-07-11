@@ -7,27 +7,31 @@ To setup your environment to run the code you'll need to first clone the reposit
 npm install grunt-cli -g
 ```
 
-Then go into the 'src' directory and run:
+The command
 ```bash
 npm install
 ```
+will grab the packages needed to automate the running and building of HCCGo. The packages.json file here is only used for this purpose. The packages.json file located in the subdir of HCCGo is the actual file used to define the application.
 
-This command will read the packages.json file and install into the 'src' directory required dependencies for the app to run. Then you'll have to come back up into the root directory of HCCGo. Using npm install the following packages:
-```bash
-grunt
-grunt-bower-task
-grunt-contrib-less
-grunt-node-webkit-builder
-grunt-shell
-```
+At this point if you run just the 'grunt' command, the library should build properly, and you'll only need to run 'npm start' in the sub HCCGo dir to run the app. Using 'grunt run' will build the app and do the 'npm start' command for you.
 
-For using grunt these packages are required inorder for the 'webkit' build to function properly. The last step is if you intend to use the 'grunt run' command. At this point if you run just the 'grunt' command, the library should build properly, and you'll only need to go into 'webkitbuilds/HCCGo' and find the folder that is closet to your system (for instance osx64 if you run a Mac machine). If you want to use 'grunt run' so the library builds and then the app immediately loads you'll need to edit Gruntfile.js in the section:
+To build the app and package for your system, in the Gruntfile.js file, go to where 'build_electron' is defined.
 ```bash
 shell: {
-  start_webkit: {
-    command: 'open webkitbuilds/HCCGo/osx/HCCGo.app'
+  start_electron: {
+    command: 'cd HCCGo/ && npm start'
+  },
+  build_electron: {
+    command: 'cd HCCGo/ && npm run-script <system-definition>'
   }
 },
 ```
 
-Just edit the text after 'command' to load the proper file for your system and 'grunt run' will work fine!
+At the <system-definition> point, change to the package of your system. All options output to directory of same name in base directory. For instance:
+```bash
+packageWin - Use for a Windows system.
+
+packageOsx - Use for a OSX system.
+
+packageNix - Use for a Linux system.
+```
