@@ -1,0 +1,24 @@
+{
+  "name": "HCCGo",
+  "version": "0.2.0",
+  "main": "main.js",
+  "description": "Interface for HCC Resouces",
+  "keywords": [
+    "HCC"
+  ],
+  "webkit": {
+    "plugin": true
+  },
+  "dependencies": {
+    "ssh2": ">= 0.3.3",
+    "fs": ">= 0.0.2",
+    "async": ">= 1.5.2",
+    "path": ">= 0.12.7",
+    "diskusage": ">= 0.1.5",
+    "csv-parse": ">= 1.1.1"
+  },
+  "devDependencies": {
+    "electron-packager": ">= 5.0.1",
+    "electron-prebuilt": ">= 0.30.3"
+  }
+}

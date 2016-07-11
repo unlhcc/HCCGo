@@ -7,7 +7,7 @@ module.exports = function(grunt) {
         platforms: ['linux', 'win', 'osx64'],
         version: '0.15.4'
        },
-       src: ['src/**']
+       src: ['HCCGo/app/**']
     },
     less: {
       production: {
@@ -24,6 +24,18 @@ module.exports = function(grunt) {
         command: 'webkitbuilds/HCCGo/linux64/HCCGo --force'
       }
     },
+    auto_install: {
+      local: {},
+      subdir: {
+        options: {
+          cwd: 'HCCGo/',
+	  stdout: true,
+	  stderr: true,
+	  failOnError: true,
+	  npm: '--development'
+	}
+      }
+    },
     bower: {
       install: {
         options: {
@@ -36,10 +48,11 @@ module.exports = function(grunt) {
       }
     }
   });
+  grunt.loadNpmTasks('grunt-auto-install');
   grunt.loadNpmTasks('grunt-nw-builder');
   grunt.loadNpmTasks('grunt-contrib-less');
   grunt.loadNpmTasks('grunt-shell');
   grunt.loadNpmTasks('grunt-bower-task');
-  grunt.registerTask('default', ['less', 'bower', 'nwjs']);
+  grunt.registerTask('default', ['less', 'bower', 'auto_install', 'nwjs']);
   grunt.registerTask('run', ['less', 'bower', 'nwjs', 'shell:start_webkit'])
 };

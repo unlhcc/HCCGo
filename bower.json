@@ -6,7 +6,7 @@
     "Derek Weitzel <djw8605@gmail.com>"
   ],
   "description": "HCC Go",
-  "main": "src/index.html",
+  "main": "HCCGo/app/index.html",
   "license": "MIT",
   "dependencies": {
     "bootstrap-material-design": "~0.3.0",
