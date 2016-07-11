@@ -341,7 +341,9 @@ clusterUploadModule.controller('clusterFileSystemCtrl', ['$scope', '$log', '$tim
        // TODO: Get working directory on windows machines
        $log.debug("Process env: ");
        $log.debug(process.env);
-       $scope.localWD = process.env.HOME;
+       $scope.localWD = process.env.HOMEDRIVE + process.env.HOMEPATH;
+       $log.debug(process);
+       $log.debug("localWD = " + $scope.localWD);
        localRead($scope.localWD);
    } else {
        // Runs for Mac and Linux systems

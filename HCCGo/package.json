@@ -5,7 +5,7 @@
   "description": "Interface for HCC Resouces",
   "scripts": {
     "start": "electron .",
-    "packageWin": "",
+    "packageWin": "node ./node_modules/electron-packager/cli.js ./ HCCGo --platform=win32 --arch=all --out ../package/win/ --version 1.2.6 --overwrite",
     "packageOsx": "",
     "packageNix": "",
     "postinstall": "postinstall.js"
@@ -20,9 +20,11 @@
     "diskusage": ">= 0.1.5",
     "fs": ">= 0.0.2",
     "path": ">= 0.12.7",
+    "electron-debug": "^1.0.1",
     "ssh2": ">= 0.3.3"
   },
   "devDependencies": {
+    "devtron": "^1.2.1",
     "electron-packager": ">= 5.0.1",
     "electron-prebuilt": ">= 0.30.3",
     "electron-rebuild": "^1.1.5"
