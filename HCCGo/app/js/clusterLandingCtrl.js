@@ -5,6 +5,8 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
 
   $scope.params = $routeParams;
   var clusterInterface = null;
+  var path = require('path');
+  var jobHistory = path.join(__dirname, 'data/jobHistory.json');
 
   // Check if app data folder is there, if not, create one with default json file
   var filePath = filePathService.getFilePath();
@@ -16,7 +18,7 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
         fs.mkdir(dataPath, function() {
           fs.exists(filePath, function(fileExists) {
             if(!fileExists)
-              fs.createReadStream('data/jobHistory.json').pipe(fs.createWriteStream(filePath));
+              fs.createReadStream(jobHistory).pipe(fs.createWriteStream(filePath));
           });
         });
     }

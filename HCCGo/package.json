@@ -1,0 +1,32 @@
+{
+  "name": "HCCGo",
+  "version": "0.2.0",
+  "main": "./main.js",
+  "description": "Interface for HCC Resouces",
+  "scripts": {
+    "start": "electron .",
+    "packageWin": "node ./node_modules/electron-packager/cli.js ./ HCCGo --platform=win32 --arch=all --out ../packageWin/ --version 1.2.6 --overwrite",
+    "packageOsx": "node ./node_modules/electron-packager/cli.js ./ HCCGo --platform=darwin --arch=x64 --out ../packageOsx/ --version 1.2.6 --overwrite",
+    "packageNix": "node ./node_modules/electron-packager/cli.js ./ HCCGo --platform=linux --arch=all --out ../packageNix/ --version 1.2.6 --overwrite",
+    "postinstall": "./postinstall.js"
+  },
+  "keywords": [
+    "HCC"
+  ],
+  "dependencies": {
+    "async": ">= 1.5.2",
+    "c3": "^0.4.11",
+    "csv-parse": ">= 1.1.1",
+    "diskusage": ">= 0.1.5",
+    "fs": ">= 0.0.2",
+    "path": ">= 0.12.7",
+    "electron-debug": "^1.0.1",
+    "ssh2": ">= 0.3.3"
+  },
+  "devDependencies": {
+    "devtron": "^1.2.1",
+    "electron-packager": ">= 5.0.1",
+    "electron-prebuilt": ">= 0.30.3",
+    "electron-rebuild": "^1.1.5"
+  }
+}

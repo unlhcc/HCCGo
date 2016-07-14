@@ -5,10 +5,14 @@ webkitbuilds/*
 
 .DS_Store
 
+npm-debug.log
 
-src/css/application.css
+HCCGo/app/css/application.css
 bower_components/*
-src/lib/*
-src/node_modules/*
+HCCGo/app/lib/*
+HCCGo/node_modules/*
+packageWin/*
+packageOsx/*
+packageNix/*
 
 *.swp
