@@ -75,6 +75,77 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
 
    };
 
+   
+  // Check the writability of a file
+  var checkWritable = function(file) {
+    
+    var deferred = $q.defer();
+    if (!file) {
+      deferred.resolve(false);
+    }
+    
+    // Write to the file to test
+    async.waterfall([
+      // Get the sftp module
+      function(callback) {
+        var sftp_return = connectionList[getClusterContext()].sftp(function (err, sftp) {
+          logger.log("Got sftp now");
+          if (err){
+            return callback(err);
+          }
+          callback(null, sftp);
+        });
+        
+      }, function(sftp, callback){
+        
+        // Check for writeable directory
+        path = require('path');
+        // Try to write to a test file
+        dirname_path = path.dirname(file);
+        test_path = path.join(dirname_path, ".hccgo-test");
+        
+        sftp.open(test_path, 'w', function(err, handle) {
+          if (err){
+            sftp.end();
+            return callback(err);
+          }
+          sftp.close(handle, function(err) {
+            if (err) {
+              sftp.end();
+              return callback(err);
+            }
+            callback(null, sftp, test_path);
+          });
+        });
+      },
+      // Now, delete the file
+      function(sftp, test_path, callback) {
+        
+        sftp.unlink(test_path, function(err) {
+          if (err) {
+            sftp.end();
+            return callback(err);
+          }
+          sftp.end();
+          callback(null);
+          
+          
+        });
+        
+      }
+    ], function(err, results) {
+      // Now, the end results
+      if (err) {
+        deferred.reject(err);
+      } else {
+        deferred.resolve(true);
+      }
+
+    });
+
+    return deferred.promise;
+  }
+
   // Functionality to upload a file to the server
   var uploadJobFile = function(jobFile, remotePath) {
 
@@ -743,6 +814,7 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
    getHomeWD: getHomeWD,
    getWorkWD: getWorkWD,
    uploadJobFile: uploadJobFile,
+   checkWritable: checkWritable,
    initiateConnection: function initiateConnection(username, password, hostname, cluster, logger, needInput, completed) {
      
      var Client = require('ssh2').Client;
@@ -792,7 +864,7 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
       tryKeyboard: true,
       readyTimeout: 99999999,
       debug: function(message) {
-        //logger.log(message);
+        logger.log(message);
       }
      });
       
