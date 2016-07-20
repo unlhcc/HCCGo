@@ -883,7 +883,7 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
       tryKeyboard: true,
       readyTimeout: 99999999,
       debug: function(message) {
-        logger.log(message);
+        //logger.log(message);
       }
      });
       
