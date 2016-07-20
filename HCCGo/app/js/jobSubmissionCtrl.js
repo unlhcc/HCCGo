@@ -75,23 +75,6 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
     return deferred.promise;
   }
 
-  $scope.checkWritable = function(location) {
-    
-    $log.debug("Checking file location: " + location);
-    connectionService.checkWritable(location).then(function(writability) {
-      
-      if (writability) {
-        $log.debug("File is writable");
-      } else {
-          $log.debug("File is not writable");
-      }
-      
-      
-    })
-    
-    
-  }
-
   // Selectize field for selecting modules
   var $select = $('#modules').selectize({
     plugins: ['remove_button'],
