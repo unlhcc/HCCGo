@@ -262,6 +262,9 @@ jobSubmissionModule.directive('remoteWritable', function($q, $log, connectionSer
           
           
         }, function(err) {
+          if (err) {
+            $log.error("Got error from checking writability: " + err);
+          }
           def.reject();
         });
         return def.promise;

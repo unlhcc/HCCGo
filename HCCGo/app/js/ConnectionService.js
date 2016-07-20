@@ -74,6 +74,20 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
       }
 
    };
+   
+  
+  /**
+    * Make a random 5 character string to use for random file id's
+    */
+  function makeid() {
+    var text = "";
+    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+    for( var i=0; i < 5; i++ )
+      text += possible.charAt(Math.floor(Math.random() * possible.length));
+
+    return text;
+  }
 
    
   // Check the writability of a file
@@ -96,13 +110,18 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
           callback(null, sftp);
         });
         
+        if (!sftp_return) {
+          callback("Unable to get sftp handle");
+          logger.log("Unable to get sftp handle");
+        }
+        
       }, function(sftp, callback){
         
         // Check for writeable directory
         path = require('path');
         // Try to write to a test file
         dirname_path = path.dirname(file);
-        test_path = path.join(dirname_path, ".hccgo-test");
+        test_path = path.join(dirname_path, ".hccgo-test" + makeid());
         
         sftp.open(test_path, 'w', function(err, handle) {
           if (err){
