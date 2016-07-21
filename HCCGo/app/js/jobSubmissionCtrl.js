@@ -180,7 +180,7 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
         connectionService.uploadJobFile(jobFile, job.location).then(function(data) {
           callback(null);
         }, function(err) {
-          callback(new Erorr("Upload of file failed!"));
+          callback(new Error("Upload of file failed!"));
         });
       },
       function(callback) {
