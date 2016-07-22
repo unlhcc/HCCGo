@@ -75,7 +75,6 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
     return deferred.promise;
   }
 
-
   // Selectize field for selecting modules
   var $select = $('#modules').selectize({
     plugins: ['remove_button'],
@@ -219,3 +218,40 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
 
 
 }]);
+
+jobSubmissionModule.directive('remoteWritable', function($q, $log, connectionService) {
+  return {
+    require: 'ngModel',
+    restrict: 'A',
+    link: function(scope, elm, attrs, ctrl) {
+      
+      ctrl.$asyncValidators.remoteWritable = function(modelValue, viewValue) {
+        if (ctrl.$isEmpty(modelValue)) {
+          // consider empty model valid
+          return $q.when();
+        }
+        
+        var def = $q.defer();
+        $log.debug("Checking file location: " + modelValue);
+        connectionService.checkWritable(modelValue).then(function(writability) {
+          
+          if (writability) {
+            $log.debug("File is writable");
+            def.resolve();
+          } else {
+            $log.debug("File is not writable");
+            def.reject();
+          }
+          
+          
+        }, function(err) {
+          if (err) {
+            $log.error("Got error from checking writability: " + err);
+          }
+          def.reject();
+        });
+        return def.promise;
+      };
+    }
+  };
+});
