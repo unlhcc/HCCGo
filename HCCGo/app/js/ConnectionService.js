@@ -107,12 +107,13 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
           if (err){
             return callback(err);
           }
-          callback(null, sftp);
+          return callback(null, sftp);
         });
         
         if (!sftp_return) {
           callback("Unable to get sftp handle");
           logger.log("Unable to get sftp handle");
+          return callback("Unable to get sftp handle");
         }
         
       }, function(sftp, callback){
@@ -120,8 +121,8 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
         // Check for writeable directory
         path = require('path');
         // Try to write to a test file
-        dirname_path = path.dirname(file);
-        test_path = path.join(dirname_path, ".hccgo-test" + makeid());
+        var dirname_path = path.dirname(file);
+        var test_path = path.join(dirname_path, ".hccgo-test" + makeid());
         
         sftp.open(test_path, 'w', function(err, handle) {
           if (err){
@@ -133,7 +134,7 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
               sftp.end();
               return callback(err);
             }
-            callback(null, sftp, test_path);
+            return callback(null, sftp, test_path);
           });
         });
       },
@@ -143,10 +144,10 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
         sftp.unlink(test_path, function(err) {
           if (err) {
             sftp.end();
-            return callback(err);
+            return callback(test_path + ": " + err);
           }
           sftp.end();
-          callback(null);
+          return callback(null);
           
           
         });
