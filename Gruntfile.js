@@ -26,7 +26,7 @@ module.exports = function(grunt) {
 	  stdout: true,
 	  stderr: true,
 	  failOnError: true,
-	  npm: '--production'
+	  npm: '--development'
 	}
       }
     },
