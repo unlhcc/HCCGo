@@ -33,30 +33,79 @@
           </span>
         </div>
       </div>
-      <div class="form-group">
+      <div class="form-group" ng-class="{'has-error': jobscript.location.$error.remoteWritable}">
           <label class="control-label col-sm-2" for="location"> Locaton </label>
           <div class="col-sm-10">
-              <input type="text" class="form-control" id="location" name="location" ng-model="job.location" ng-pattern="/^.*\.slurm$/" placeholder="loading work folder" required>
+            <!-- ng-pattern="/^.*\.slurm$/" -->
+            <div class="right-inner-addon">
+              <input type="text" class="form-control" id="location" name="location" ng-model="job.location"  placeholder="loading work folder" required remote-writable />
+              <div class="status-checkstatus">
+                <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" x="0px"     y="0px"
+                viewBox="0, 0, 100, 100" id="checkmark">
+                  <g transform="">
+                    <circle class="status-fill" ng-class="{'status-fill-complete': (!jobscript.location.$error.remoteWritable && !jobscript.location.$pending.remoteWritable) || (jobscript.location.$error.remoteWritable), 'status-successs': !jobscript.location.$error.remoteWritable && !jobscript.location.$pending.remoteWritable, 'status-failure': jobscript.location.$error.remoteWritable}" fill="none" stroke="#7DB0D5" stroke-width="4" stroke-miterlimit="10" cx="50" cy="50" r="44"/> 
+  	                  <polyline class="status-check" ng-class="{'status-check-complete': !jobscript.location.$error.remoteWritable && !jobscript.location.$pending.remoteWritable}" fill="none" stroke="#7DB0D5" stroke-width="8" stroke-linecap="round" stroke-miterlimit="10" 
+                        points="70,35 45,65 30,52  "/>
+                      <polyline class="status-anx" ng-class="{'status-anx-complete': jobscript.location.$error.remoteWritable}" fill="none" stroke="#7DB0D5" stroke-width="8" stroke-linecap="round" stroke-miterlimit="10" 
+                        points="30,30 70,70"/>
+                      <polyline class="status-anx" ng-class="{'status-anx-complete': jobscript.location.$error.remoteWritable}" fill="none" stroke="#7DB0D5" stroke-width="8" stroke-linecap="round" stroke-miterlimit="10" 
+                        points="30,70 70,30"/>
+                  </g>
+                </svg>
+              </div>
+            </div>
               <span class="text-danger" ng-show="jobscript.location.$touched && jobscript.location.$invalid">
                   <span ng-show="jobscript.location.$error.required"> Location is required. </span>
                   <span ng-show="jobscript.location.$error.pattern"> Must end in .slurm </span>
               </span>
           </div>
       </div>
-      <div class="form-group">
+      <div class="form-group" ng-class="{'has-error': jobscript.error.$error.remoteWritable}">
         <label class="control-label col-sm-2" for="error"> Error: </label>
         <div class="col-sm-10">
-          <input type="text" class="form-control" id="error" name="error" ng-model="job.error" ng-pattern="/^.*\.err$/" placeholder="loading work folder" required>
+          <div class="right-inner-addon">
+            <input type="text" class="form-control" id="error" name="error" ng-model="job.error" ng-pattern="/^.*\.err$/" placeholder="loading work folder" required remote-writable>
+            <div class="status-checkstatus">
+              <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" x="0px"     y="0px"
+              viewBox="0, 0, 100, 100" id="checkmark">
+                <g transform="">
+                  <circle class="status-fill" ng-class="{'status-fill-complete': (!jobscript.error.$error.remoteWritable && !jobscript.error.$pending.remoteWritable) || (jobscript.error.$error.remoteWritable), 'status-successs': !jobscript.error.$error.remoteWritable && !jobscript.error.$pending.remoteWritable, 'status-failure': jobscript.error.$error.remoteWritable}" fill="none" stroke="#7DB0D5" stroke-width="4" stroke-miterlimit="10" cx="50" cy="50" r="44"/> 
+                    <polyline class="status-check" ng-class="{'status-check-complete': !jobscript.error.$error.remoteWritable && !jobscript.error.$pending.remoteWritable}" fill="none" stroke="#7DB0D5" stroke-width="8" stroke-linecap="round" stroke-miterlimit="10" 
+                      points="70,35 45,65 30,52  "/>
+                    <polyline class="status-anx" ng-class="{'status-anx-complete': jobscript.error.$error.remoteWritable}" fill="none" stroke="#7DB0D5" stroke-width="8" stroke-linecap="round" stroke-miterlimit="10" 
+                      points="30,30 70,70"/>
+                    <polyline class="status-anx" ng-class="{'status-anx-complete': jobscript.error.$error.remoteWritable}" fill="none" stroke="#7DB0D5" stroke-width="8" stroke-linecap="round" stroke-miterlimit="10" 
+                      points="30,70 70,30"/>
+                </g>
+              </svg>
+            </div>
+          </div>
           <span class="text-danger" ng-show="jobscript.error.$touched && jobscript.error.$invalid">
               <span ng-show="jobscript.error.$error.required"> Error is required. </span>
               <span ng-show="jobscript.error.$error.pattern"> Must end in .err </span>
           </span>
         </div>
       </div>
-      <div class="form-group">
+      <div class="form-group" ng-class="{'has-error': jobscript.output.$error.remoteWritable}">
         <label class="control-label col-sm-2" for="output"> Output: </label>
         <div class="col-sm-10">
-          <input type="text" class="form-control" id="output" name="output" ng-model="job.output" ng-pattern="/^.*\.out$/" placeholder="loading work folder" required>
+          <div class="right-inner-addon">
+            <input type="text" class="form-control" id="output" name="output" ng-model="job.output" ng-pattern="/^.*\.out$/" placeholder="loading work folder" required remote-writable>
+            <div class="status-checkstatus">
+              <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" x="0px"     y="0px"
+              viewBox="0, 0, 100, 100" id="checkmark">
+                <g transform="">
+                  <circle class="status-fill" ng-class="{'status-fill-complete': (!jobscript.output.$error.remoteWritable && !jobscript.output.$pending.remoteWritable) || (jobscript.output.$error.remoteWritable), 'status-successs': !jobscript.output.$error.remoteWritable && !jobscript.output.$pending.remoteWritable, 'status-failure': jobscript.output.$error.remoteWritable}" fill="none" stroke="#7DB0D5" stroke-width="4" stroke-miterlimit="10" cx="50" cy="50" r="44"/> 
+                    <polyline class="status-check" ng-class="{'status-check-complete': !jobscript.output.$error.remoteWritable && !jobscript.output.$pending.remoteWritable}" fill="none" stroke="#7DB0D5" stroke-width="8" stroke-linecap="round" stroke-miterlimit="10" 
+                      points="70,35 45,65 30,52  "/>
+                    <polyline class="status-anx" ng-class="{'status-anx-complete': jobscript.output.$error.remoteWritable}" fill="none" stroke="#7DB0D5" stroke-width="8" stroke-linecap="round" stroke-miterlimit="10" 
+                      points="30,30 70,70"/>
+                    <polyline class="status-anx" ng-class="{'status-anx-complete': jobscript.output.$error.remoteWritable}" fill="none" stroke="#7DB0D5" stroke-width="8" stroke-linecap="round" stroke-miterlimit="10" 
+                      points="30,70 70,30"/>
+                </g>
+              </svg>
+            </div>
+          </div>
           <span class="text-danger" ng-show="jobscript.output.$touched && jobscript.output.$invalid">
               <span ng-show="jobscript.output.$error.required"> Output is required. </span>
               <span ng-show="jobscript.output.$error.pattern"> Must end in .out </span>

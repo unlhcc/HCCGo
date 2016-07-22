@@ -248,3 +248,110 @@ div.historyinfo {
 @-webkit-keyframes spin { 100% { -webkit-transform: rotate(360deg); } }
 @keyframes spin { 100% { -webkit-transform: rotate(360deg); transform:rotate(360deg); } }
 
+
+/**
+  * CSS necessary for the writability status
+  */
+
+.right-inner-addon {
+  position: relative;
+}
+
+.status-checkstatus {
+  width: 20px;
+  position: absolute;
+  right: -0px;
+  top: -0px;
+}
+
+.status-check 
+{
+	stroke-dasharray: 110;
+	stroke-dashoffset: -110;
+	stroke-width: 0;
+}
+
+.status-anx
+{
+  stroke-dasharray: 110;
+  stroke-dashoffset: -110;
+  stroke-width: 0; 
+}
+
+.status-anx-complete
+{
+	animation: status-anx 1s ease-in forwards;
+	stroke-width: 15;
+	stroke-dashoffset: 0;
+  stroke: #f44336;
+  transition: status-stroke 1.6s;
+
+}
+
+.status-check-complete 
+{   
+	animation: status-check 1s ease-in forwards;
+	stroke-width: 15;
+	stroke-dashoffset: 0;
+  stroke: #009900;
+  transition: status-stroke 1.6s;
+}
+
+.status-fill 
+{
+	stroke-dasharray: 285;
+	stroke-dashoffset: -100;
+	animation: status-spin-fill 3s linear infinite forwards;
+  transform-origin: 50% 50%;
+}
+
+.status-fill-complete 
+{
+	animation: status-fill 1s ease-out forwards;
+}
+@keyframes status-check {
+ 0% {
+   stroke-dashoffset: -110;
+}
+ 100% {
+   stroke-dashoffset: 0;
+ }
+}
+
+@keyframes status-anx {
+ 0% {
+   stroke-dashoffset: -110;
+}
+ 100% {
+   stroke-dashoffset: 0;
+ }
+}
+@keyframes status-spin-fill {
+  0% {
+	transform: rotate(0deg);
+  }
+  100% {
+	transform: rotate(720deg);
+  }
+}
+@keyframes status-fill {
+  0% {
+	stroke-dashoffset: 285;
+  }
+  100% {
+	stroke-dashoffset: 0;
+  }
+}
+
+.status-success {
+  stroke: #009900;
+  transition: status-stroke 1.6s;
+}
+
+.status-failure {
+  stroke: #f44336;
+  transition: status-stroke 1.6s;
+}
+
+
+

@@ -74,6 +74,97 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
       }
 
    };
+   
+  
+  /**
+    * Make a random 5 character string to use for random file id's
+    */
+  function makeid() {
+    var text = "";
+    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+    for( var i=0; i < 5; i++ )
+      text += possible.charAt(Math.floor(Math.random() * possible.length));
+
+    return text;
+  }
+
+   
+  // Check the writability of a file
+  var checkWritable = function(file) {
+    
+    var deferred = $q.defer();
+    if (!file) {
+      deferred.resolve(false);
+    }
+    
+    // Write to the file to test
+    async.waterfall([
+      // Get the sftp module
+      function(callback) {
+        var sftp_return = connectionList[getClusterContext()].sftp(function (err, sftp) {
+          logger.log("Got sftp now");
+          if (err){
+            return callback(err);
+          }
+          return callback(null, sftp);
+        });
+        
+        if (!sftp_return) {
+          callback("Unable to get sftp handle");
+          logger.log("Unable to get sftp handle");
+          return callback("Unable to get sftp handle");
+        }
+        
+      }, function(sftp, callback){
+        
+        // Check for writeable directory
+        path = require('path');
+        // Try to write to a test file
+        var dirname_path = path.dirname(file);
+        var test_path = path.join(dirname_path, ".hccgo-test" + makeid());
+        
+        sftp.open(test_path, 'w', function(err, handle) {
+          if (err){
+            sftp.end();
+            return callback(err);
+          }
+          sftp.close(handle, function(err) {
+            if (err) {
+              sftp.end();
+              return callback(err);
+            }
+            return callback(null, sftp, test_path);
+          });
+        });
+      },
+      // Now, delete the file
+      function(sftp, test_path, callback) {
+        
+        sftp.unlink(test_path, function(err) {
+          if (err) {
+            sftp.end();
+            return callback(test_path + ": " + err);
+          }
+          sftp.end();
+          return callback(null);
+          
+          
+        });
+        
+      }
+    ], function(err, results) {
+      // Now, the end results
+      if (err) {
+        deferred.reject(err);
+      } else {
+        deferred.resolve(true);
+      }
+
+    });
+
+    return deferred.promise;
+  }
 
   // Functionality to upload a file to the server
   var uploadJobFile = function(jobFile, remotePath) {
@@ -743,6 +834,7 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
    getHomeWD: getHomeWD,
    getWorkWD: getWorkWD,
    uploadJobFile: uploadJobFile,
+   checkWritable: checkWritable,
    initiateConnection: function initiateConnection(username, password, hostname, cluster, logger, needInput, completed) {
      
      var Client = require('ssh2').Client;
