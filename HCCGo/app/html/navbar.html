@@ -1,4 +1,6 @@
 <div class="navbar navbar-hcc" ng-controller="NavCtrl">
+ <div ng-hide="currentpath === '/'">
+
   <div class="navbar-header">
     <a ng-click="goHome()" class="navbar-brand" href="javascript:void(0)">HCC Go</a>
   </div>
@@ -22,15 +24,20 @@
     
     <ul class="nav navbar-nav navbar-right">
       <li class="dropdown">
-        <a href="javascript:void(0)" data-target="#" class="dropdown-toggle" data-toggle="dropdown"> {{username}}@{{params.clusterId}} <b class="caret"></b></a>
+        <a href="javascript:void(0)" data-target="#" 
+		   class="dropdown-toggle" 
+		   data-toggle="dropdown"> {{username}}@{{params.clusterId}} <b class="caret"></b></a>
         <ul class="dropdown-menu">
           <li><a ng-click="logout()">Logout</a></li>
         </ul>
       </li>
     </ul>
-
-   
- 
-    
+  </div>
+ </div>
+  <div class="navbar navbar-hcc navbar-welcome" ng-hide="currentPath != '/'">
+    <div class="navbar-header">
+        <a class="navbar-brand">HCC Go</a>
+    </div>
   </div>
 </div>
+
