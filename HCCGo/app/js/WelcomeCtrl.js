@@ -1,7 +1,7 @@
 
 welcomeModule = angular.module('HccGoApp.WelcomeCtrl', [ ]);
 
-welcomeModule.controller('welcomeCtrl', ['$scope', '$log', '$timeout', 'connectionService', '$location', 'preferencesManager', function($scope, $log, $timeout, connectionService, $location, preferencesManager) {
+welcomeModule.controller('welcomeCtrl', ['$scope', '$log', '$timeout', 'connectionService', 'notifierService', '$location', 'preferencesManager', function($scope, $log, $timeout, connectionService, notifierService, $location, preferencesManager) {
   
   var $selector = $('#clusterSelect').selectize({
     
