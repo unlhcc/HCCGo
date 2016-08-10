@@ -1,7 +1,7 @@
 navBar = angular.module('HccGoApp.NavCtrl', ['ngRoute' ]);
 
-navBar.controller('NavCtrl', ['$route', '$scope', '$routeParams', '$location', '$log', 'preferencesManager', 'connectionService',
-   function($route,$scope,$routeParams,$location,$log,preferencesManager,connectionService) {
+navBar.controller('NavCtrl', ['$route', '$scope', '$routeParams', '$location', '$log', '$templateCache', 'preferencesManager', 'connectionService',
+   function($route,$scope,$routeParams,$location,$log,$templateCache,preferencesManager,connectionService) {
    // This controller intended purely to manage navigation bar
    // No code beyond navigational controls should be used here
    $scope.params = $routeParams;
@@ -22,9 +22,7 @@ navBar.controller('NavCtrl', ['$route', '$scope', '$routeParams', '$location', '
    };
 
    // Sets username in nav bar
-   /*connectionService.getUsername().then(function(username) {
-      $scope.username = username;
-   })*/
+   //$scope.username = $templateCache.get('username');
    
    // Nav to jobHistory
    $scope.jobHistory = function() {
@@ -32,14 +30,13 @@ navBar.controller('NavCtrl', ['$route', '$scope', '$routeParams', '$location', '
    }
 
    // For Reference
-   $scope.$on('$viewContentLoaded', function() {
-      $log.debug("ngView has changed");
-	  $scope.currentPath = $location.path();
-	  if($scope.username == null){
-         connectionService.getUsername().then(function(username) {
-            $scope.username = username;
-         }) 
-	  }
-   })
+   $log.debug("Username: " + $scope.username);
+   if($templateCache.get('username') == null){
+      connectionService.getUsername().then(function(username) {
+          $scope.username = username;
+      }) 
+   } else {
+      $scope.username = $templateCache.get('username');
+   }
    
 }]);
