@@ -9,12 +9,10 @@ notifierModule.factory('notifierService',['$log', '$q', '$routeParams', 'toastr'
    var path = require('path');
    var fs = require('fs');
    
-   var setDebug = false;     // Setting to true enables debug messages
-   
    const toastrOptions = {closeButton: true,
                           timeOut: 5000,
-				          extendedTimeOut: 5000,
-				          progressBar: true};
+                          extendedTimeOut: 5000,
+                          progressBar: true};
    
    /**
    * To notify user of application dependent on window focus
