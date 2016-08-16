@@ -16,7 +16,7 @@ module.exports = function(grunt) {
         command: 'cd HCCGo/ && npm start'
       },
       build_electron: {
-        command: 'cd HCCGo/ && npm run-script packageNix'
+        command: 'cd HCCGo/ && npm run-script packageWin'
       }
     },
     auto_install: {
