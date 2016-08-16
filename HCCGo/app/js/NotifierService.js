@@ -1,5 +1,5 @@
 
-notifierModule = angular.module('NotifierModule', [])
+notifierModule = angular.module('NotifierModule', ['toastr'])
 
 notifierModule.factory('notifierService',['$log', '$q', '$routeParams', 'toastr', 
                                            function($log, $q, $routeParams, toastr) {
