@@ -1,7 +1,7 @@
 
 connectionModule = angular.module('ConnectionServiceModule', [])
 
-connectionModule.factory('connectionService',['$log', '$q', '$routeParams', function($log, $q, $routeParams) {
+connectionModule.factory('connectionService',['$log', '$q', '$routeParams', '$templateCache', function($log, $q, $routeParams, $templateCache) {
   
    var connectionList = {crane: null,
                      tusker: null,
@@ -282,7 +282,7 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
       var deferred = $q.defer();
     
       runCommand('whoami').then(function(data) {
-      
+         $templateCache.put('username', data);
          deferred.resolve(data.trim());
       
       })
@@ -887,7 +887,7 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
         //logger.log(message);
       }
      });
-      
+	  
       switch(cluster) {
       case "Crane":
          connectionList['crane'] = conn;
@@ -905,7 +905,7 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
          return false;
      }
      $log.debug(connectionList);
-    
+
    }
 
    }
