@@ -1,27 +1,28 @@
 
 clusterUploadModule = angular.module('HccGoApp.clusterFileSystemCtrl', ['ngRoute' ]);
 
-clusterUploadModule.controller('clusterFileSystemCtrl', ['$scope', '$log', '$timeout', 'connectionService', '$routeParams', '$location', '$q', 'preferencesManager', 'notifierService', 
-                                                         function($scope, $log, $timeout, connectionService, $routeParams, $location, $q, preferencesManager, notifierService) {
+clusterUploadModule.controller('clusterFileSystemCtrl', ['$scope', '$log', '$timeout', 'connectionService', '$routeParams', '$location', '$q', 'preferencesManager', 'notifierService', 'fileManageService', 
+                                                         function($scope, $log, $timeout, connectionService, $routeParams, $location, $q, preferencesManager, notifierService, fileManageService) {
 
    // Initialization functions
-   var disk = require('diskusage');
+   const disk = require('diskusage');
+   const path = require("path");
+   const fs = require("fs");
+   const async = require("async");
+
    $scope.params = $routeParams
    var clusterInterface = null;
-   var path = require("path");
-   var fs = require("fs");
-   var async = require("async");
    $scope.sourceDir = {name: ".."};
-   $scope.localFiles = [];
-   $scope.remoteFiles = [];
+   $scope.localFiles = fileManageService.getLocalFiles();
+   $scope.remoteFiles = fileManageService.getRemoteFiles();
 
    // Sets default values on load
    $scope.onViewLoad = function () {
       $log.debug("ngView has changed");
-      $scope.uploadStatus = false;
-      $scope.boolUp = true;
-      $scope.boolDown = false;
-      $scope.processStatus = true;
+      $scope.uploadStatus = fileManageService.getUploadStatus();
+      $scope.boolUp = fileManageService.getBoolUp();
+      $scope.boolDown = fileManageService.getBoolDown();
+      $scope.processStatus = fileManageService.getProcessStatus();
    }
 
    $scope.wdSwitcher = function(dir) {
@@ -31,8 +32,8 @@ clusterUploadModule.controller('clusterFileSystemCtrl', ['$scope', '$log', '$tim
           $scope.remoteWD = workWD;
       }
 
-      $scope.userDownAuth = false;
-      $scope.userUpAuth = false;
+      $scope.userDownAuth = fileManageService.setUserDownAuth(false);
+      $scope.userUpAuth = fileManageService.setUserUpAuth(false);
 
       // Update view
       remoteRead($scope.remoteWD);
@@ -41,9 +42,9 @@ clusterUploadModule.controller('clusterFileSystemCtrl', ['$scope', '$log', '$tim
    // Changes working directory from supplied list
    $scope.cdSSH = function (data) {
       if (data.name != "..") {
-          $scope.remoteWD = $scope.remoteWD + "/" + data.name;
+          $scope.remoteWD = fileManageService.setRemoteWD($scope.remoteWD + "/" + data.name);
       } else {
-          $scope.remoteWD = path.dirname($scope.remoteWD);
+          $scope.remoteWD = fileManageService.setRemoteWD(path.dirname($scope.remoteWD));
       }
 
       // loads view
@@ -57,7 +58,7 @@ clusterUploadModule.controller('clusterFileSystemCtrl', ['$scope', '$log', '$tim
    // Load Remote view
    var remoteRead = function(data) {
       // Clears content of remoteFiles array
-      $scope.remoteFiles = [];
+      $scope.remoteFiles = fileManageService.setRemoteFiles([]);
 
       // Resets file directory listing
       connectionService.readDir(data).then(function (serverResponse) {
@@ -73,6 +74,7 @@ clusterUploadModule.controller('clusterFileSystemCtrl', ['$scope', '$log', '$tim
              // Indicates iteree is over
              callback(null); 
           }, function(err) {
+             fileManageService.setRemoteFiles($scope.remoteFiles);
              if(err) $log.debug(err);
           });
        });
@@ -82,9 +84,9 @@ clusterUploadModule.controller('clusterFileSystemCtrl', ['$scope', '$log', '$tim
    // Wrapper for local check
    $scope.cdLocal = function(data) {
       if (data.name != "..") {
-          $scope.localWD = $scope.localWD + "/" + data.name;
+          $scope.localWD = fileManageService.setLocalWD($scope.localWD + "/" + data.name);
       } else {
-          $scope.localWD = path.dirname($scope.localWD);
+          $scope.localWD = fileManageService.setLocalWD(path.dirname($scope.localWD));
       }
 
       // Load display
@@ -97,7 +99,7 @@ clusterUploadModule.controller('clusterFileSystemCtrl', ['$scope', '$log', '$tim
   
    var localRead = function(data) {
       // Clears content of localFiles array
-      $scope.localFiles = [];
+      $scope.localFiles = fileManageService.setLocalFiles([]);
 
       // Resets file directory listing
       fs.readdir(data, function(err, files) {
@@ -115,6 +117,7 @@ clusterUploadModule.controller('clusterFileSystemCtrl', ['$scope', '$log', '$tim
              // Indicates code completion for this iteree
              callback(null);
          }, function(err) {
+             fileManageService.setLocalFiles($scope.localFiles);
              $timeout(function() {
                  if(err) $log.debug(err);
              }, 300);
@@ -124,44 +127,44 @@ clusterUploadModule.controller('clusterFileSystemCtrl', ['$scope', '$log', '$tim
 
    $scope.verifyUpload = function () {
       angular.element('#btnUpload').attr('disabled', '');
-      $scope.userUpAuth = true;
-      $scope.processStatus = true;
+      $scope.userUpAuth = fileManageService.setUserUpAuth(true);
+      $scope.processStatus = fileManageService.setProcessStatus(true);
 
       connectionService.localSize(String($scope.localWD + "/" + localFocus)).then( function(ldata) {
-          if ($scope.remoteWD.indexOf(workWD) > -1) {
+          if ($scope.remoteWD.indexOf(fileManageService.getWorkWD()) > -1) {
               connectionService.runCommand("lfs quota -g `id -g` /work").then(function(data) {
-                  $scope.processStatus = false;
-                  $scope.accuSize = ldata;
+                  $scope.processStatus = fileManageService.setProcessStatus(false);
+                  $scope.accuSize = fileManageService.setAccuSize(ldata);
 
                   reported_output = data.split("\n")[2];
                   split_output = $.trim(reported_output).split(/[ ]+/);
-                  $scope.diskAvail = Math.floor(((split_output[3] - split_output[1]) / split_output[3])*100);
-                  $scope.diskQuota = Math.floor(((ldata / Math.pow(1024, 1)) / split_output[3])*100);
+                  $scope.diskAvail = fileManageService.setDiskAvail(Math.floor(((split_output[3] - split_output[1]) / split_output[3])*100));
+                  $scope.diskQuota = fileManageService.setDiskQuota(Math.floor(((ldata / Math.pow(1024, 1)) / split_output[3])*100));
               });
           } else {
               connectionService.runCommand("quota -w -f /home").then(function(data) {
-                  $scope.processStatus = false;
-                  $scope.accuSize = ldata;
+                  $scope.processStatus = fileManageService.setProcessStatus(false);
+                  $scope.accuSize = fileManageService.setAccuSize(ldata);
 
                   reported_output = data.split("\n")[2];              
                   split_output = reported_output.split(/[ ]+/);
-                  $scope.diskAvail = Math.floor(((split_output[2] - split_output[1]) / split_output[2])*100);
-                  $scope.diskQuota = Math.floor(((ldata / Math.pow(1024, 1)) / split_output[2])*100);
+                  $scope.diskAvail = fileManageService.setDiskAvail(Math.floor(((split_output[2] - split_output[1]) / split_output[2])*100));
+                  $scope.diskQuota = fileManageService.setDiskQuota(Math.floor(((ldata / Math.pow(1024, 1)) / split_output[2])*100));
               });
           }
       });
    }
 
    $scope.verifyUploadCancel = function () {
-      $scope.userUpAuth = false;
+      $scope.userUpAuth = fileManageService.setUserUpAuth(false);
       notifierService.warning('Action cancelled by user.');
    }
 
    // Upload entire directory
    $scope.uploadCall = function() {
       // Disable upload button to prevent double clicking
-      $scope.processStatus = true;
-      $scope.userUpAuth = false;
+      $scope.processStatus = fileManageService.setProcessStatus(true);
+      $scope.userUpAuth = fileManageService.setUserUpAuth(false);
 
       // Runs file upload
       connectionService.uploadFile(String($scope.localWD + "/" + localFocus), String($scope.remoteWD + "/"), function(total_transferred,counter,filesTotal,currentTotal,sizeTotal){
@@ -248,24 +251,24 @@ clusterUploadModule.controller('clusterFileSystemCtrl', ['$scope', '$log', '$tim
    } 
    
    // highlight selection and store id
-   var remoteFocus = new String("");    // Stores id of highlight object of remote origin
-   var localFocus = new String("");     // Stores id of highlight object of local origin
+   var remoteFocus = fileManageService.getRemoteFocus();    // Stores id of highlight object of remote origin
+   var localFocus = fileManageService.getLocalFocus();     // Stores id of highlight object of local origin
    $scope.remoteHighlight = function(id) {
       angular.element("#btnDownload").removeAttr('disabled');       // Shows download button
       angular.element("#btnUpload").attr('disabled', '');           // Hides upload button
       angular.element("#l" +  localFocus.replace(/\./g, "\\.")).removeClass('highlight');
-      localFocus = "";
+      localFocus = fileManageService.setLocalFocus("");
       angular.element("#r" + remoteFocus.replace(/\./g, "\\.")).removeClass('highlight');
-      remoteFocus = id.name;
+      remoteFocus = fileManageService.setRemoteFocus(id.name);
       angular.element("#r" + id.name.replace(/\./g, "\\.")).addClass('highlight');
 
       // Change button context
       angular.element("#tranContent").text("Download: " + remoteFocus);
 
       // Sets all 'processing' displays to be hidden
-      $scope.processStatus = false;
-      $scope.uploadStatus = false;
-      $scope.processFinished = false;
+      $scope.processStatus = fileManageService.setProcessStatus(false);
+      $scope.uploadStatus = fileManageService.setUploadStatus(false);
+      $scope.processFinished = fileManageService.setProcessFinished(false);
       $scope.userUpAuth = false;
       $scope.userDownAuth = false;
    }
@@ -321,34 +324,45 @@ clusterUploadModule.controller('clusterFileSystemCtrl', ['$scope', '$log', '$tim
    });
 */
    // Gets directory strings from remote server
-   var homeWD, workWD;
-   connectionService.getHomeWD().then(function(data) {
-       $scope.remoteWD = data;
-       homeWD = data;
-       remoteRead($scope.remoteWD);    // Sets remote display
-       $log.debug("Home directory: " + homeWD);
-   });
-   connectionService.getWorkWD().then(function(data) {
-       workWD = data;
-       $log.debug("Work directory: " + workWD);
-   });
+   if (fileManageService.getHomeWD() == "") {
+       connectionService.getHomeWD().then(function(data) {
+           $scope.remoteWD = fileManageService.setRemoteWD(data);
+           fileManageService.setHomeWD(data);
+           remoteRead($scope.remoteWD);    // Sets remote display
+           $log.debug("Home directory: " + homeWD);
+       });
+   } else {
+       $scope.remoteWD = fileManageService.getRemoteWD();
+       remoteRead($scope.remoteWD);
+   }
+   if (fileManageService.getWorkWD() == "") {
+       connectionService.getWorkWD().then(function(data) {
+           fileManageService.setWorkWD(data);
+           $log.debug("Work directory: " + workWD);
+       });
+   }
 
    // Gets directory strings from local system
    if (process.platform === 'win32') {
-       // TODO: Get working directory on windows machines
        $log.debug("Process env: ");
        $log.debug(process.env);
-       $scope.localWD = process.env.HOMEDRIVE + process.env.HOMEPATH;
-       $log.debug(process);
-       $log.debug("localWD = " + $scope.localWD);
-       localRead($scope.localWD);
+       if (fileManageService.getLocalWD == "") {
+           $scope.localWD = fileManageService.setLocalWD(process.env.HOMEDRIVE + process.env.HOMEPATH);
+       } else {
+           $scope.localWD = fileManageService.getLocalWD();
+       }
    } else {
        // Runs for Mac and Linux systems
        // Establishes Displayed files
        $log.debug("process working directory: " + process.env.HOME);
-       $scope.localWD = process.env.HOME;
-       $log.debug(process);
-       localRead($scope.localWD);    // Sets local display
+       if (fileManageService.getLocalWD == "") {
+           $scope.localWD = fileManageService.setLocalWD(process.env.HOME);
+       } else {
+           $scope.localWD = fileManageService.getLocalWD();
+       }
    }
+
+
+   localRead($scope.localWD);    // Sets local display
  
 }]);
