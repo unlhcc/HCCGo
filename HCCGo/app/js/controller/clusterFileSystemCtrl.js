@@ -172,9 +172,9 @@ clusterUploadModule.controller('clusterFileSystemCtrl', ['$scope', '$log', '$tim
          //$log.debug("Total transferred: " + total_transferred);
          //$log.debug("Chunks: " + chunk);
          //$log.debug("Total: " + total);
-         $scope.processStatus = false;
+         $scope.processStatus = fileManageService.setProcessStatus(false);
          
-         $scope.filesTotal = filesTotal;
+         $scope.filesTotal = filemanageService.setFilesTotal(filesTotal);
          $scope.counter = counter;
          
          // Work on progress bar
@@ -195,16 +195,16 @@ clusterUploadModule.controller('clusterFileSystemCtrl', ['$scope', '$log', '$tim
 
    $scope.verifyDownload = function () {
       angular.element('#btnDownload').attr('disabled', '');
-      $scope.userDownAuth = true;
-      $scope.processStatus = true;
+      $scope.userDownAuth = fileManageService.setUserDownAuth(true);
+      $scope.processStatus = fileManageService.setProcessStatus(true);
 
       connectionService.runCommand("du -sb " + String($scope.remoteWD + "/" + remoteFocus)).then(function (data) {
           $scope.processStatus = false;
           var data_response = data.split(/[	]+/); //NOTE: Matches tab spaces
-          $scope.accuSize = data_response[0];
+          $scope.accuSize = fileManageService.setAccuSize(data_response[0]);
           disk.check($scope.localWD, function(err, info) {
-              $scope.diskQuota = Math.floor((data_response[0]/info.available)*100);
-              $scope.diskAvail = Math.floor((info.free/info.total)*100);
+              $scope.diskQuota = fileManageService.setDiskQuota(Math.floor((data_response[0]/info.available)*100));
+              $scope.diskAvail = fileManageService.setDiskAvail(Math.floor((info.free/info.total)*100));
           });
       });
    }

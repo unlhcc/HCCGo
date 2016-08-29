@@ -26,11 +26,31 @@ fileManageModule.factory('fileManageService',['$log', '$q', '$routeParams', 'con
    var _accuSize = 0;
    var _diskAvail = 0;
    var _diskQuota = 0;
+   var _filesTotal = 0;
+   var _counter = 0;
 
    /**
    * To handle state information for the file management
    *
    */
+
+   service.getCounter = function(){
+       return _counter;
+   }
+
+   service.setCounter = function(x){
+       _counter = x;
+       return _counter;
+   }
+
+   service.getFilesTotal = function(){
+       return _filesTtoal;
+   }
+
+   service.setFilesTotal = function(x){
+       _filesTotal = x;
+       return _filesTotal;
+   }
 
    service.getDiskQuota = function(){
        return _diskQuota;
