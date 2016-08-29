@@ -27,8 +27,12 @@ clusterUploadModule.controller('clusterFileSystemCtrl', ['$scope', '$log', '$tim
    $scope.wdSwitcher = function(dir) {
       if(dir.indexOf(workWD) > -1) {
           $scope.remoteWD = homeWD;
+          angular.element('#lblSwitch').text('Work');
+          angular.element('#lblRemote').text('Home');
       } else {
           $scope.remoteWD = workWD;
+          angular.element('#lblSwitch').text('Home');
+          angular.element('#lblRemote').text('Work');
       }
 
       $scope.userDownAuth = false;
