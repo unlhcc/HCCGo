@@ -4,6 +4,8 @@ jobSubmissionModule = angular.module('HccGoApp.jobSubmissionCtrl', ['ngRoute' ])
 jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout', 'connectionService', '$routeParams', '$location', '$q', 'preferencesManager', 'notifierService', 'jobService', 'filePathService', function($scope, $log, $timeout, connectionService, $routeParams, $location, $q, preferencesManager, notifierService, jobService, filePathService) {
 
   $scope.params = $routeParams;
+  const Datastore = require('nedb');
+  var db = new Datastore({ filename: filePathService.getDBPath(), autoload: true });
 
   // get path to work directory
   var getWork = function() {
@@ -110,9 +112,9 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
 
   // Write a job submission script, pass in form data
   $scope.writeSubmissionScript = function(job) {
-    
+
     $("#submitbtn").prop('disabled', true);
-    
+
     // Create string for file
     var jobFile =
       "#!/bin/sh\n" +
@@ -167,7 +169,23 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
         console.log("History written successfully.");
       }
     });
-    
+
+    // db entry
+    var doc = {
+      "runtime": job.runtime,
+      "memory": job.memory,
+      "jobname": job.jobname,
+      "location": job.location,
+      "error": job.error,
+      "output": job.output,
+      "modules": ((job.modules != null) ? job.modules : []),
+      "commands": job.commands,
+      "timestamp": now
+    }
+    db.insert(doc, function(err, newDoc) {
+      console.log(err);
+    });
+
     async = require("async");
     // Call the series of actions to submit a job
     async.series([
@@ -192,9 +210,9 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
         }, function(err) {
           callback(new Error("Job submission failed!"))
         });
-        
+
       }
-      
+
     ], function(err, result) {
       // If there has been an error in the series
       if (err) {
@@ -208,7 +226,7 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
         $location.path("cluster/" + $scope.params.clusterId);
       }
     });
-    
+
 
   }
 
@@ -220,17 +238,17 @@ jobSubmissionModule.directive('remoteWritable', function($q, $log, connectionSer
     require: 'ngModel',
     restrict: 'A',
     link: function(scope, elm, attrs, ctrl) {
-      
+
       ctrl.$asyncValidators.remoteWritable = function(modelValue, viewValue) {
         if (ctrl.$isEmpty(modelValue)) {
           // consider empty model valid
           return $q.when();
         }
-        
+
         var def = $q.defer();
         $log.debug("Checking file location: " + modelValue);
         connectionService.checkWritable(modelValue).then(function(writability) {
-          
+
           if (writability) {
             $log.debug("File is writable");
             def.resolve();
@@ -238,8 +256,8 @@ jobSubmissionModule.directive('remoteWritable', function($q, $log, connectionSer
             $log.debug("File is not writable");
             def.reject();
           }
-          
-          
+
+
         }, function(err) {
           if (err) {
             $log.error("Got error from checking writability: " + err);

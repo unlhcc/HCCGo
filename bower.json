@@ -40,7 +40,7 @@
 	},
         "jquery-file-tree": {
             "img": [
-                "**/img/*.png", 
+                "**/img/*.png",
                 "**/img/*.gif"],
             "css": "**/*.css",
             "js": "**/*.js"

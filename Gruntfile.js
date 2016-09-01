@@ -16,7 +16,7 @@ module.exports = function(grunt) {
         command: 'cd HCCGo/ && npm start'
       },
       build_electron: {
-        command: 'cd HCCGo/ && npm run-script packageWin'
+        command: 'cd HCCGo/ && npm run-script packageOsx'
       }
     },
     auto_install: {
@@ -46,12 +46,12 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-less');
   grunt.loadNpmTasks('grunt-shell');
   grunt.loadNpmTasks('grunt-bower-task');
-  grunt.registerTask('default', ['less', 
-                                 'bower', 
+  grunt.registerTask('default', ['less',
+                                 'bower',
 				 'auto_install']);
-  grunt.registerTask('run', ['less', 
-                             'bower', 
-			     'auto_install', 
+  grunt.registerTask('run', ['less',
+                             'bower',
+			     'auto_install',
 			     'shell:start_electron']);
   grunt.registerTask('package', ['less',
                                  'bower',

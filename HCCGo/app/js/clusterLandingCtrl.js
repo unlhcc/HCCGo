@@ -11,17 +11,34 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
   // Check if app data folder is there, if not, create one with default json file
   var filePath = filePathService.getFilePath();
   var dataPath = filePathService.getDataPath();
+  var dbPath = filePathService.getDBPath();
 
   var fs = require('fs');
   fs.exists(dataPath, function(exists) {
     if(!exists) {
         fs.mkdir(dataPath, function() {
-          fs.exists(filePath, function(fileExists) {
-            if(!fileExists)
-              fs.createReadStream(jobHistory).pipe(fs.createWriteStream(filePath));
-          });
+            // create default files
+            fs.createReadStream(jobHistory).pipe(fs.createWriteStream(filePath));
+            fs.createWriteStream(dbPath);
         });
     }
+    else {
+      fs.exists(filePath, function(fileExists) {
+        if(!fileExists)
+          fs.createReadStream(jobHistory).pipe(fs.createWriteStream(filePath));
+      });
+      fs.exists(dbPath, function(fileExists) {
+        if(!fileExists)
+          fs.createWriteStream(dbPath);
+      });
+    }
+  });
+
+  // nedb datastore
+  const Datastore = require('nedb');
+  var db = new Datastore({ filename: dbPath, autoload: true });
+  db.find({}, function (err, docs) {
+    console.log(docs);
   });
 
   // Generate empty graphs
@@ -88,14 +105,14 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
 
   $scope.refreshCluster = function() {
     getClusterStats($scope.params.clusterId);
-    
+
   }
 
   function getClusterStats(clusterId) {
 
     // Begin spinning the refresh image
     $(".mdi-action-autorenew").addClass("spinning-image");
-    
+
     // Query the connection service for the cluster
     clusterInterface.getJobs().then(function(data) {
       // Process the data
@@ -177,7 +194,7 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
 
 
   }
-  
+
   preferencesManager.getClusters().then(function(clusters) {
     // Get the cluster type
     var clusterType = $.grep(clusters, function(e) {return e.label == $scope.params.clusterId})[0].type;
@@ -192,9 +209,9 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
     }
 
     getClusterStats($scope.params.clusterId);
-    
+
     // Update the cluster every 15 seconds
-    var refreshingPromise; 
+    var refreshingPromise;
     var isRefreshing = false;
     $scope.startRefreshing = function(){
       if(isRefreshing) return;
@@ -211,7 +228,7 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
         $timeout.cancel(refreshingPromise);
       }
     });
-    
+
     $scope.startRefreshing();
   })
 
