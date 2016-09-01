@@ -5,9 +5,9 @@
   "description": "Interface for HCC Resouces",
   "scripts": {
     "start": "electron .",
-    "packageWin": "node ./node_modules/electron-packager/cli.js ./ HCCGo --platform=win32 --arch=all --out ../packageWin/ --version 1.2.6 --overwrite",
-    "packageOsx": "node ./node_modules/electron-packager/cli.js ./ HCCGo --platform=darwin --arch=x64 --out ../packageOsx/ --version 1.2.6 --overwrite",
-    "packageNix": "node ./node_modules/electron-packager/cli.js ./ HCCGo --platform=linux --arch=all --out ../packageNix/ --version 1.2.6 --overwrite",
+    "packageWin": "node ./node_modules/electron-packager/cli.js ./ HCCGo --platform=win32 --arch=all --out ../packageWin/ --version 1.2.6 --overwrite --icon ./icons/HCCGo",
+    "packageOsx": "node ./node_modules/electron-packager/cli.js ./ HCCGo --platform=darwin --arch=x64 --out ../packageOsx/ --version 1.2.6 --overwrite --icon ./icons/HCCGo",
+    "packageNix": "node ./node_modules/electron-packager/cli.js ./ HCCGo --platform=linux --arch=all --out ../packageNix/ --version 1.2.6 --overwrite --icon ./icons/HCCGo",
     "postinstall": "./postinstall.js"
   },
   "keywords": [
