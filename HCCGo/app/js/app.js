@@ -8,6 +8,7 @@ var app = angular.module('HccGoApp', ['HccGoApp.WelcomeCtrl',
                               'HccGoApp.jobSubmissionCtrl', 
                               'HccGoApp.jobHistoryCtrl', 
                               'filePathService',
+                              'fileManageService',
                               'HccGoApp.NavCtrl']).config([
   '$routeProvider', function($routeProvider) {
     return $routeProvider.when('/', {

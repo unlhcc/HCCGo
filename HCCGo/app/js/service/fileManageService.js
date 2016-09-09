@@ -1,7 +1,7 @@
 
-fileManageModule = angular.module('FileManageModule', [])
+fileManageService = angular.module('fileManageService', [])
 
-fileManageModule.factory('fileManageService',['$log', '$q', '$routeParams', 'connectionService', function($log, $q, $routeParams, connectionService) {
+fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'connectionService', function($log, $q, $routeParams, connectionService) {
   
    const async = require('async');
    const path = require('path');
@@ -28,11 +28,21 @@ fileManageModule.factory('fileManageService',['$log', '$q', '$routeParams', 'con
    var _diskQuota = 0;
    var _filesTotal = 0;
    var _counter = 0;
+   var _totalProgress = 0;
 
    /**
    * To handle state information for the file management
    *
    */
+
+   service.getTotalProgress = function(){
+       return _totalProgress;
+   }
+
+   service.setTotalProgress = function(x){
+       _totalProgress = x;
+       return _totalProgress;
+   }
 
    service.getCounter = function(){
        return _counter;
@@ -44,7 +54,7 @@ fileManageModule.factory('fileManageService',['$log', '$q', '$routeParams', 'con
    }
 
    service.getFilesTotal = function(){
-       return _filesTtoal;
+       return _filesTotal;
    }
 
    service.setFilesTotal = function(x){
