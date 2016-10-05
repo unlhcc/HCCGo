@@ -223,10 +223,14 @@ div.historyinfo {
       color: green;
     }
   }
-
-  .idle {
+  .complete {
     i {
 
+    }
+  }
+  .idle {
+    i {
+      color: orange;
     }
   }
 
@@ -264,7 +268,7 @@ div.historyinfo {
   top: -0px;
 }
 
-.status-check 
+.status-check
 {
 	stroke-dasharray: 110;
 	stroke-dashoffset: -110;
@@ -275,7 +279,7 @@ div.historyinfo {
 {
   stroke-dasharray: 110;
   stroke-dashoffset: -110;
-  stroke-width: 0; 
+  stroke-width: 0;
 }
 
 .status-anx-complete
@@ -288,8 +292,8 @@ div.historyinfo {
 
 }
 
-.status-check-complete 
-{   
+.status-check-complete
+{
 	animation: status-check 1s ease-in forwards;
 	stroke-width: 15;
 	stroke-dashoffset: 0;
@@ -297,7 +301,7 @@ div.historyinfo {
   transition: status-stroke 1.6s;
 }
 
-.status-fill 
+.status-fill
 {
 	stroke-dasharray: 285;
 	stroke-dashoffset: -100;
@@ -305,7 +309,7 @@ div.historyinfo {
   transform-origin: 50% 50%;
 }
 
-.status-fill-complete 
+.status-fill-complete
 {
 	animation: status-fill 1s ease-out forwards;
 }
@@ -352,6 +356,3 @@ div.historyinfo {
   stroke: #f44336;
   transition: status-stroke 1.6s;
 }
-
-
-

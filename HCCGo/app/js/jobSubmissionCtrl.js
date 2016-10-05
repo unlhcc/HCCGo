@@ -170,22 +170,6 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
       }
     });
 
-    // db entry
-    var doc = {
-      "runtime": job.runtime,
-      "memory": job.memory,
-      "jobname": job.jobname,
-      "location": job.location,
-      "error": job.error,
-      "output": job.output,
-      "modules": ((job.modules != null) ? job.modules : []),
-      "commands": job.commands,
-      "timestamp": now
-    }
-    db.insert(doc, function(err, newDoc) {
-      console.log(err);
-    });
-
     async = require("async");
     // Call the series of actions to submit a job
     async.series([
@@ -206,6 +190,14 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
         $('#submitprogress').css('width', curValue+'%').attr('aria-valuenow', curValue);
         $('progresssummary').text("Submitting Job...");
         connectionService.submitJob(job.location).then(function(data) {
+          // db entry
+          var doc = {
+            "jobId": data.split(" ")[3].trim(),
+            "loaded": false
+          }
+          db.insert(doc, function(err, newDoc) {
+            if(err) console.log(err);
+          });
           callback(null);
         }, function(err) {
           callback(new Error("Job submission failed!"))
