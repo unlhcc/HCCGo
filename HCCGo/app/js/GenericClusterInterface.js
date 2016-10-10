@@ -80,9 +80,9 @@ GenericClusterInterface.prototype.getCompletedJobs = function(docs) {
         var index = desiredFields.indexOf(headers[j]);
         if(index > -1) {
           if(headers[j] == "JobName")
-            returnData[desiredFields[index]] = jobData[j];
+            returnData[desiredFields[index]] = jobData[j] === undefined ? "" : jobData[j];
           else
-            returnData[desiredFields[index]] = batchData[j];
+            returnData[desiredFields[index]] = batchData[j] === undefined ? "" : batchData[j];
         }
       }
       if(returnData.State != "COMPLETED") returnData = {}

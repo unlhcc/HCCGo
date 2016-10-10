@@ -106,6 +106,15 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
 
   }
 
+  $scope.removeCompletedJob = function(index) {
+    // deletes the document from db and removes it from list
+    var job = $scope.jobs[index];
+    $scope.jobs.splice(index,1);
+    db.remove({ _id: job._id }, { multi: true }, function (err, numRemoved) {
+      if(err) console.log("Error deleting document " + err);
+    });
+  }
+
   function getClusterStats(clusterId) {
 
     // Begin spinning the refresh image
@@ -124,7 +133,6 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
     db.find({ loaded: false }, function (err, docs) {
       // if they are newly completed jobs, fetch the data
       clusterInterface.getCompletedJobs(docs).then(function(data) {
-        console.log(data);
         for (var i = 0; i < data.length; i++) {
           db.update(
             { _id: data[i]._id },
@@ -141,10 +149,15 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
             function (err, numReplaced) {
               // update db with data so it doesn't have to be queried again
               if(err) console.log("Error updating db: " + err);
+              else {
+                db.find({ loaded: true }, function (err, docs) {
+                  jobList = jobList.concat(docs);
+                  if(err) console.log("Error fetching completed jobs: " + err);
+                });
+              }
             }
           );
         }
-        jobList = jobList.concat(data);
       }, function(error) {
         console.log("Error getting completed job data: " + error);
       });

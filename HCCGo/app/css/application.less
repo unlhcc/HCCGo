@@ -216,7 +216,8 @@ div.historyinfo {
 
 .jobdisplay ul {
   list-style:none;
-  overflow-y: scroll;
+  overflow-y: auto;
+  overflow-x: hidden;
 
   .running {
     i {
@@ -242,8 +243,11 @@ div.historyinfo {
 
   h3.jobname {
     margin-top: 0px;
-  }
 
+    a.deleteButton {
+      color: red;
+    }
+  }
 }
 .spinning-image {
     -webkit-animation:spin 2s linear infinite;
