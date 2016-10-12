@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en" >
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Pardon our dust!</title>
+
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="lib/jquery/jquery.js"></script>
+    <script>window.$ = window.jQuery = require('./lib/jquery/jquery.js');</script>
+
+    <!-- Bootstrap -->
+    <!--<link href="lib/css/bootstrap/bootstrap-theme.css" rel="stylesheet">-->
+    <link href="lib/bootstrap/css/bootstrap.css" rel="stylesheet">
+    <link href="lib/bootstrap-material-design/material.css" rel="stylesheet">
+    <link href="lib/bootstrap-material-design/ripples.css" rel="stylesheet">
+    <link href="../node_modules/c3/c3.css" rel="stylesheet">
+    <link href="css/application.css" rel="stylesheet">
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="lib/bootstrap/js/bootstrap.js"></script>
+    <script src="lib/bootstrap-material-design/material.js"></script>
+    <script src="lib/bootstrap-material-design/ripples.js"></script>
+
+    <script>
+      $.material.init();
+      $.material.input();
+      //process.on("uncaughtException", function(e) { //console.log(e); });
+    </script>
+    
+  </head>
+  <body>
+    <div class="navbar navbar-hcc navbar-welcome">
+     <div class="navbar-header">
+       <div class="navbar-brand">
+         <div class="element-title">HCC Go</div>
+         <div class="element-subtitle"><b>Beta</b></div>
+       </div>
+     </div>
+    </div>
+    <div class="container">
+      <div class="row">
+        <div class="well">
+          <p>Welcome to the HCC Go Beta! We're very excited to have you trying this new application we are developing, and hope you find it easy and convenient to use.
+          </p>
+          <p>Because this is a Beta, we do expect that there will be some bugs and glitches you may come across. If you do, please let us know, and we will endeavor to fix them as soon as possible. You can contact us at insert-name@bugemail.com to let us know what issues you may be coming across.
+          </p>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
