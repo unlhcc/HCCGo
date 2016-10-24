@@ -91,19 +91,25 @@ body {
       .element-subtitle{
         z-index:1;
         font-size:medium;
-        margin:-20px 0 0 100px;
+        margin:-20px 0 0 160px;
         position:relative;
-        color:black;
+        color:white;
       }
     }
   }
 
 }
 .imageSubtitle{
-   position: absolute;
-   top: 60%;
-   left: 40%;
-   color:black;
+   position: relative;
+   top: -25px;
+   left: 49%;
+   color:white;
+   font-size: 65%;
+   background-color: rgb(0, 0, 0);
+   background-color: rgba(0, 0, 0, 0.7);
+   letter-spacing: 1px;
+   padding-right: 2px;
+   padding-left: 2px;
 }
 
 .card {
@@ -241,17 +247,22 @@ div.historyinfo {
 
 .jobdisplay ul {
   list-style:none;
-  overflow-y: scroll;
+  overflow-y: auto;
+  overflow-x: hidden;
 
   .running {
     i {
       color: green;
     }
   }
-
-  .idle {
+  .complete {
     i {
 
+    }
+  }
+  .idle {
+    i {
+      color: orange;
     }
   }
 
@@ -263,8 +274,11 @@ div.historyinfo {
 
   h3.jobname {
     margin-top: 0px;
-  }
 
+    a.deleteButton {
+      color: red;
+    }
+  }
 }
 .spinning-image {
     -webkit-animation:spin 2s linear infinite;

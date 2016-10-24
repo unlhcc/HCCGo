@@ -62,8 +62,14 @@
       $.material.init();
       $.material.input();
       //process.on("uncaughtException", function(e) { //console.log(e); });
+      var shell = require('electron').shell;
+      //open links externally by default
+      $(document).on('click', 'a[href^="http"]', function(event) {
+        event.preventDefault();
+        shell.openExternal(this.href);
+      });
     </script>
-    
+
   </head>
   <body ng-app="HccGoApp">
     <div ng-view>
