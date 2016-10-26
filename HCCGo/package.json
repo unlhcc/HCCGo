@@ -13,6 +13,9 @@
   "keywords": [
     "HCC"
   ],
+  "build": {
+    "asar": "false"
+  },
   "dependencies": {
     "async": ">= 1.5.2",
     "c3": ">= 0.4.11",
