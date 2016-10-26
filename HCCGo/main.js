@@ -12,7 +12,7 @@ app.on('ready', function() {
         width: 1000,
         height: 800
     });
-	
+
 	ipcMain.on('focus-check-reply', (event, arg) => {
 	    console.log("Checking if app has focus");
 		event.sender.send('focus-check-message', mainWindow.isFocused());

@@ -8,36 +8,49 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
   var clusterInterface = null;
   var path = require('path');
   var jobHistory = path.join(__dirname, 'data/jobHistory.json');
+  // nedb datastore
+  const DataStore = require('nedb');
 
   // Check if app data folder is there, if not, create one with default json file
-  var filePath = filePathService.getFilePath();
+  var jobHistoryPath = filePathService.getJobHistory();
   var dataPath = filePathService.getDataPath();
-  var dbPath = filePathService.getDBPath();
+  var submittedJobsPath = filePathService.getSubmittedJobs();
 
   var fs = require('fs');
   fs.exists(dataPath, function(exists) {
     if(!exists) {
         fs.mkdir(dataPath, function() {
             // create default files
-            fs.createReadStream(jobHistory).pipe(fs.createWriteStream(filePath));
-            fs.createWriteStream(dbPath);
+            fs.createWriteStream(jobHistoryPath);
+            var jobHistoryDB = new DataStore({ filename: jobHistoryPath, autoload:true });
+            $.getJSON(jobHistory, function(json) {
+              jobHistoryDB.insert(json.jobs[0], function(err, newDoc) {
+                if(err) console.log(err);
+              });
+            });
+            fs.createWriteStream(submittedJobsPath);
         });
     }
     else {
-      fs.exists(filePath, function(fileExists) {
-        if(!fileExists)
-          fs.createReadStream(jobHistory).pipe(fs.createWriteStream(filePath));
+      fs.exists(jobHistoryPath, function(fileExists) {
+        if(!fileExists) {
+          fs.createWriteStream(jobHistoryPath);
+          var jobHistoryDB = new DataStore({ filename: jobHistoryPath, autoload:true });
+          $.getJSON(jobHistory, function(json) {
+            jobHistoryDB.insert(json.jobs[0], function(err, newDoc) {
+              if(err) console.log(err);
+            });
+          });
+        }
       });
-      fs.exists(dbPath, function(fileExists) {
+      fs.exists(submittedJobsPath, function(fileExists) {
         if(!fileExists)
-          fs.createWriteStream(dbPath);
+          fs.createWriteStream(submittedJobsPath);
       });
     }
   });
 
-  // nedb datastore
-  const Datastore = require('nedb');
-  var db = new Datastore({ filename: dbPath, autoload: true });
+  var db = new DataStore({ filename: submittedJobsPath, autoload: true });
 
   // Generate empty graphs
   var homeUsageGauge = c3.generate({

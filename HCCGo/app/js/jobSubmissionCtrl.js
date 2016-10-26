@@ -4,8 +4,9 @@ jobSubmissionModule = angular.module('HccGoApp.jobSubmissionCtrl', ['ngRoute' ])
 jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout', 'connectionService', '$routeParams', '$location', '$q', 'preferencesManager', 'notifierService', 'jobService', 'filePathService', function($scope, $log, $timeout, connectionService, $routeParams, $location, $q, preferencesManager, notifierService, jobService, filePathService) {
 
   $scope.params = $routeParams;
-  const Datastore = require('nedb');
-  var db = new Datastore({ filename: filePathService.getDBPath(), autoload: true });
+  const DataStore = require('nedb');
+  var submittedJobsDB = new DataStore({ filename: filePathService.getSubmittedJobs(), autoload: true });
+  var jobHistoryDB = new DataStore({ filename: filePathService.getJobHistory(), autoload:true });
 
   // get path to work directory
   var getWork = function() {
@@ -15,12 +16,13 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
 
       deferred.resolve(data.trim());
 
-    })
+    });
 
     return deferred.promise;
 
   }
 
+  // gets the job that was selected from job histroy
   var loadedJob = jobService.getJob();
 
   if(loadedJob == null) {
@@ -41,13 +43,6 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
       commands: loadedJob.commands
     };
   }
-
-  // load json file
-  var filePath = filePathService.getFilePath();
-  var jsonFile;
-  $.getJSON(filePath, function(json) {
-    jsonFile = json;
-  });
 
   $scope.cancel = function() {
     $location.path("cluster/" + $scope.params.clusterId + "/jobHistory");
@@ -134,20 +129,29 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
     var now = Date.now();
     // updating job history
     if(loadedJob != null) {
-      jsonFile.jobs[loadedJob.id].timestamp = now;
-      jsonFile.jobs[loadedJob.id].runtime = job.runtime;
-      jsonFile.jobs[loadedJob.id].memory = job.memory;
-      jsonFile.jobs[loadedJob.id].jobname = job.jobname;
-      jsonFile.jobs[loadedJob.id].location = job.location;
-      jsonFile.jobs[loadedJob.id].error = job.error;
-      jsonFile.jobs[loadedJob.id].output = job.output;
-      jsonFile.jobs[loadedJob.id].modules = ((job.modules != null) ? job.modules : []);
-      jsonFile.jobs[loadedJob.id].commands = job.commands;
+      jobHistoryDB.update(
+        { _id: loadedJob._id },
+        { $set:
+          {
+            timestamp: now,
+            runtime: job.runtime,
+            memory: job.memory,
+            jobname: job.jobname,
+            location: job.location,
+            error: job.error,
+            output: job.error,
+            modules: ((job.modules != null) ? job.modules : []),
+            commands: job.commands
+          }
+        },
+        {},
+        function (err, numReplaced) {
+          if(err) console.log("Error updating job history db: " + err);
+        }
+      );
     }
     else {
-      var newId = jsonFile.jobs[jsonFile.jobs.length-1].id + 1;
       var newJob = {
-        "id": newId,
         "runtime": job.runtime,
         "memory": job.memory,
         "jobname": job.jobname,
@@ -158,17 +162,10 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
         "commands": job.commands,
         "timestamp": now
       }
-      jsonFile.jobs.push(newJob);
+      jobHistoryDB.insert(newJob, function(err, newDoc) {
+        if(err) console.log(err);
+      });
     }
-    var fs = require("fs");
-    fs.writeFile(filePath, JSON.stringify(jsonFile, null, 2), function(err) {
-      if(err) {
-        return console.error(err);
-      }
-      else {
-        console.log("History written successfully.");
-      }
-    });
 
     async = require("async");
     // Call the series of actions to submit a job
@@ -195,7 +192,7 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
             "jobId": data.split(" ")[3].trim(),
             "loaded": false
           }
-          db.insert(doc, function(err, newDoc) {
+          submittedJobsDB.insert(doc, function(err, newDoc) {
             if(err) console.log(err);
           });
           callback(null);
