@@ -11,7 +11,11 @@ if (process.platform == 'win32') {
 }
 
 // nslog fixer
-fs.unlinkSync(__dirname + '\\node_modules\\nslog\\build\\Release\\nslog.node');
+try {
+    fs.unlinkSync(__dirname + '\\node_modules\\nslog\\build\\Release\\nslog.node');
+} catch (e) {
+    console.log("nslog.node doesn't exist\n");
+}
 
 const ref = spawn(__dirname + '\\node_modules\\.bin\\' + rebuilder,
                   ['--version='+target,'--log'],
