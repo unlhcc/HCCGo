@@ -1,24 +1,38 @@
 #!/usr/bin/env node
-var exec = require('child_process').exec;
+const spawn = require('child_process').spawn;
+const ref = spawn(__dirname + '\\node_modules\\.bin\\electron-rebuild.cmd',
+                  ['-w', 'ffi', '--log'],
+		  { cwd: __dirname,
+		    env: process.env});
+const ffi = spawn(__dirname + '\\node_modules\\.bin\\electron-rebuild.cmd',
+                  ['-w', 'ref', '--log'],
+		  { cwd: __dirname,
+		    env: process.env});
 
-/*exec('npm rebiuld --runtime=electron --target=1.4.3 --disturl=https://atom.io/download/atom-shell',
-    function(error,stdout,stderr){
-    console.log(error);
-	console.log(stdout);
-	console.log(stderr);
-    });
-*/
+ref.stdout.on('data', (data) => {
+    console.log(`refout: ${data}`);
+});
 
-exec(__dirname + '\\node_modules\\.bin\\electron-rebuild.cmd -w ffi',
-    function(error,stdout,stderr){
-    console.log(error);
-	console.log(stdout);
-	console.log(stderr);
-    });
+ref.stderr.on('data', (data) => {
+    console.log(`referr: ${data}`);
+});
 
-exec(__dirname + '\\node_modules\\.bin\\electron-rebuild.cmd -w ref',
-    function(error,stdout,stderr){
-    console.log(error);
-	console.log(stdout);
-	console.log(stderr);
-    });
+ref.on('close', (code) => {
+    if (code !== 0) {
+        console.log(`ref rebuild exited with code ${code}`);
+    }
+});
+
+ffi.stdout.on('data', (data) => {
+    console.log(`ffiout: ${data}`);
+});
+
+ffi.stderr.on('data', (data) => {
+    console.log(`ffierr: ${data}`);
+});
+
+ffi.on('close', (code) => {
+    if (code !== 0) {
+        console.log(`ffi rebuild exited with code ${code}`);
+    }
+});
