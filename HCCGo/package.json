@@ -5,10 +5,10 @@
   "description": "Interface for HCC Resouces",
   "scripts": {
     "start": "electron .",
-    "packageWin": "node ./node_modules/electron-packager/cli.js ./ HCCGo --platform=win32 --arch=all --out ../packageWin/ --version 1.4.3 --overwrite --icon ./icons/HCCGo",
+    "packageWin": "node ./node_modules/electron-packager/cli.js ./ HCCGo --platform=win32 --arch=x64 --out ../packageWin/ --version 1.4.3 --overwrite --icon ./icons/HCCGo",
     "packageOsx": "node ./node_modules/electron-packager/cli.js ./ HCCGo --platform=darwin --arch=x64 --out ../packageOsx/ --version 1.4.3 --overwrite --icon ./icons/HCCGo",
-    "packageNix": "node ./node_modules/electron-packager/cli.js ./ HCCGo --platform=linux --arch=all --out ../packageNix/ --version 1.4.3 --overwrite --icon ./icons/HCCGo",
-    "postinstall": "postinstall.js"
+    "packageNix": "node ./node_modules/electron-packager/cli.js ./ HCCGo --platform=linux --arch=x64 --out ../packageNix/ --version 1.4.3 --overwrite --icon ./icons/HCCGo",
+    "postinstall": "node postinstall.js"
   },
   "keywords": [
     "HCC"
@@ -25,6 +25,7 @@
     "fs": ">= 0.0.2",
     "nedb": "^1.8.0",
     "node-notifier": "^4.6.0",
+    "nslog": "^3.0.0",
     "path": ">= 0.12.7",
     "ssh2": ">= 0.3.3"
   },

@@ -1,38 +1,30 @@
 #!/usr/bin/env node
-const spawn = require('child_process').spawn;
-const ref = spawn(__dirname + '\\node_modules\\.bin\\electron-rebuild.cmd',
-                  ['-w', 'ffi', '--log'],
-		  { cwd: __dirname,
-		    env: process.env});
-const ffi = spawn(__dirname + '\\node_modules\\.bin\\electron-rebuild.cmd',
-                  ['-w', 'ref', '--log'],
-		  { cwd: __dirname,
-		    env: process.env});
+const spawn = require('child_process').spawnSync;
+const fs = require('fs');
+var rebuilder = "";
+const target = "1.4.3";
 
-ref.stdout.on('data', (data) => {
-    console.log(`refout: ${data}`);
-});
+if (process.platform == 'win32') {
+    rebuilder = "electron-rebuild.cmd";
+} else {
+    rebuilder = "electron-rebuild";
+}
 
-ref.stderr.on('data', (data) => {
-    console.log(`referr: ${data}`);
-});
+// nslog fixer
+fs.unlinkSync(__dirname + '\\node_modules\\nslog\\build\\Release\\nslog.node');
 
-ref.on('close', (code) => {
-    if (code !== 0) {
-        console.log(`ref rebuild exited with code ${code}`);
-    }
-});
+const ref = spawn(__dirname + '\\node_modules\\.bin\\' + rebuilder,
+                  ['--version='+target,'--log'],
+		  { cwd: __dirname + '\\node_modules\\ref',
+		    env: process.env,
+			shell: true });
+console.log('ref output: ' + ref.output);
+console.log('ref error: ' + ref.error);
 
-ffi.stdout.on('data', (data) => {
-    console.log(`ffiout: ${data}`);
-});
-
-ffi.stderr.on('data', (data) => {
-    console.log(`ffierr: ${data}`);
-});
-
-ffi.on('close', (code) => {
-    if (code !== 0) {
-        console.log(`ffi rebuild exited with code ${code}`);
-    }
-});
+const ffi = spawn(__dirname + '\\node_modules\\.bin\\' + rebuilder,
+                  ['--version='+target,'--log'],
+		  { cwd: __dirname + '\\node_modules\\ffi',
+		    env: process.env,
+			shell: true });
+console.log('ffi output: ' + ffi.output);
+console.log('ffi error: ' + ffi.error);
