@@ -8,10 +8,8 @@ var rebuilder = "";
 
 if (process.platform == 'win32') {
     rebuilder = "electron-rebuild.cmd";
-    brace = "\\";
 } else {
     rebuilder = "electron-rebuild";
-    brace = "/";
 }
 
 // nslog fixer
