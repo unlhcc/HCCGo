@@ -1,7 +1,7 @@
 
 clusterLandingModule = angular.module('HccGoApp.clusterLandingCtrl', ['ngRoute' ]);
 
-clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeout', 'connectionService', '$routeParams', '$location', '$q', 'preferencesManager', 'filePathService', function($scope, $log, $timeout, connectionService, $routeParams, $location, $q, preferencesManager, filePathService) {
+clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeout', 'connectionService', '$routeParams', '$location', '$q', 'preferencesManager', 'filePathService', 'notifierService', function($scope, $log, $timeout, connectionService, $routeParams, $location, $q, preferencesManager, filePathService, notifierService) {
 
   $scope.params = $routeParams;
   $scope.jobs = [];
@@ -144,36 +144,34 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
     });
 
     db.find({ loaded: false }, function (err, docs) {
-      // if they are newly completed jobs, fetch the data
-      clusterInterface.getCompletedJobs(docs).then(function(data) {
-        for (var i = 0; i < data.length; i++) {
-          db.update(
-            { _id: data[i]._id },
-            { $set:
-              {
-              "loaded": true,
-              "complete": true,
-              "elapsed": data[i].Elapsed,
-              "reqMem": data[i].ReqMem,
-              "jobName": data[i].JobName
+        // if they are newly completed jobs, fetch the data
+      if (docs.length > 0) {
+        clusterInterface.getCompletedJobs(docs).then(function(data) {
+          for (var i = 0; i < data.length; i++) {
+            console.log(data[i]);
+            db.update(
+              { _id: data[i]._id },
+              { $set:
+                {
+                "loaded": true,
+                "complete": true,
+                "elapsed": data[i].Elapsed,
+                "reqMem": data[i].ReqMem,
+                "jobName": data[i].JobName
+                }
+              },
+              { returnUpdatedDocs: true },
+              function (err, numReplaced, affectedDocuments) {
+                // update db with data so it doesn't have to be queried again
+                if (!err) {
+                  notifierService.success('Your job, ' + affectedDocuments.jobName + ', has been completed', 'Job Completed!');
+                  jobList = jobList.concat(affectedDocuments);
+                }
               }
-            },
-            {},
-            function (err, numReplaced) {
-              // update db with data so it doesn't have to be queried again
-              if(err) console.log("Error updating db: " + err);
-              else {
-                db.find({ loaded: true }, function (err, docs) {
-                  jobList = jobList.concat(docs);
-                  if(err) console.log("Error fetching completed jobs: " + err);
-                });
-              }
-            }
-          );
-        }
-      }, function(error) {
-        console.log("Error getting completed job data: " + error);
-      });
+            );
+          }
+        });
+      }
       if(err) console.log("Error fetching completed jobs: " + err);
     });
 

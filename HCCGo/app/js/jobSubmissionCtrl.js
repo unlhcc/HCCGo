@@ -139,7 +139,7 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
             jobname: job.jobname,
             location: job.location,
             error: job.error,
-            output: job.error,
+            output: job.output,
             modules: ((job.modules != null) ? job.modules : []),
             commands: job.commands
           }
