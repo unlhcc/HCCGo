@@ -4,28 +4,31 @@
   "main": "./main.js",
   "description": "Interface for HCC Resouces",
   "scripts": {
-    "start": "electron .",
-    "packageWin": "node ./node_modules/electron-packager/cli.js ./ HCCGo --platform=win32 --arch=all --out ../packageWin/ --version 1.4.3 --overwrite --icon ./icons/HCCGo",
+    "start": "node node_modules/electron/cli.js .",
+    "packageWin": "node ./node_modules/electron-packager/cli.js ./ HCCGo --platform=win32 --arch=x64 --out ../packageWin/ --version 1.4.3 --overwrite --icon ./icons/HCCGo",
     "packageOsx": "node ./node_modules/electron-packager/cli.js ./ HCCGo --platform=darwin --arch=x64 --out ../packageOsx/ --version 1.4.3 --overwrite --icon ./icons/HCCGo",
-    "packageNix": "node ./node_modules/electron-packager/cli.js ./ HCCGo --platform=linux --arch=all --out ../packageNix/ --version 1.4.3 --overwrite --icon ./icons/HCCGo",
-    "postinstall": "./postinstall.js"
+    "packageNix": "node ./node_modules/electron-packager/cli.js ./ HCCGo --platform=linux --arch=x64 --out ../packageNix/ --version 1.4.3 --overwrite --icon ./icons/HCCGo",
+    "postinstall": "node postinstall.js"
   },
   "keywords": [
     "HCC"
   ],
   "dependencies": {
+    "asar": "^0.12.3",
     "async": ">= 1.5.2",
     "c3": ">= 0.4.11",
+    "csv": "^1.1.0",
     "csv-parse": ">= 1.1.1",
     "d3": "^3.5.17",
     "diskusage": ">= 0.1.5",
+    "electron": "^1.4.3",
     "electron-debug": "^1.0.1",
     "fs": ">= 0.0.2",
-    "node-notifier": "^4.6.0",
-    "path": ">= 0.12.7",
-    "ssh2": ">= 0.3.3",
     "nedb": "^1.8.0",
-    "csv": "^1.1.0"
+    "node-notifier": "^4.6.0",
+    "nslog": "^3.0.0",
+    "path": ">= 0.12.7",
+    "ssh2": ">= 0.3.3"
   },
   "devDependencies": {
     "devtron": "^1.2.1",
