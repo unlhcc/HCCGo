@@ -30,6 +30,13 @@ module.exports = function(grunt) {
 	}
       }
     },
+    marked: {
+      dist: {
+        files: {
+          'HCCGo/app/html/beta_notice.html': 'HCCGo/app/markdown/beta_notice.md'
+        }
+      }
+    },
     bower: {
       install: {
         options: {
@@ -46,15 +53,18 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-less');
   grunt.loadNpmTasks('grunt-shell');
   grunt.loadNpmTasks('grunt-bower-task');
+  grunt.loadNpmTasks('grunt-marked');
   grunt.registerTask('default', ['less',
                                  'bower',
 				 'auto_install']);
   grunt.registerTask('run', ['less',
                              'bower',
+                             'marked',
 			     'auto_install',
 			     'shell:start_electron']);
   grunt.registerTask('package', ['less',
                                  'bower',
+                                 'marked',
 				 'auto_install',
 				 'shell:build_electron']);
 };
