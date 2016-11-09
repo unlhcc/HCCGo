@@ -1,43 +1,56 @@
 
 clusterLandingModule = angular.module('HccGoApp.clusterLandingCtrl', ['ngRoute' ]);
 
-clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeout', 'connectionService', '$routeParams', '$location', '$q', 'preferencesManager', 'filePathService', function($scope, $log, $timeout, connectionService, $routeParams, $location, $q, preferencesManager, filePathService) {
+clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeout', 'connectionService', '$routeParams', '$location', '$q', 'preferencesManager', 'filePathService', 'notifierService', function($scope, $log, $timeout, connectionService, $routeParams, $location, $q, preferencesManager, filePathService, notifierService) {
 
   $scope.params = $routeParams;
   $scope.jobs = [];
   var clusterInterface = null;
   var path = require('path');
   var jobHistory = path.join(__dirname, 'data/jobHistory.json');
+  // nedb datastore
+  const DataStore = require('nedb');
 
   // Check if app data folder is there, if not, create one with default json file
-  var filePath = filePathService.getFilePath();
+  var jobHistoryPath = filePathService.getJobHistory();
   var dataPath = filePathService.getDataPath();
-  var dbPath = filePathService.getDBPath();
+  var submittedJobsPath = filePathService.getSubmittedJobs();
 
   var fs = require('fs');
   fs.exists(dataPath, function(exists) {
     if(!exists) {
         fs.mkdir(dataPath, function() {
             // create default files
-            fs.createReadStream(jobHistory).pipe(fs.createWriteStream(filePath));
-            fs.createWriteStream(dbPath);
+            fs.createWriteStream(jobHistoryPath);
+            var jobHistoryDB = new DataStore({ filename: jobHistoryPath, autoload:true });
+            $.getJSON(jobHistory, function(json) {
+              jobHistoryDB.insert(json.jobs[0], function(err, newDoc) {
+                if(err) console.log(err);
+              });
+            });
+            fs.createWriteStream(submittedJobsPath);
         });
     }
     else {
-      fs.exists(filePath, function(fileExists) {
-        if(!fileExists)
-          fs.createReadStream(jobHistory).pipe(fs.createWriteStream(filePath));
+      fs.exists(jobHistoryPath, function(fileExists) {
+        if(!fileExists) {
+          fs.createWriteStream(jobHistoryPath);
+          var jobHistoryDB = new DataStore({ filename: jobHistoryPath, autoload:true });
+          $.getJSON(jobHistory, function(json) {
+            jobHistoryDB.insert(json.jobs[0], function(err, newDoc) {
+              if(err) console.log(err);
+            });
+          });
+        }
       });
-      fs.exists(dbPath, function(fileExists) {
+      fs.exists(submittedJobsPath, function(fileExists) {
         if(!fileExists)
-          fs.createWriteStream(dbPath);
+          fs.createWriteStream(submittedJobsPath);
       });
     }
   });
 
-  // nedb datastore
-  const Datastore = require('nedb');
-  var db = new Datastore({ filename: dbPath, autoload: true });
+  var db = new DataStore({ filename: submittedJobsPath, autoload: true });
 
   // Generate empty graphs
   var homeUsageGauge = c3.generate({
@@ -131,36 +144,34 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
     });
 
     db.find({ loaded: false }, function (err, docs) {
-      // if they are newly completed jobs, fetch the data
-      clusterInterface.getCompletedJobs(docs).then(function(data) {
-        for (var i = 0; i < data.length; i++) {
-          db.update(
-            { _id: data[i]._id },
-            { $set:
-              {
-              "loaded": true,
-              "complete": true,
-              "elapsed": data[i].Elapsed,
-              "reqMem": data[i].ReqMem,
-              "jobName": data[i].JobName
+        // if they are newly completed jobs, fetch the data
+      if (docs.length > 0) {
+        clusterInterface.getCompletedJobs(docs).then(function(data) {
+          for (var i = 0; i < data.length; i++) {
+            console.log(data[i]);
+            db.update(
+              { _id: data[i]._id },
+              { $set:
+                {
+                "loaded": true,
+                "complete": true,
+                "elapsed": data[i].Elapsed,
+                "reqMem": data[i].ReqMem,
+                "jobName": data[i].JobName
+                }
+              },
+              { returnUpdatedDocs: true },
+              function (err, numReplaced, affectedDocuments) {
+                // update db with data so it doesn't have to be queried again
+                if (!err) {
+                  notifierService.success('Your job, ' + affectedDocuments.jobName + ', has been completed', 'Job Completed!');
+                  jobList = jobList.concat(affectedDocuments);
+                }
               }
-            },
-            {},
-            function (err, numReplaced) {
-              // update db with data so it doesn't have to be queried again
-              if(err) console.log("Error updating db: " + err);
-              else {
-                db.find({ loaded: true }, function (err, docs) {
-                  jobList = jobList.concat(docs);
-                  if(err) console.log("Error fetching completed jobs: " + err);
-                });
-              }
-            }
-          );
-        }
-      }, function(error) {
-        console.log("Error getting completed job data: " + error);
-      });
+            );
+          }
+        });
+      }
       if(err) console.log("Error fetching completed jobs: " + err);
     });
 

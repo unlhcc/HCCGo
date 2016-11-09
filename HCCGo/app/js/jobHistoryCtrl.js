@@ -37,12 +37,15 @@ jobHistoryModule.service('jobService', function() {
 
   }
 
-  // load json file
-  var filePath = filePathService.getFilePath();
-  var jsonFile
-  $.getJSON(filePath, function(json) {
-    $scope.jobs = json.jobs;
-    jsonFile = json;
+  // query db
+  const DataStore = require('nedb');
+  var jobHistoryPath = filePathService.getJobHistory();
+  var jobHistoryDB = new DataStore({ filename: jobHistoryPath, autoload:true });
+  // Get completed jobs from db file
+  jobHistoryDB.find({}, function (err, docs) {
+    // if data already loaded, just add them to the list
+    $scope.jobs = docs;
+    if(err) console.log("Error fetching completed jobs: " + err);
   });
 
   $scope.deleteJob = function(job) {
@@ -54,21 +57,10 @@ jobHistoryModule.service('jobService', function() {
           $("#panel"+job.id).fadeOut(500, function() {
             $(this).css({"visibility":"hidden",display:'block'}).slideUp();
           });
-          // remove from angular binding and reset ids
-          $scope.jobs.splice(job.id,1);
-          for (var i = 0; i < $scope.jobs.length; i++) {
-            $scope.jobs[i].id = i;
-          }
-          // remove entry from json file
-          var fs = require("fs");
-          jsonFile.jobs = $scope.jobs;
-          fs.writeFile(filePath, JSON.stringify(jsonFile, null, 2), function(err) {
-            if(err) {
-              return console.error(err);
-            }
-            else {
-              console.log("Job successfully deleted.");
-            }
+          // remove from angular binding
+          $scope.jobs.splice(index,1);
+          db.remove({ _id: job._id }, { multi: true }, function (err, numRemoved) {
+            if(err) console.log("Error deleting document " + err);
           });
         }
       }

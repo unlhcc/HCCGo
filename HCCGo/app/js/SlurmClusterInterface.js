@@ -100,10 +100,11 @@ SlurmClusterInterface.prototype.getCompletedJobs = function(docs) {
               returnData[desiredFields[index]] = batchData[j] === undefined ? "" : batchData[j];
           }
         }
-        if(returnData.State != "COMPLETED") returnData = {}
-        completedJobs.push(returnData);
-        if(i==docs.length)
-          deferred.resolve(completedJobs);
+        if(returnData.State == "COMPLETED") completedJobs.push(returnData);
+        if(i==docs.length) {
+          if(completedJobs.length > 0) deferred.resolve(completedJobs);
+          else deferred.reject("No running jobs have been completed.")
+        }
       });
 
     });

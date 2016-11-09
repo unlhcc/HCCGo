@@ -4,17 +4,17 @@ filePathService.service('filePathService', function() {
   var dataPath = process.env.APPDATA || (process.platform == 'darwin' ? process.env.HOME + '/Library/' : process.env.HOME);
   var path = require('path');
   dataPath = path.join(dataPath, 'HCCGo');
-  var filePath = path.join(dataPath, 'jobHistory.json');
-  var dbPath = path.join(dataPath, 'submittedJobs.db')
+  var jobHistoryPath = path.join(dataPath, 'jobHistory.db');
+  var submittedJobsPath = path.join(dataPath, 'submittedJobs.db')
   return {
-    getFilePath: function() {
-      return filePath;
+    getJobHistory: function() {
+      return jobHistoryPath;
     },
     getDataPath: function() {
       return dataPath;
     },
-    getDBPath: function() {
-      return dbPath;
+    getSubmittedJobs: function() {
+      return submittedJobsPath;
     }
   };
 
