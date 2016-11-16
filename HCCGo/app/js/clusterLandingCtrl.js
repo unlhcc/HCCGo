@@ -207,17 +207,18 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
               function(jobs) {
                 
                 $log.debug("Got " + jobs.length + " completed jobs");
-                recent_completed = [];
-                for (var i = 0; i < jobs.length; i++) {
-                  $log.debug(jobs[i]);
+                var recent_completed = [];
+                async.each(jobs, function(job, each_callback) {
+                  
+                  $log.debug(job);
                   db.update(
-                    { _id: jobs[i]._id },
+                    { _id: job._id },
                     { $set:
                       {
                       "complete": true,
-                      "elapsed": jobs[i].Elapsed,
-                      "reqMem": jobs[i].ReqMem,
-                      "jobName": jobs[i].JobName
+                      "elapsed": job.Elapsed,
+                      "reqMem": job.ReqMem,
+                      "jobName": job.JobName
                       }
                     },
                     { returnUpdatedDocs: true },
@@ -228,13 +229,18 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
                         $log.debug("Completed job is: " + affectedDocuments);
                         
                         recent_completed.push(affectedDocuments);
+                        return each_callback(null);
 
                       }
                     }
                   );
-                }
-                // After the for loop, return all of the recently completed jobs.
-                return callback(null, recent_completed);
+                }, function(err) {
+                  // After the for loop, return all of the recently completed jobs.
+                  return callback(null, recent_completed);
+                  
+                });
+                
+                
               }
             , function(msg) {
               $log.debug("No jobs returned by completed job");
