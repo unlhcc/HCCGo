@@ -190,7 +190,6 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
           // db entry
           var doc = {
             "jobId": data.split(" ")[3].trim(),
-            "loaded": false,
             "complete": false
           }
           submittedJobsDB.insert(doc, function(err, newDoc) {

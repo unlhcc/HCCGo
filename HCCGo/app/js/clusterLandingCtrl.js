@@ -217,7 +217,6 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
                     { _id: jobs[i]._id },
                     { $set:
                       {
-                      "loaded": true,
                       "complete": true,
                       "elapsed": jobs[i].Elapsed,
                       "reqMem": jobs[i].ReqMem,
