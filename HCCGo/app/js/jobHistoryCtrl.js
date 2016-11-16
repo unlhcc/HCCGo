@@ -16,7 +16,7 @@ jobHistoryModule.service('jobService', function() {
     }
   };
 
-}).controller('jobHistoryCtrl', ['$scope', '$log', '$timeout', 'connectionService', '$routeParams', '$location', '$q', 'preferencesManager', 'jobService', 'filePathService', function($scope, $log, $timeout, connectionService, $routeParams, $location, $q, preferencesManager, jobService, filePathService) {
+}).controller('jobHistoryCtrl', ['$scope', '$log', '$timeout', 'connectionService', '$routeParams', '$location', '$q', 'preferencesManager', 'jobService', 'dbService', function($scope, $log, $timeout, connectionService, $routeParams, $location, $q, preferencesManager, jobService, dbService) {
 
   $scope.params = $routeParams;
 
@@ -39,8 +39,7 @@ jobHistoryModule.service('jobService', function() {
 
   // query db
   const DataStore = require('nedb');
-  var jobHistoryPath = filePathService.getJobHistory();
-  var jobHistoryDB = new DataStore({ filename: jobHistoryPath, autoload:true });
+  var jobHistoryDB = dbService.getJobHistoryDB();
   // Get completed jobs from db file
   jobHistoryDB.find({}, function (err, docs) {
     // if data already loaded, just add them to the list

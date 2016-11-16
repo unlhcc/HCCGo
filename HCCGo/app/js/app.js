@@ -1,13 +1,14 @@
-var app = angular.module('HccGoApp', ['HccGoApp.WelcomeCtrl', 
-                              'ngRoute', 
-                              'ConnectionServiceModule', 
+var app = angular.module('HccGoApp', ['HccGoApp.WelcomeCtrl',
+                              'ngRoute',
+                              'ConnectionServiceModule',
 							  'NotifierModule',
-                              'HccGoApp.clusterLandingCtrl', 
-                              'PreferencesManager', 
+                              'HccGoApp.clusterLandingCtrl',
+                              'PreferencesManager',
                               'HccGoApp.clusterFileSystemCtrl',
-                              'HccGoApp.jobSubmissionCtrl', 
-                              'HccGoApp.jobHistoryCtrl', 
+                              'HccGoApp.jobSubmissionCtrl',
+                              'HccGoApp.jobHistoryCtrl',
                               'filePathService',
+                              'dbService',
                               'HccGoApp.NavCtrl']).config([
   '$routeProvider', function($routeProvider) {
     return $routeProvider.when('/', {
