@@ -1,28 +1,26 @@
 
 clusterLandingModule = angular.module('HccGoApp.clusterLandingCtrl', ['ngRoute' ]);
 
-clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeout', 'connectionService', '$routeParams', '$location', '$q', 'preferencesManager', 'filePathService', 'notifierService', function($scope, $log, $timeout, connectionService, $routeParams, $location, $q, preferencesManager, filePathService, notifierService) {
+clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeout', 'connectionService', '$routeParams', '$location', '$q', 'preferencesManager', 'filePathService', 'notifierService', 'dbService', function($scope, $log, $timeout, connectionService, $routeParams, $location, $q, preferencesManager, filePathService, notifierService, dbService) {
 
   $scope.params = $routeParams;
   $scope.jobs = [];
   var clusterInterface = null;
   var path = require('path');
   var jobHistory = path.join(__dirname, 'data/jobHistory.json');
-  // nedb datastore
-  const DataStore = require('nedb');
 
   // Check if app data folder is there, if not, create one with default json file
   var jobHistoryPath = filePathService.getJobHistory();
   var dataPath = filePathService.getDataPath();
   var submittedJobsPath = filePathService.getSubmittedJobs();
-
+  var db;
   var fs = require('fs');
   fs.exists(dataPath, function(exists) {
     if(!exists) {
         fs.mkdir(dataPath, function() {
             // create default files
             fs.createWriteStream(jobHistoryPath);
-            var jobHistoryDB = new DataStore({ filename: jobHistoryPath, autoload:true });
+            var jobHistoryDB = dbService.getJobHistoryDB();
             $.getJSON(jobHistory, function(json) {
               jobHistoryDB.insert(json.jobs[0], function(err, newDoc) {
                 if(err) console.log(err);
@@ -35,7 +33,7 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
       fs.exists(jobHistoryPath, function(fileExists) {
         if(!fileExists) {
           fs.createWriteStream(jobHistoryPath);
-          var jobHistoryDB = new DataStore({ filename: jobHistoryPath, autoload:true });
+          var jobHistoryDB = dbService.getJobHistoryDB();
           $.getJSON(jobHistory, function(json) {
             jobHistoryDB.insert(json.jobs[0], function(err, newDoc) {
               if(err) console.log(err);
@@ -49,8 +47,7 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
       });
     }
   });
-
-  var db = new DataStore({ filename: submittedJobsPath, autoload: true });
+  db = dbService.getSubmittedJobsDB();
 
   // Generate empty graphs
   var homeUsageGauge = c3.generate({

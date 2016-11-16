@@ -16,3 +16,5 @@ packageOsx/*
 packageNix/*
 
 *.swp
+
+HCCGo/app/html/beta_notice.html
