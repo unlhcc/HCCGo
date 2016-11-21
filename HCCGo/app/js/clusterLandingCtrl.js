@@ -1,28 +1,26 @@
 
 clusterLandingModule = angular.module('HccGoApp.clusterLandingCtrl', ['ngRoute' ]);
 
-clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeout', 'connectionService', '$routeParams', '$location', '$q', 'preferencesManager', 'filePathService', 'notifierService', function($scope, $log, $timeout, connectionService, $routeParams, $location, $q, preferencesManager, filePathService, notifierService) {
+clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeout', 'connectionService', '$routeParams', '$location', '$q', 'preferencesManager', 'filePathService', 'notifierService', 'dbService', function($scope, $log, $timeout, connectionService, $routeParams, $location, $q, preferencesManager, filePathService, notifierService, dbService) {
 
   $scope.params = $routeParams;
   $scope.jobs = [];
   var clusterInterface = null;
   var path = require('path');
   var jobHistory = path.join(__dirname, 'data/jobHistory.json');
-  // nedb datastore
-  const DataStore = require('nedb');
 
   // Check if app data folder is there, if not, create one with default json file
   var jobHistoryPath = filePathService.getJobHistory();
   var dataPath = filePathService.getDataPath();
   var submittedJobsPath = filePathService.getSubmittedJobs();
-
+  var db;
   var fs = require('fs');
   fs.exists(dataPath, function(exists) {
     if(!exists) {
         fs.mkdir(dataPath, function() {
             // create default files
             fs.createWriteStream(jobHistoryPath);
-            var jobHistoryDB = new DataStore({ filename: jobHistoryPath, autoload:true });
+            var jobHistoryDB = dbService.getJobHistoryDB();
             $.getJSON(jobHistory, function(json) {
               jobHistoryDB.insert(json.jobs[0], function(err, newDoc) {
                 if(err) console.log(err);
@@ -35,7 +33,7 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
       fs.exists(jobHistoryPath, function(fileExists) {
         if(!fileExists) {
           fs.createWriteStream(jobHistoryPath);
-          var jobHistoryDB = new DataStore({ filename: jobHistoryPath, autoload:true });
+          var jobHistoryDB = dbService.getJobHistoryDB();
           $.getJSON(jobHistory, function(json) {
             jobHistoryDB.insert(json.jobs[0], function(err, newDoc) {
               if(err) console.log(err);
@@ -49,8 +47,7 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
       });
     }
   });
-
-  var db = new DataStore({ filename: submittedJobsPath, autoload: true });
+  db = dbService.getSubmittedJobsDB();
 
   // Generate empty graphs
   var homeUsageGauge = c3.generate({
@@ -134,62 +131,148 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
     $(".mdi-action-autorenew").addClass("spinning-image");
 
     // Array to concat together running and completed jobs
-    var jobList = [];
-
+    //var jobList = [];
+    async = require("async");
     // Get completed jobs from db file
-    db.find({ loaded: true }, function (err, docs) {
-      // if data already loaded, just add them to the list
-      jobList = jobList.concat(docs);
-      if(err) console.log("Error fetching completed jobs: " + err);
-    });
-
-    db.find({ loaded: false }, function (err, docs) {
-        // if they are newly completed jobs, fetch the data
-      if (docs.length > 0) {
-        clusterInterface.getCompletedJobs(docs).then(function(data) {
-          for (var i = 0; i < data.length; i++) {
-            console.log(data[i]);
-            db.update(
-              { _id: data[i]._id },
-              { $set:
-                {
-                "loaded": true,
-                "complete": true,
-                "elapsed": data[i].Elapsed,
-                "reqMem": data[i].ReqMem,
-                "jobName": data[i].JobName
-                }
-              },
-              { returnUpdatedDocs: true },
-              function (err, numReplaced, affectedDocuments) {
-                // update db with data so it doesn't have to be queried again
-                if (!err) {
-                  notifierService.success('Your job, ' + affectedDocuments.jobName + ', has been completed', 'Job Completed!');
-                  jobList = jobList.concat(affectedDocuments);
-                }
-              }
-            );
+    
+    async.parallel([
+      
+      // Query all the uncompleted jobs in the DB
+      function(callback) {
+        db.find({complete: false}, function (err, docs) {
+          
+          if (err) {
+            $log.err("Error querying the DB for job states");
+            return callback("Error querying the DB for job states");
           }
+          
+          return callback(null, docs);  
         });
+      },
+      
+      function(callback) {
+        db.find({complete: true}, function (err, docs) {
+          if (err) {
+            $log.err("Error querying the DB for job states");
+            return callback("Error querying the DB for job states");
+          }
+          return callback(null, docs);
+        
+        });
+      },
+      
+      // Query for all of the jobs that are not completed:
+      function(callback) {
+        clusterInterface.getJobs().then(function(data) {
+        
+          return callback(null, data);
+        });
+        
+      }],
+      // Here is where we combine the results from the DB and the getting of jobs
+      function(err, results) {
+        
+        // results[0] is jobs from the DB that have not completed
+        // results[1] is jobs completed in the DB
+        // results[2] is jobs from the cluster
+        var completed_jobs = results[1];
+        var db_jobs = results[0];
+        var cluster_jobs = results[2].jobs;
+
+        // Find jobs that are in the DB but not reported (recently completed jobs)
+        for (var index = 0; index < db_jobs.length; index++) {
+          curJob = db_jobs[index];
+          for (var indexa = 0; indexa < cluster_jobs.length; indexa++) {
+            if (curJob.jobId == cluster_jobs[indexa].jobId) {
+              // Remove the job from the list of jobs we care about
+              db_jobs.splice(index, 1);
+              
+              // Break out of this inner for loop
+              break;
+            }
+          }
+        }
+        
+        // Now, db_jobs are jobs that are in the DB as running, but 
+        // not in the list of running or idle jobs.  So they must
+        // have completed
+        
+        // Update the DB
+        async.series([
+          function(callback) {
+            if (db_jobs.length < 1) {
+              return callback(null, null);
+            }
+            clusterInterface.getCompletedJobs(db_jobs).then(
+              function(jobs) {
+                
+                $log.debug("Got " + jobs.length + " completed jobs");
+                var recent_completed = [];
+                async.each(jobs, function(job, each_callback) {
+                  
+                  $log.debug(job);
+                  db.update(
+                    { _id: job._id },
+                    { $set:
+                      {
+                      "complete": true,
+                      "elapsed": job.Elapsed,
+                      "reqMem": job.ReqMem,
+                      "jobName": job.JobName
+                      }
+                    },
+                    { returnUpdatedDocs: true },
+                    function (err, numReplaced, affectedDocuments) {
+                      // update db with data so it doesn't have to be queried again
+                      if (!err) {
+                        notifierService.success('Your job, ' + affectedDocuments.jobName + ', has been completed', 'Job Completed!');
+                        $log.debug("Completed job is: " + affectedDocuments);
+                        
+                        recent_completed.push(affectedDocuments);
+                        return each_callback(null);
+
+                      }
+                    }
+                  );
+                }, function(err) {
+                  // After the for loop, return all of the recently completed jobs.
+                  return callback(null, recent_completed);
+                  
+                });
+                
+                
+              }
+            , function(msg) {
+              $log.debug("No jobs returned by completed job");
+              return callback(null, null);
+            });
+          
+          }
+        ], 
+        function(err, recent_completed) {
+          $scope.numRunning = results[2].numRunning;
+          $scope.numIdle = results[2].numIdle;
+          $scope.numError = results[2].numError;
+          $log.debug("Concat all the things!");
+          // Ok, now concat everything together.  Running jobs, completed jobs, and recently completed jobs.
+          if (recent_completed[0] == null) {
+            $scope.jobs = completed_jobs.concat(cluster_jobs);
+          } else {
+            $scope.jobs = recent_completed[0].concat(completed_jobs, cluster_jobs);
+          }
+          
+          
+        });
+        
       }
-      if(err) console.log("Error fetching completed jobs: " + err);
-    });
+    );
+    
 
-    // Query the connection service for the cluster
-    clusterInterface.getJobs().then(function(data) {
-      // Process the data
+    
+    
+    // Make sure the jobs data is always shown
 
-      $scope.numRunning = data.numRunning;
-      $scope.numIdle = data.numIdle;
-      $scope.numError = data.numError;
-      $scope.jobs = data.jobs.concat(jobList);
-
-      $(".mdi-action-autorenew").removeClass("spinning-image");
-
-    }, function(error) {
-      console.log("Error in CTRL: " + error);
-    })
-
+    
     clusterInterface.getStorageInfo().then(function(data) {
 
 

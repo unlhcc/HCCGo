@@ -1,12 +1,12 @@
 
 jobSubmissionModule = angular.module('HccGoApp.jobSubmissionCtrl', ['ngRoute' ]);
 
-jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout', 'connectionService', '$routeParams', '$location', '$q', 'preferencesManager', 'notifierService', 'jobService', 'filePathService', function($scope, $log, $timeout, connectionService, $routeParams, $location, $q, preferencesManager, notifierService, jobService, filePathService) {
+jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout', 'connectionService', '$routeParams', '$location', '$q', 'preferencesManager', 'notifierService', 'jobService', 'dbService', function($scope, $log, $timeout, connectionService, $routeParams, $location, $q, preferencesManager, notifierService, jobService, dbService) {
 
   $scope.params = $routeParams;
   const DataStore = require('nedb');
-  var submittedJobsDB = new DataStore({ filename: filePathService.getSubmittedJobs(), autoload: true });
-  var jobHistoryDB = new DataStore({ filename: filePathService.getJobHistory(), autoload:true });
+  var submittedJobsDB = dbService.getSubmittedJobsDB();
+  var jobHistoryDB = dbService.getJobHistoryDB();
 
   // get path to work directory
   var getWork = function() {
@@ -190,7 +190,7 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
           // db entry
           var doc = {
             "jobId": data.split(" ")[3].trim(),
-            "loaded": false
+            "complete": false
           }
           submittedJobsDB.insert(doc, function(err, newDoc) {
             if(err) console.log(err);
