@@ -29,5 +29,6 @@ app.on('ready', function() {
 
     mainWindow.once('ready-to-show', () => {
         mainWindow.show();
+        //mainWindow.webContents.openDevTools();
     });
 });
