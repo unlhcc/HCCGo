@@ -2,6 +2,10 @@ Welcome to the HCCGo Beta.  With HCCGo, you are able to submit jobs, transfer fi
 
 ### What's Changed
 
+#### Version 0.1
+
+* Remove electron packaging (recursive) to minimize size [#57](https://github.com/unlhcc/HCCGo/pull/57)
+* Fix race condition in recently completed [#53](https://github.com/unlhcc/HCCGo/pull/53) [#54](https://github.com/unlhcc/HCCGo/pull/54)
 * Add Beta modal text [#49](https://github.com/unlhcc/HCCGo/pull/49)
 * Open external links in default browser [#48](https://github.com/unlhcc/HCCGo/pull/48) 
 * Add Beta notifications everywhere [#47](https://github.com/unlhcc/HCCGo/pull/47) 
