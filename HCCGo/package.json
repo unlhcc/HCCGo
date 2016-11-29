@@ -14,24 +14,24 @@
     "HCC"
   ],
   "dependencies": {
-    "asar": "^0.12.3",
     "async": ">= 1.5.2",
     "c3": ">= 0.4.11",
     "csv": "^1.1.0",
     "csv-parse": ">= 1.1.1",
     "d3": "^3.5.17",
     "diskusage": ">= 0.1.5",
-    "electron": "^1.4.3",
-    "electron-debug": "^1.0.1",
     "fs": ">= 0.0.2",
+    "electron-debug": "^1.0.1",
     "nedb": "^1.8.0",
     "node-notifier": "^4.6.0",
-    "nslog": "^3.0.0",
     "path": ">= 0.12.7",
     "ssh2": ">= 0.3.3"
   },
   "devDependencies": {
     "devtron": "^1.2.1",
+    "asar": "^0.12.3",
+    "nslog": "^3.0.0",
+    "electron": "^1.4.3",
     "electron-packager": ">= 5.0.1",
     "electron-prebuilt": ">= 0.30.3",
     "electron-rebuild": ">= 1.1.5",
