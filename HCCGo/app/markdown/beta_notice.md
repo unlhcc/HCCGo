@@ -1,6 +1,9 @@
-Welcome to the HCCGo Beta.  With HCCGo, you are able to submit jobs, transfer files, and monitor your usage of HCC resources
+tWelcome to the HCCGo Beta.  With HCCGo, you are able to submit jobs, transfer files, and monitor your usage of HCC resources
 
 ### What's Changed
+
+* Add Keybinding to open debug window, Alt+F12 (or fn+Alt+F12 for Mac) [#62](https://github.com/unlhcc/HCCGo/pull/62)
+* Reduce packaging size by moving electron dependency to devDependencies [#60](https://github.com/unlhcc/HCCGo/pull/60)
 
 #### Version 0.1
 

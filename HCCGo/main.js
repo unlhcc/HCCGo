@@ -1,11 +1,11 @@
 'use strict';
 
-const {app, BrowserWindow} = require('electron');
+const {app, BrowserWindow, globalShortcut} = require('electron');
 const {ipcMain} = require('electron');
 
 let mainWindow = null;
 
-require('electron-debug')({showDevTools: false});
+require('electron-debug')({showDevTools: true});
 
 app.on('ready', function() {
 
@@ -26,7 +26,11 @@ app.on('ready', function() {
     });
 
     mainWindow.loadURL('file://' + __dirname + '/app/index.html');
-
+	
+    globalShortcut.register('Alt+F12', () => {
+        mainWindow.webContents.openDevTools();
+    });
+	
     mainWindow.once('ready-to-show', () => {
         mainWindow.show();
     });

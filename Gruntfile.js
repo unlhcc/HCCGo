@@ -15,9 +15,15 @@ module.exports = function(grunt) {
       start_electron: {
         command: 'cd HCCGo/ && npm start'
       },
-      build_electron: {
+      build_electron_windows: {
         command: 'cd HCCGo/ && npm run-script packageWin'
-      }
+      },
+	  build_electron_macos: {
+	    command: 'cd HCCGo/ && npm run-script packageOsx'
+	  },
+	  build_electron_linux: {
+	    command: 'cd HCCGo/ && npm run-script packageNix'
+	  }
     },
     auto_install: {
       subdir: {
@@ -62,9 +68,19 @@ module.exports = function(grunt) {
                              'marked',
 			     'auto_install',
 			     'shell:start_electron']);
-  grunt.registerTask('package', ['less',
-                                 'bower',
-                                 'marked',
-				 'auto_install',
-				 'shell:build_electron']);
+  grunt.registerTask('packageWin', ['less',
+                                    'bower',
+                                    'marked',
+				    'auto_install',
+				    'shell:build_electron_windows']);
+  grunt.registerTask('packageOsx', ['less',
+                                    'bower',
+                                    'marked',
+				    'auto_install',
+				    'shell:build_electron_macos']);  
+  grunt.registerTask('packageNix', ['less',
+                                    'bower',
+                                    'marked',
+				    'auto_install',
+				    'shell:build_electron_linux']);
 };
