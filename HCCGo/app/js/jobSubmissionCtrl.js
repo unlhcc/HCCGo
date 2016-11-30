@@ -1,9 +1,12 @@
 
 jobSubmissionModule = angular.module('HccGoApp.jobSubmissionCtrl', ['ngRoute' ]);
 
-jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout', 'connectionService', '$routeParams', '$location', '$q', 'preferencesManager', 'notifierService', 'jobService', 'filePathService', function($scope, $log, $timeout, connectionService, $routeParams, $location, $q, preferencesManager, notifierService, jobService, filePathService) {
+jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout', 'connectionService', '$routeParams', '$location', '$q', 'preferencesManager', 'notifierService', 'jobService', 'dbService', function($scope, $log, $timeout, connectionService, $routeParams, $location, $q, preferencesManager, notifierService, jobService, dbService) {
 
   $scope.params = $routeParams;
+  const DataStore = require('nedb');
+  var submittedJobsDB = dbService.getSubmittedJobsDB();
+  var jobHistoryDB = dbService.getJobHistoryDB();
 
   // get path to work directory
   var getWork = function() {
@@ -13,12 +16,13 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
 
       deferred.resolve(data.trim());
 
-    })
+    });
 
     return deferred.promise;
 
   }
 
+  // gets the job that was selected from job histroy
   var loadedJob = jobService.getJob();
 
   if(loadedJob == null) {
@@ -39,13 +43,6 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
       commands: loadedJob.commands
     };
   }
-
-  // load json file
-  var filePath = filePathService.getFilePath();
-  var jsonFile;
-  $.getJSON(filePath, function(json) {
-    jsonFile = json;
-  });
 
   $scope.cancel = function() {
     $location.path("cluster/" + $scope.params.clusterId + "/jobHistory");
@@ -110,9 +107,9 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
 
   // Write a job submission script, pass in form data
   $scope.writeSubmissionScript = function(job) {
-    
+
     $("#submitbtn").prop('disabled', true);
-    
+
     // Create string for file
     var jobFile =
       "#!/bin/sh\n" +
@@ -132,20 +129,29 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
     var now = Date.now();
     // updating job history
     if(loadedJob != null) {
-      jsonFile.jobs[loadedJob.id].timestamp = now;
-      jsonFile.jobs[loadedJob.id].runtime = job.runtime;
-      jsonFile.jobs[loadedJob.id].memory = job.memory;
-      jsonFile.jobs[loadedJob.id].jobname = job.jobname;
-      jsonFile.jobs[loadedJob.id].location = job.location;
-      jsonFile.jobs[loadedJob.id].error = job.error;
-      jsonFile.jobs[loadedJob.id].output = job.output;
-      jsonFile.jobs[loadedJob.id].modules = ((job.modules != null) ? job.modules : []);
-      jsonFile.jobs[loadedJob.id].commands = job.commands;
+      jobHistoryDB.update(
+        { _id: loadedJob._id },
+        { $set:
+          {
+            timestamp: now,
+            runtime: job.runtime,
+            memory: job.memory,
+            jobname: job.jobname,
+            location: job.location,
+            error: job.error,
+            output: job.output,
+            modules: ((job.modules != null) ? job.modules : []),
+            commands: job.commands
+          }
+        },
+        {},
+        function (err, numReplaced) {
+          if(err) console.log("Error updating job history db: " + err);
+        }
+      );
     }
     else {
-      var newId = jsonFile.jobs[jsonFile.jobs.length-1].id + 1;
       var newJob = {
-        "id": newId,
         "runtime": job.runtime,
         "memory": job.memory,
         "jobname": job.jobname,
@@ -156,18 +162,11 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
         "commands": job.commands,
         "timestamp": now
       }
-      jsonFile.jobs.push(newJob);
+      jobHistoryDB.insert(newJob, function(err, newDoc) {
+        if(err) console.log(err);
+      });
     }
-    var fs = require("fs");
-    fs.writeFile(filePath, JSON.stringify(jsonFile, null, 2), function(err) {
-      if(err) {
-        return console.error(err);
-      }
-      else {
-        console.log("History written successfully.");
-      }
-    });
-    
+
     async = require("async");
     // Call the series of actions to submit a job
     async.series([
@@ -188,13 +187,21 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
         $('#submitprogress').css('width', curValue+'%').attr('aria-valuenow', curValue);
         $('progresssummary').text("Submitting Job...");
         connectionService.submitJob(job.location).then(function(data) {
+          // db entry
+          var doc = {
+            "jobId": data.split(" ")[3].trim(),
+            "complete": false
+          }
+          submittedJobsDB.insert(doc, function(err, newDoc) {
+            if(err) console.log(err);
+          });
           callback(null);
         }, function(err) {
           callback(new Error("Job submission failed!"))
         });
-        
+
       }
-      
+
     ], function(err, result) {
       // If there has been an error in the series
       if (err) {
@@ -208,7 +215,7 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
         $location.path("cluster/" + $scope.params.clusterId);
       }
     });
-    
+
 
   }
 
@@ -220,17 +227,17 @@ jobSubmissionModule.directive('remoteWritable', function($q, $log, connectionSer
     require: 'ngModel',
     restrict: 'A',
     link: function(scope, elm, attrs, ctrl) {
-      
+
       ctrl.$asyncValidators.remoteWritable = function(modelValue, viewValue) {
         if (ctrl.$isEmpty(modelValue)) {
           // consider empty model valid
           return $q.when();
         }
-        
+
         var def = $q.defer();
         $log.debug("Checking file location: " + modelValue);
         connectionService.checkWritable(modelValue).then(function(writability) {
-          
+
           if (writability) {
             $log.debug("File is writable");
             def.resolve();
@@ -238,8 +245,8 @@ jobSubmissionModule.directive('remoteWritable', function($q, $log, connectionSer
             $log.debug("File is not writable");
             def.reject();
           }
-          
-          
+
+
         }, function(err) {
           if (err) {
             $log.error("Got error from checking writability: " + err);

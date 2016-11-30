@@ -33,6 +33,10 @@ body {
 
 }
 
+.navIcon {
+  height: 130%;
+}
+
 .highlight {
   background-color: #F1F5F8;
 }
@@ -76,9 +80,36 @@ body {
     .navbar-brand, .navbar-header {
       font-size: xx-large;
       float: none;
+      
+
+
+      .element-title{
+        z-index:0;
+        position:relative;
+      }
+
+      .element-subtitle{
+        z-index:1;
+        font-size:medium;
+        margin:-20px 0 0 160px;
+        position:relative;
+        color:white;
+      }
     }
   }
 
+}
+.imageSubtitle{
+   position: relative;
+   top: -25px;
+   left: 49%;
+   color:white;
+   font-size: 65%;
+   background-color: rgb(0, 0, 0);
+   background-color: rgba(0, 0, 0, 0.7);
+   letter-spacing: 1px;
+   padding-right: 2px;
+   padding-left: 2px;
 }
 
 .card {
@@ -216,17 +247,22 @@ div.historyinfo {
 
 .jobdisplay ul {
   list-style:none;
-  overflow-y: scroll;
+  overflow-y: auto;
+  overflow-x: hidden;
 
   .running {
     i {
       color: green;
     }
   }
-
-  .idle {
+  .complete {
     i {
 
+    }
+  }
+  .idle {
+    i {
+      color: orange;
     }
   }
 
@@ -238,8 +274,11 @@ div.historyinfo {
 
   h3.jobname {
     margin-top: 0px;
-  }
 
+    a.deleteButton {
+      color: red;
+    }
+  }
 }
 .spinning-image {
     -webkit-animation:spin 2s linear infinite;
@@ -264,7 +303,7 @@ div.historyinfo {
   top: -0px;
 }
 
-.status-check 
+.status-check
 {
 	stroke-dasharray: 110;
 	stroke-dashoffset: -110;
@@ -275,7 +314,7 @@ div.historyinfo {
 {
   stroke-dasharray: 110;
   stroke-dashoffset: -110;
-  stroke-width: 0; 
+  stroke-width: 0;
 }
 
 .status-anx-complete
@@ -288,8 +327,8 @@ div.historyinfo {
 
 }
 
-.status-check-complete 
-{   
+.status-check-complete
+{
 	animation: status-check 1s ease-in forwards;
 	stroke-width: 15;
 	stroke-dashoffset: 0;
@@ -297,7 +336,7 @@ div.historyinfo {
   transition: status-stroke 1.6s;
 }
 
-.status-fill 
+.status-fill
 {
 	stroke-dasharray: 285;
 	stroke-dashoffset: -100;
@@ -305,7 +344,7 @@ div.historyinfo {
   transform-origin: 50% 50%;
 }
 
-.status-fill-complete 
+.status-fill-complete
 {
 	animation: status-fill 1s ease-out forwards;
 }
@@ -352,6 +391,3 @@ div.historyinfo {
   stroke: #f44336;
   transition: status-stroke 1.6s;
 }
-
-
-

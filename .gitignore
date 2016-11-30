@@ -14,5 +14,8 @@ HCCGo/node_modules/*
 packageWin/*
 packageOsx/*
 packageNix/*
+HCCGo/app/html/beta_notice.html
 
 *.swp
+
+HCCGo/app/html/beta_notice.html

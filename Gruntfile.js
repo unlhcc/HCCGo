@@ -15,9 +15,15 @@ module.exports = function(grunt) {
       start_electron: {
         command: 'cd HCCGo/ && npm start'
       },
-      build_electron: {
+      build_electron_windows: {
         command: 'cd HCCGo/ && npm run-script packageWin'
-      }
+      },
+	  build_electron_macos: {
+	    command: 'cd HCCGo/ && npm run-script packageOsx'
+	  },
+	  build_electron_linux: {
+	    command: 'cd HCCGo/ && npm run-script packageNix'
+	  }
     },
     auto_install: {
       subdir: {
@@ -28,6 +34,13 @@ module.exports = function(grunt) {
 	  failOnError: true,
 	  npm: '--development'
 	}
+      }
+    },
+    marked: {
+      dist: {
+        files: {
+          'HCCGo/app/html/beta_notice.html': 'HCCGo/app/markdown/beta_notice.md'
+        }
       }
     },
     bower: {
@@ -46,15 +59,28 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-less');
   grunt.loadNpmTasks('grunt-shell');
   grunt.loadNpmTasks('grunt-bower-task');
-  grunt.registerTask('default', ['less', 
-                                 'bower', 
-				 'auto_install']);
-  grunt.registerTask('run', ['less', 
-                             'bower', 
-			     'auto_install', 
-			     'shell:start_electron']);
-  grunt.registerTask('package', ['less',
+  grunt.loadNpmTasks('grunt-marked');
+  grunt.registerTask('default', ['less',
                                  'bower',
-				 'auto_install',
-				 'shell:build_electron']);
+				 'auto_install']);
+  grunt.registerTask('run', ['less',
+                             'bower',
+                             'marked',
+			     'auto_install',
+			     'shell:start_electron']);
+  grunt.registerTask('packageWin', ['less',
+                                    'bower',
+                                    'marked',
+				    'auto_install',
+				    'shell:build_electron_windows']);
+  grunt.registerTask('packageOsx', ['less',
+                                    'bower',
+                                    'marked',
+				    'auto_install',
+				    'shell:build_electron_macos']);  
+  grunt.registerTask('packageNix', ['less',
+                                    'bower',
+                                    'marked',
+				    'auto_install',
+				    'shell:build_electron_linux']);
 };

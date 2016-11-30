@@ -2,7 +2,9 @@
 welcomeModule = angular.module('HccGoApp.WelcomeCtrl', [ ]);
 
 welcomeModule.controller('welcomeCtrl', ['$scope', '$log', '$timeout', 'connectionService', 'notifierService', '$location', 'preferencesManager', function($scope, $log, $timeout, connectionService, notifierService, $location, preferencesManager) {
-  
+ 
+  angular.element('#betaModal').modal('show');
+ 
   var $selector = $('#clusterSelect').selectize({
     
     createOnBlur: true,

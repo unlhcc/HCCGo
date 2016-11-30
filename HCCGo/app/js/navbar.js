@@ -7,7 +7,7 @@ navBar.controller('NavCtrl', ['$route', '$scope', '$routeParams', '$location', '
    $scope.params = $routeParams;
    $scope.currentPath = $location.path();
    var clusterInterface = null;
-  
+
    $scope.logout = function() {
       connectionService.closeStream();
       $location.path("/");

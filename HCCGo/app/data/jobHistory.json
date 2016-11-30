@@ -1,7 +1,6 @@
 {
   "jobs": [
     {
-      "id": 0,
       "runtime": "3:00:00",
       "memory": "1024",
       "jobname": "jobTemplate",
