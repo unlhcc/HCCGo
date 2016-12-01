@@ -2,6 +2,7 @@ tWelcome to the HCCGo Beta.  With HCCGo, you are able to submit jobs, transfer f
 
 ### What's Changed
 
+* Add Copy / Paste functionality [#69](https://github.com/unlhcc/HCCGo/pull/69)
 * Add Keybinding to open debug window, Alt+F12 (or fn+Alt+F12 for Mac) [#62](https://github.com/unlhcc/HCCGo/pull/62)
 * Reduce packaging size by moving electron dependency to devDependencies [#60](https://github.com/unlhcc/HCCGo/pull/60)
 
