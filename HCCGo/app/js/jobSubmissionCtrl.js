@@ -141,7 +141,8 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
             error: job.error,
             output: job.output,
             modules: ((job.modules != null) ? job.modules : []),
-            commands: job.commands
+            commands: job.commands,
+            cluster: $scope.params.clusterId
           }
         },
         {},
@@ -160,7 +161,8 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
         "output": job.output,
         "modules": ((job.modules != null) ? job.modules : []),
         "commands": job.commands,
-        "timestamp": now
+        "timestamp": now,
+        "cluster": $scope.params.clusterId
       }
       jobHistoryDB.insert(newJob, function(err, newDoc) {
         if(err) console.log(err);
@@ -190,7 +192,8 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
           // db entry
           var doc = {
             "jobId": data.split(" ")[3].trim(),
-            "complete": false
+            "complete": false,
+            "cluster": $scope.params.clusterId
           }
           submittedJobsDB.insert(doc, function(err, newDoc) {
             if(err) console.log(err);
