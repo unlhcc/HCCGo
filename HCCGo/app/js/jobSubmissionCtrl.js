@@ -8,6 +8,9 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
   var submittedJobsDB = dbService.getSubmittedJobsDB();
   var jobHistoryDB = dbService.getJobHistoryDB();
 
+  //enable tooltips
+  $('[data-toggle="tooltip"]').tooltip();
+
   // get path to work directory
   var getWork = function() {
     var deferred = $q.defer();
