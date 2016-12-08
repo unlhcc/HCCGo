@@ -80,7 +80,7 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
     valueField: 'label',
     maxItems: 30,
     delimiter: ',',
-    selectOnTab: true,
+    selectOnTab: false,
   });
 
   var selectize = $select[0].selectize;
