@@ -19,6 +19,18 @@ updaterService.service('updaterService', [ '$log', function($log) {
       $log.debug("Received checking-for-update event");
     });
     
+    ipcRenderer.on('update-available', function(event, arg) {
+      $log.debug("Received update-available event");
+    });
+    
+    ipcRenderer.on('update-not-available', fuction(event, arg) {
+      $log.debug("Received update-not-available event");
+    });
+    
+    ipcRenderer.on('update-downloaded', function(event, arg) {
+      $log.debug("Received update-downloaded event");
+    });
+    
   };
   
   

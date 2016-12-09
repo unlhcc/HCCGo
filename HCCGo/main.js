@@ -55,15 +55,15 @@ app.on('ready', function() {
 
         
         autoUpdater.on('update-available', function() {
-            mainWindow.webContents.send('asynchronous-message', 'update-available');
+            mainWindow.webContents.send('update-available');
         });
         
         autoUpdater.on('update-not-available', function() {
-            mainWindow.webContents.send('asynchronous-message', 'update-not-available');
+            mainWindow.webContents.send('update-not-available');
         });
         
         autoUpdater.on('update-downloaded', function(event, releaseNotes, releaseName, releaseDate, updateURL) {
-            mainWindow.webContents.send('asynchronous-message', 'update-downloaded');
+            mainWindow.webContents.send('update-downloaded', {releaseNotes: releaseNotes, releaseName: releaseName, releaseDate: releaseDate, updateURL: updateURL});
         });
         
         autoUpdater.checkForUpdates()
@@ -72,12 +72,6 @@ app.on('ready', function() {
     
 
     var template = [{
-        label: "Application",
-        submenu: [
-            { label: "About Application", selector: "orderFrontStandardAboutPanel:" },
-            { type: "separator" },
-            { label: "Quit", accelerator: "Command+Q", click: function() { app.quit(); }}
-        ]}, {
         label: "Edit",
         submenu: [
             { label: "Undo", accelerator: "CmdOrCtrl+Z", selector: "undo:", role: 'undo' },
@@ -87,8 +81,141 @@ app.on('ready', function() {
             { label: "Copy", accelerator: "CmdOrCtrl+C", selector: "copy:", role: "copy" },
             { label: "Paste", accelerator: "CmdOrCtrl+V", selector: "paste:", role: "paste" },
             { label: "Select All", accelerator: "CmdOrCtrl+A", selector: "selectAll:", role: "selectall" }
-        ]}
+        ]}, {
+            label: 'View',
+            submenu: [
+          {
+            label: "Reload",
+            role: 'reload'
+          },
+          {
+            label: "Open Dev Tools",
+            role: 'toggledevtools',
+            click: function() {
+                mainWindow.webContents.openDevTools();
+            }
+          },
+          {
+            type: 'separator'
+          },
+          {
+            role: 'resetzoom'
+          },
+          {
+            role: 'zoomin'
+          },
+          {
+            role: 'zoomout'
+          },
+          {
+            type: 'separator'
+          },
+          {
+            role: 'togglefullscreen'
+          }
+      ]}, {
+          role: 'window',
+          submenu: [
+            {
+              role: 'minimize'
+            },
+            {
+              role: 'close'
+            }
+          ]
+        },
+        {
+          role: 'help',
+          submenu: [
+            {
+              label: 'Learn More',
+              click () { require('electron').shell.openExternal('http://electron.atom.io') }
+            }
+          ]
+        }
     ];
+
+    if (process.platform === 'darwin') {
+    template.unshift({
+      label: app.getName(),
+      submenu: [
+        {
+          role: 'about'
+        },
+        { 
+          label: "Check for Updates", click: function() {
+          autoUpdater.checkForUpdates();
+        }},
+        {
+          type: 'separator'
+        },
+        {
+          role: 'services',
+          submenu: []
+        },
+        {
+          type: 'separator'
+        },
+        {
+          role: 'hide'
+        },
+        {
+          role: 'hideothers'
+        },
+        {
+          role: 'unhide'
+        },
+        {
+          type: 'separator'
+        },
+        {
+          role: 'quit'
+        }
+      ]
+    });
+    // Edit menu.
+    template[1].submenu.push(
+      {
+        type: 'separator'
+      },
+      {
+        label: 'Speech',
+        submenu: [
+          {
+            role: 'startspeaking'
+          },
+          {
+            role: 'stopspeaking'
+          }
+        ]
+      }
+    )
+    // Window menu.
+    template[3].submenu = [
+      {
+        label: 'Close',
+        accelerator: 'CmdOrCtrl+W',
+        role: 'close'
+      },
+      {
+        label: 'Minimize',
+        accelerator: 'CmdOrCtrl+M',
+        role: 'minimize'
+      },
+      {
+        label: 'Zoom',
+        role: 'zoom'
+      },
+      {
+        type: 'separator'
+      },
+      {
+        label: 'Bring All to Front',
+        role: 'front'
+      }
+    ]
+    }
+
 
     Menu.setApplicationMenu(Menu.buildFromTemplate(template));
     
