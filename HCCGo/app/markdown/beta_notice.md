@@ -1,4 +1,4 @@
-tWelcome to the HCCGo Beta.  With HCCGo, you are able to submit jobs, transfer files, and monitor your usage of HCC resources
+Welcome to the HCCGo Beta.  With HCCGo, you are able to submit jobs, transfer files, and monitor your usage of HCC resources
 
 ### What's Changed
 

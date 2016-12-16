@@ -1,6 +1,6 @@
 {
   "name": "HCCGo-Dev",
-  "version": "0.1.0",
+  "version": "0.2.0-beta",
   "dependencies": {
     "grunt": ">= 1.0.1",
     "grunt-auto-install": ">= 0.3.1",

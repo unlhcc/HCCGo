@@ -44,9 +44,10 @@ app.on('ready', function() {
 
         autoUpdater.setFeedURL('https://hccgo.herokuapp.com/update/'+platform+'/'+version);
         
-        autoUpdater.on('error', function(error) {
+        autoUpdater.on('error', function(error, msg) {
             console.log("Erorr is " + error);
-            mainWindow.webContents.send('updater-error', error);
+            var arg = {err: error, msg: msg};
+            mainWindow.webContents.send('updater-error', arg);
         });
         
         autoUpdater.on('checking-for-update', function() {
@@ -65,6 +66,10 @@ app.on('ready', function() {
         autoUpdater.on('update-downloaded', function(event, releaseNotes, releaseName, releaseDate, updateURL) {
             mainWindow.webContents.send('update-downloaded', {releaseNotes: releaseNotes, releaseName: releaseName, releaseDate: releaseDate, updateURL: updateURL});
         });
+        
+        ipcMain.on('updateRestart', function(event, arg) {
+            autoUpdater.quitAndInstall();
+        })
         
         autoUpdater.checkForUpdates()
         
