@@ -116,11 +116,11 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
     // Create string for file
     var jobFile =
       "#!/bin/sh\n" +
-      "#SBATCH --time=" + job.runtime + "\n" +
-      "#SBATCH --mem-per-cpu=" + job.memory + "\n" +
-      "#SBATCH --job-name=" + job.jobname + "\n" +
-      "#SBATCH --error=" + job.error + "\n" +
-      "#SBATCH --output=" + job.output + "\n";
+      "#SBATCH --time=\"" + job.runtime + "\"\n" +
+      "#SBATCH --mem-per-cpu=\"" + job.memory + "\"\n" +
+      "#SBATCH --job-name=\"" + job.jobname + "\"\n" +
+      "#SBATCH --error=\"" + job.error + "\"\n" +
+      "#SBATCH --output=\"" + job.output + "\"\n";
       if(job.modules != null){
           for(var i = 0; i < job.modules.length; i++) {
               jobFile += "\nmodule load " + job.modules[i];
