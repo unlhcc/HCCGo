@@ -23,12 +23,8 @@
                   <td>{{numError}}</td>
                 </tr>
               </tbody>
-
             </table>
-
-            <!--<button href="javascript:void(0)" class="btn btn-primary btn-lg">Submit Job <i class="mdi-navigation-chevron-right"></i></a>
-         <button ng-click="goToUpload()" class="btn btn-primary">Upload <i class="mdi-navigation-chevron-right"></i></a>-->
-        </div>
+          </div>
         </div>
       </div>
       <div class="row">
@@ -49,11 +45,8 @@
               <div id="workUsageGauge"></div>
             </div>
           </div>
-
         </div>
-
       </div>
-
     </div>
 
     <div class="col-md-8 jobdisplay">
@@ -74,9 +67,14 @@
                 <div class="row">
                   <h3 class="jobname">
                     {{job.jobName}}
-                    <a class="pull-right deleteButton" href="javascript:void(0)" ng-click="removeCompletedJob($index)" ng-if="job.complete">
-                      <i class="glyphicon glyphicon-remove"></i>
-                    </a>
+                    <span class="pull-right">
+                      <a href="javascript:void(0)" ng-click="viewOutErr($index)" ng-if="job.complete">
+                        <i class="glyphicon glyphicon-search"></i>
+                      </a>
+                      <a class="deleteButton" href="javascript:void(0)" ng-click="removeCompletedJob($index)" ng-if="job.complete">
+                        <i class="glyphicon glyphicon-remove"></i>
+                      </a>
+                    </span>
                   </h3>
                 </div>
                 <div class="row">
@@ -89,15 +87,11 @@
               </div>
             </div>
             <hr />
-
           </li>
-
         </ul>
-
       </div>
     </div>
 
   </div>
-
 
 </div>
