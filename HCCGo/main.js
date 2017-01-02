@@ -1,6 +1,6 @@
 'use strict';
 
-const {app, BrowserWindow, globalShortcut} = require('electron');
+const {app, BrowserWindow, globalShortcut, Menu} = require('electron');
 const {ipcMain} = require('electron');
 
 let mainWindow = null;
@@ -34,4 +34,27 @@ app.on('ready', function() {
     mainWindow.once('ready-to-show', () => {
         mainWindow.show();
     });
+    
+
+    var template = [{
+        label: "Application",
+        submenu: [
+            { label: "About Application", selector: "orderFrontStandardAboutPanel:" },
+            { type: "separator" },
+            { label: "Quit", accelerator: "Command+Q", click: function() { app.quit(); }}
+        ]}, {
+        label: "Edit",
+        submenu: [
+            { label: "Undo", accelerator: "CmdOrCtrl+Z", selector: "undo:", role: 'undo' },
+            { label: "Redo", accelerator: "Shift+CmdOrCtrl+Z", selector: "redo:", role: 'redo' },
+            { type: "separator" },
+            { label: "Cut", accelerator: "CmdOrCtrl+X", selector: "cut:", role: "cut" },
+            { label: "Copy", accelerator: "CmdOrCtrl+C", selector: "copy:", role: "copy" },
+            { label: "Paste", accelerator: "CmdOrCtrl+V", selector: "paste:", role: "paste" },
+            { label: "Select All", accelerator: "CmdOrCtrl+A", selector: "selectAll:", role: "selectall" }
+        ]}
+    ];
+
+    Menu.setApplicationMenu(Menu.buildFromTemplate(template));
+    
 });

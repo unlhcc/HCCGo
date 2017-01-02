@@ -8,6 +8,9 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
   var submittedJobsDB = dbService.getSubmittedJobsDB();
   var jobHistoryDB = dbService.getJobHistoryDB();
 
+  //enable tooltips
+  $('[data-toggle="tooltip"]').tooltip();
+
   // get path to work directory
   var getWork = function() {
     var deferred = $q.defer();
@@ -80,7 +83,7 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
     valueField: 'label',
     maxItems: 30,
     delimiter: ',',
-    selectOnTab: true,
+    selectOnTab: false,
   });
 
   var selectize = $select[0].selectize;
@@ -113,11 +116,11 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
     // Create string for file
     var jobFile =
       "#!/bin/sh\n" +
-      "#SBATCH --time=" + job.runtime + "\n" +
-      "#SBATCH --mem-per-cpu=" + job.memory + "\n" +
-      "#SBATCH --job-name=" + job.jobname + "\n" +
-      "#SBATCH --error=" + job.error + "\n" +
-      "#SBATCH --output=" + job.output + "\n";
+      "#SBATCH --time=\"" + job.runtime + "\"\n" +
+      "#SBATCH --mem-per-cpu=\"" + job.memory + "\"\n" +
+      "#SBATCH --job-name=\"" + job.jobname + "\"\n" +
+      "#SBATCH --error=\"" + job.error + "\"\n" +
+      "#SBATCH --output=\"" + job.output + "\"\n";
       if(job.modules != null){
           for(var i = 0; i < job.modules.length; i++) {
               jobFile += "\nmodule load " + job.modules[i];
@@ -141,7 +144,8 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
             error: job.error,
             output: job.output,
             modules: ((job.modules != null) ? job.modules : []),
-            commands: job.commands
+            commands: job.commands,
+            cluster: $scope.params.clusterId
           }
         },
         {},
@@ -160,7 +164,8 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
         "output": job.output,
         "modules": ((job.modules != null) ? job.modules : []),
         "commands": job.commands,
-        "timestamp": now
+        "timestamp": now,
+        "cluster": $scope.params.clusterId
       }
       jobHistoryDB.insert(newJob, function(err, newDoc) {
         if(err) console.log(err);
@@ -190,7 +195,8 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
           // db entry
           var doc = {
             "jobId": data.split(" ")[3].trim(),
-            "complete": false
+            "complete": false,
+            "cluster": $scope.params.clusterId
           }
           submittedJobsDB.insert(doc, function(err, newDoc) {
             if(err) console.log(err);
