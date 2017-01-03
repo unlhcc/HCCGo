@@ -4,6 +4,7 @@ updaterService.service('updaterService', [ '$log', '$rootScope', function($log, 
 
   const {ipcRenderer} = require('electron');
   var updateDetails = null;
+  var updateAvailable = false;
   
   var start = function() {
     $log.debug("Starting updater");
@@ -30,6 +31,7 @@ updaterService.service('updaterService', [ '$log', '$rootScope', function($log, 
       $log.debug("Received update-downloaded event");
       $log.debug("Release available: " + arg.releaseName);
       $rootScope.$broadcast('update:available', arg);
+      updateAvailable = true;
       
     });
     
@@ -40,9 +42,15 @@ updaterService.service('updaterService', [ '$log', '$rootScope', function($log, 
     ipcRenderer.send('updateRestart');
   }
   
+  var hasUpdate = function() {
+    return updateAvailable;
+  }
+  
   return {
   start: start,
-  updateRestart: updateRestart
+  updateRestart: updateRestart,
+  hasUpdate: hasUpdate,
+  updateDetails: updateDetails
   }
 
 }]);
