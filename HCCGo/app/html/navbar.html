@@ -1,4 +1,5 @@
-<div class="navbar navbar-hcc" ng-controller="NavCtrl">
+<div ng-controller="NavCtrl">
+<div class="navbar navbar-hcc">
   <div class="navbar-header">
     <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
       <span class="icon-bar"></span>
@@ -48,6 +49,7 @@
 
 <div class="update-banner col-md-12" ng-show="updateAvailable">
   <center>
-    An update to HCCGo is available, version {{ update.releaseName }}.  <a ng-click="restartUpdate()">Restart and Update</a>
+    An update to HCCGo is available, version {{ update.releaseName }}.  <a href="javascript:void(0)" ng-click="restartUpdate()">Restart and Update</a>
   </center>
 </div>
+</div> <!-- End NavCtrl -->

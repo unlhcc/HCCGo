@@ -33,22 +33,23 @@ navBar.controller('NavCtrl', ['$route', '$scope', '$routeParams', '$location', '
    
    /* Handle updates
    */
+   var setUpdate = function(updateDetails) {
+      $scope.update = updateDetails
+      $scope.updateAvailable = true;
+   }
+   
    $scope.$on('update:available', function(event, updateDetails) {
-      setUpdate(updateDetails)
+      setUpdate(updateDetails);
    });
    
    if (updaterService.hasUpdate()) {
-      setUpdate(updaterService.hasUpdate);
+      setUpdate(updaterService.updateDetails);
    }
    
    $scope.restartUpdate = function() {
       updaterService.updateRestart();
    }
    
-   var setUpdate = function(updateDetails) {
-      $scope.update = updateDetails
-      $scope.updateAvailable = true;
-   }
 
    /* For Reference
    $scope.onViewLoad = function viewLoad() {
