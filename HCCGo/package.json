@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node node_modules/electron/cli.js .",
     "packageWin": "node ./node_modules/electron-packager/cli.js ./ HCCGo --platform=win32 --arch=x64 --out ../packageWin/ --version 1.4.3 --overwrite --icon ./icons/HCCGo",
-    "packageOsx": "node ./node_modules/electron-packager/cli.js ./ HCCGo --platform=darwin --arch=x64 --out ../packageOsx/ --version 1.4.3 --overwrite --icon ./icons/HCCGo",
+    "packageOsx": "node ./node_modules/electron-packager/cli.js ./ HCCGo --platform=darwin --arch=x64 --out ../packageOsx/ --version 1.4.3 --overwrite --icon ./icons/HCCGo --osx-sign",
     "packageNix": "node ./node_modules/electron-packager/cli.js ./ HCCGo --platform=linux --arch=x64 --out ../packageNix/ --version 1.4.3 --overwrite --icon ./icons/HCCGo",
     "postinstall": "node postinstall.js"
   },

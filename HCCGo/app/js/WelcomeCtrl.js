@@ -1,8 +1,9 @@
 
 welcomeModule = angular.module('HccGoApp.WelcomeCtrl', [ ]);
 
-welcomeModule.controller('welcomeCtrl', ['$scope', '$log', '$timeout', 'connectionService', 'notifierService', '$location', 'preferencesManager', function($scope, $log, $timeout, connectionService, notifierService, $location, preferencesManager) {
+welcomeModule.controller('welcomeCtrl', ['$scope', '$log', '$timeout', 'connectionService', 'notifierService', '$location', 'preferencesManager', 'updaterService', function($scope, $log, $timeout, connectionService, notifierService, $location, preferencesManager, updaterService) {
  
+  updaterService.start();
   angular.element('#betaModal').modal('show');
  
   var $selector = $('#clusterSelect').selectize({
