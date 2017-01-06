@@ -1,4 +1,5 @@
 <div ng-controller="NavCtrl">
+
 <div class="navbar navbar-hcc">
   <div class="navbar-header">
     <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
@@ -31,8 +32,17 @@
      </li>
     </ul>
 
+    
 
     <ul class="nav navbar-nav navbar-right">
+      <li>
+        <button type="button" 
+        ng-click="updateDialog()"
+        class="btn btn-info navbar-btn"
+        ng-show="updateAvailable">
+        Update Available
+        </button>
+      </li>
       <li class="dropdown">
         <a href="javascript:void(0)" data-target="#" class="dropdown-toggle" data-toggle="dropdown"> {{username}}@{{params.clusterId}} <b class="caret"></b></a>
         <ul class="dropdown-menu">
@@ -45,11 +55,5 @@
 
 
   </div>
-</div>
-
-<div class="update-banner col-md-12" ng-show="updateAvailable">
-  <center>
-    An update to HCCGo is available, version {{ update.releaseName }}.  <a href="javascript:void(0)" ng-click="restartUpdate()">Restart and Update</a>
-  </center>
 </div>
 </div> <!-- End NavCtrl -->

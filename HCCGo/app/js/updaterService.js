@@ -32,6 +32,7 @@ updaterService.service('updaterService', [ '$log', '$rootScope', function($log, 
       $log.debug("Release available: " + arg.releaseName);
       $rootScope.$broadcast('update:available', arg);
       updateAvailable = true;
+      updateDetails = arg;
       
     });
     
@@ -46,11 +47,15 @@ updaterService.service('updaterService', [ '$log', '$rootScope', function($log, 
     return updateAvailable;
   }
   
+  var getUpdateDetails = function() {
+    return updateDetails;
+  }
+  
   return {
   start: start,
   updateRestart: updateRestart,
   hasUpdate: hasUpdate,
-  updateDetails: updateDetails
+  getUpdateDetails: getUpdateDetails
   }
 
 }]);

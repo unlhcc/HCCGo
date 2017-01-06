@@ -39,7 +39,10 @@ navBar.controller('NavCtrl', ['$route', '$scope', '$routeParams', '$location', '
    }
    
    $scope.$on('update:available', function(event, updateDetails) {
-      setUpdate(updateDetails);
+      $scope.$apply(function() {
+        setUpdate(updateDetails);
+      });
+      
    });
    
    if (updaterService.hasUpdate()) {
@@ -48,6 +51,12 @@ navBar.controller('NavCtrl', ['$route', '$scope', '$routeParams', '$location', '
    
    $scope.restartUpdate = function() {
       updaterService.updateRestart();
+   }
+   
+   $scope.updateDialog = function() {
+      
+      $location.path("/update");
+      
    }
    
 
