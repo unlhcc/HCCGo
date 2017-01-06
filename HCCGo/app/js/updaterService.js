@@ -59,3 +59,36 @@ updaterService.service('updaterService', [ '$log', '$rootScope', function($log, 
   }
 
 }]);
+
+updaterService.controller('updateButtonCtrl', ['$scope', 'updaterService', '$location', function($scope, updaterService, $location) {
+  
+  /* Handle updates
+   */
+   var setUpdate = function(updateDetails) {
+      $scope.update = updateDetails
+      $scope.updateAvailable = true;
+   }
+   
+   $scope.$on('update:available', function(event, updateDetails) {
+      $scope.$apply(function() {
+        setUpdate(updateDetails);
+      });
+      
+   });
+   
+   if (updaterService.hasUpdate()) {
+      setUpdate(updaterService.updateDetails);
+   }
+   
+   $scope.restartUpdate = function() {
+      updaterService.updateRestart();
+   }
+   
+   $scope.updateDialog = function() {
+      
+      $location.path("/update");
+      
+   }
+  
+  
+}]);
