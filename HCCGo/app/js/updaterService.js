@@ -1,12 +1,30 @@
-updaterService = angular.module('updaterService', []);
-updaterService.service('updaterService', [ '$log', '$rootScope', function($log, $rootScope) {
 
+/**
+ * @namespace updaterModule
+ *
+ */
+updaterModule = angular.module('updaterModule', []);
+
+/**
+ * @memberof updaterModule
+ * @ngdoc service
+ * @class updaterService
+ * @param $log {service} Logging for angularjs
+ * @param $rootScope {service} Root Scope
+ */
+var updaterService = function($log, $rootScope) {
 
   const {ipcRenderer} = require('electron');
   var updateDetails = null;
   var updateAvailable = false;
   
-  var start = function() {
+  
+  /**
+   * Start the updater and sets listeners for the update events.
+   * @method start
+   * @memberof updaterModule.updaterService
+   */
+  this.start = function() {
     $log.debug("Starting updater");
     
     ipcRenderer.on('updater-error', function(event, arg) {
@@ -38,31 +56,54 @@ updaterService.service('updaterService', [ '$log', '$rootScope', function($log, 
     
   };
   
-  var updateRestart = function() {
+  /**
+   * Update and restart HCCGo
+   * @memberof updaterModule.updaterService
+   * @function updateRestart
+   */
+  this.updateRestart = function() {
     $log.debug("Restarting and updating!");
     ipcRenderer.send('updateRestart');
   }
   
-  var hasUpdate = function() {
+  /**
+   * Check if there is an update available
+   * @return {bool} True if there is an update available, false otherwise.
+   * @memberof updaterModule.updaterService
+   * @function hasUpdate
+   */
+  this.hasUpdate = function() {
     return updateAvailable;
   }
   
-  var getUpdateDetails = function() {
+  /**
+   * Get the details for the update
+   * @return {UpdateDeatils} Deatils of the update
+   * @memberof updaterModule.updaterService
+   * @function getUpdateDetails
+   */
+  this.getUpdateDetails = function() {
     return updateDetails;
   }
   
-  return {
-  start: start,
-  updateRestart: updateRestart,
-  hasUpdate: hasUpdate,
-  getUpdateDetails: getUpdateDetails
-  }
+}
+updaterModule.service('updaterService', [ '$log', '$rootScope', updaterService]);
 
-}]);
 
-updaterService.controller('updateButtonCtrl', ['$scope', 'updaterService', '$location', function($scope, updaterService, $location) {
-  
-  /* Handle updates
+/**
+ * @memberof updaterModule
+ * @ngdoc service
+ * @class updaterButtonCtrl
+ * @param $scope {service} Local controller scope
+ * @param updaterService {service} Updater Service
+ * @param $location {service} Location service
+ */
+var updaterButtonCtrl = function($scope, updaterService, $location) {  
+
+  /**
+   * Function called when update is detected
+   * @private 
+   * @memberof updaterModule.updaterButtonCtrl
    */
    var setUpdate = function(updateDetails) {
       $scope.update = updateDetails
@@ -80,15 +121,26 @@ updaterService.controller('updateButtonCtrl', ['$scope', 'updaterService', '$loc
       setUpdate(updaterService.updateDetails);
    }
    
+   /**
+    * Restart and update when the button is pressed
+    * @function restartUpdate
+    * @memberof updaterModule.updaterButtonCtrl
+    */
    $scope.restartUpdate = function() {
       updaterService.updateRestart();
    }
    
+   /**
+    * Change the view to the update dialog
+    * @function updateDialog
+    * @memberof updaterModule.updaterButtonCtrl
+    */ 
    $scope.updateDialog = function() {
       
       $location.path("/update");
       
    }
   
-  
-}]);
+}
+
+updaterModule.controller('updateButtonCtrl', ['$scope', 'updaterService', '$location', updaterButtonCtrl]);
