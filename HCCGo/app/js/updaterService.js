@@ -1,12 +1,8 @@
 
-/**
- * @namespace updaterModule
- *
- */
 updaterModule = angular.module('updaterModule', []);
 
 /**
- * @memberof updaterModule
+ * @memberof HCCGo
  * @ngdoc service
  * @class updaterService
  * @param $log {service} Logging for angularjs
@@ -22,7 +18,7 @@ var updaterService = function($log, $rootScope) {
   /**
    * Start the updater and sets listeners for the update events.
    * @method start
-   * @memberof updaterModule.updaterService
+   * @memberof HCCGo.updaterService
    */
   this.start = function() {
     $log.debug("Starting updater");
@@ -58,7 +54,7 @@ var updaterService = function($log, $rootScope) {
   
   /**
    * Update and restart HCCGo
-   * @memberof updaterModule.updaterService
+   * @memberof HCCGo.updaterService
    * @function updateRestart
    */
   this.updateRestart = function() {
@@ -69,7 +65,7 @@ var updaterService = function($log, $rootScope) {
   /**
    * Check if there is an update available
    * @return {bool} True if there is an update available, false otherwise.
-   * @memberof updaterModule.updaterService
+   * @memberof HCCGo.updaterService
    * @function hasUpdate
    */
   this.hasUpdate = function() {
@@ -79,7 +75,7 @@ var updaterService = function($log, $rootScope) {
   /**
    * Get the details for the update
    * @return {UpdateDeatils} Deatils of the update
-   * @memberof updaterModule.updaterService
+   * @memberof HCCGo.updaterService
    * @function getUpdateDetails
    */
   this.getUpdateDetails = function() {
@@ -91,7 +87,7 @@ updaterModule.service('updaterService', [ '$log', '$rootScope', updaterService])
 
 
 /**
- * @memberof updaterModule
+ * @memberof HCCGo
  * @ngdoc service
  * @class updaterButtonCtrl
  * @param $scope {service} Local controller scope
@@ -103,7 +99,7 @@ var updaterButtonCtrl = function($scope, updaterService, $location) {
   /**
    * Function called when update is detected
    * @private 
-   * @memberof updaterModule.updaterButtonCtrl
+   * @memberof HCCGo.updaterButtonCtrl
    */
    var setUpdate = function(updateDetails) {
       $scope.update = updateDetails
@@ -124,7 +120,7 @@ var updaterButtonCtrl = function($scope, updaterService, $location) {
    /**
     * Restart and update when the button is pressed
     * @function restartUpdate
-    * @memberof updaterModule.updaterButtonCtrl
+    * @memberof HCCGo.updaterButtonCtrl
     */
    $scope.restartUpdate = function() {
       updaterService.updateRestart();
@@ -133,7 +129,7 @@ var updaterButtonCtrl = function($scope, updaterService, $location) {
    /**
     * Change the view to the update dialog
     * @function updateDialog
-    * @memberof updaterModule.updaterButtonCtrl
+    * @memberof HCCGo.updaterButtonCtrl
     */ 
    $scope.updateDialog = function() {
       
