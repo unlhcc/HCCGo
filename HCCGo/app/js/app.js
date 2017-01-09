@@ -9,7 +9,7 @@ var app = angular.module('HccGoApp', ['HccGoApp.WelcomeCtrl',
                               'HccGoApp.jobHistoryCtrl',
                               'filePathService',
                               'dbService',
-                              'updaterService',
+                              'updaterModule',
                               'HccGoApp.updatePageCtrl',
                               'HccGoApp.NavCtrl']).config([
   '$routeProvider', function($routeProvider) {
