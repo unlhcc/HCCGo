@@ -88,7 +88,7 @@ updaterModule.service('updaterService', [ '$log', '$rootScope', updaterService])
 
 /**
  * @memberof HCCGo
- * @ngdoc service
+ * @ngdoc controller
  * @class updaterButtonCtrl
  * @param $scope {service} Local controller scope
  * @param updaterService {service} Updater Service
