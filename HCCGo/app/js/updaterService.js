@@ -87,6 +87,16 @@ updaterModule.service('updaterService', [ '$log', '$rootScope', updaterService])
 
 
 /**
+ * Controller for an update Button.
+ * @example 
+ * <li ng-controller="updateButtonCtrl" ng-show="updateAvailable">
+ *   <button type="button" 
+ *   ng-click="updateDialog()"
+ *   class="btn btn-info navbar-btn"
+ *   ng-show="updateAvailable">
+ *   Update Available
+ *   </button>
+ * </li>
  * @memberof HCCGo
  * @ngdoc controller
  * @class updaterButtonCtrl
