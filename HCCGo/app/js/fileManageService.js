@@ -7,33 +7,39 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
    const path = require('path');
    const fs = require('fs');
    
-   var service = {};
-   var _uploadStatus = false;
-   var _boolUp = true;
-   var _boolDown = false;
-   var _processStatus = true;
-   var _localFiles = [];
-   var _remoteFiles = [];
-   var _homeWD = new String("");
-   var _workWD = new String("");
-   var _localWD = new String("");
-   var _remoteWD = new String("");
-   var _remoteFocus = new String("");
-   var _localFocus = new String("");
-   var _processFinished = false;
-   var _userDownAuth = false;
-   var _userUpAuth = false;
-   var _accuSize = 0;
-   var _diskAvail = 0;
-   var _diskQuota = 0;
-   var _filesTotal = 0;
-   var _counter = 0;
-   var _totalProgress = 0;
+   const _sourceDir = {name: ".."};
+
+   let service = {};
+   let _uploadStatus = false;
+   let _boolUp = true;
+   let _boolDown = false;
+   let _processStatus = true;
+   let _localFiles = [];
+   let _remoteFiles = [];
+   let _homeWD = new String("");
+   let _workWD = new String("");
+   let _localWD = new String("");
+   let _remoteWD = new String("");
+   let _remoteFocus = new String("");
+   let _localFocus = new String("");
+   let _processFinished = false;
+   let _userDownAuth = false;
+   let _userUpAuth = false;
+   let _accuSize = 0;
+   let _diskAvail = 0;
+   let _diskQuota = 0;
+   let _filesTotal = 0;
+   let _counter = 0;
+   let _totalProgress = 0;
 
    /**
    * To handle state information for the file management
    *
    */
+
+   service.getSourceDir = function(){
+       return _sourceDir;
+   }
 
    service.getTotalProgress = function(){
        return _totalProgress;
@@ -213,6 +219,152 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
        _localFocus = x;
        return _localFocus;
    }
+
+   let remoteRead = function(data){
+       let _tempFiles = [];
+
+       // REsets file directory listing
+       connectionService.readDir(data).then(function (serverResponse) {
+           // loops through each value returned by the server
+           async.each(serverResponse, function(file, callback){
+              $log.debug("Server Response: " + file.filename);
+              if (file.longname.charAt(0) == 'd') {
+                  _tempFiles.unshift({Class: "directory", name: file.filename});
+              } else {
+                  _tempFiles.push({Class: "ext_txt", name: file.filename});
+              }
+
+              // Indicates iteree is over
+              callback(null);
+           }, function(err) {
+              if(err) {
+                  $log.debug(err);
+              } else {
+                  _remoteFiles = _tempFiles;
+              }
+           });
+       });
+   }
+
+   let localRead = function(data) {
+      // Clears content of localFiles array
+      _tempFiles = [];
+
+      // Resets file directory listing
+      fs.readdir(data, function(err, files) {
+         async.each(files, function (file, callback) {
+             fs.stat(String(_localWD + "/" + file), function (err, stats) {
+                 if (err) {
+                     callback(err);
+                 } else if (stats.isDirectory()) {
+                     _tempFiles.unshift({Class: "directory", name: file});
+                 } else if (stats.isFile()) {
+                     _tempFiles.push({Class: "ext_txt", name: file});
+                 }
+             });
+
+             // Indicates code completion for this iteree
+             callback(null);
+         }, function(err) {
+             if(err) {
+                 $log.debug(err);
+             } else {
+                 _localFiles = _tempFiles;
+             }
+         }); 
+      });
+   }
+
+   service.wdSwitcher = function(dir){
+       let deferred = $q.defer();
+       let boolRet = false;
+       boolRet = dir.indexOf(_workWD) > -1;
+       
+       _userDownAuth = false;
+       _userUpAuth = false;
+
+       if(boolRet) {
+           _remoteWD = _homeWD;
+       } else {
+           _remoteWD = _workWD;
+       }
+
+       remoteRead(_remoteWD);
+
+       deferred.resolve(boolRet);
+
+       return deferred.promise;
+   }
+
+   service.cdSSH = function(data) {
+       let deferred = $q.defer();
+
+       if (data.name != "..") {
+           _remoteWD = _remoteWD + "/" + data.name;
+       } else {
+           _remoteWD = path.dirname(_remoteWD);
+       }
+
+       remoteRead(_remoteWD);
+
+       deferred.resolve(null);
+
+       return deferred.promise;
+   }
+
+   service.cdLocal = function(data) {
+       let deferred = $q.defer();
+
+       if (data.name != "..") {
+           _localWD = _localWD + "/" + data.name;
+       } else {
+           _localWD = path.dirname(_localWD);
+       }
+
+       localRead(_localWD);
+
+       deferred.resolve(null);
+
+       return deferred.promise;
+   }
+
+   // Value initialization
+   //
+   // Gets directory strings from remote server
+   if (_homeWD == "") {
+       connectionService.getHomeWD().then(function(data) {
+           _remoteWD = data;
+           _homeWD = data;
+           remoteRead(_remoteWD);    // Sets remote display
+           $log.debug("Home directory: " + _homeWD);
+       });
+   }
+   if (_workWD == "") {
+       connectionService.getWorkWD().then(function(data) {
+           _workWD = data;
+           $log.debug("Work directory: " + _workWD);
+       });
+   }
+
+   // Gets directory strings from local system
+   if (process.platform === 'win32') {
+       $log.debug("Process env: ");
+       $log.debug(process.env);
+       if (_localWD == "") {
+           _localWD = process.env.HOMEDRIVE + process.env.HOMEPATH;
+       }
+   } else {
+       // Runs for Mac and Linux systems
+       // Establishes Displayed files
+       $log.debug("process working directory: " + process.env.HOME);
+       if (_localWD == "") {
+           _localWD = process.env.HOME;
+       }
+   }
+
+
+   localRead(_localWD);    // Sets local display
+
   
    return service;
   
