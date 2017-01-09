@@ -1,5 +1,6 @@
-<div class="navbar navbar-hcc" ng-controller="NavCtrl">
+<div ng-controller="NavCtrl">
 
+<div class="navbar navbar-hcc">
   <div class="navbar-header">
     <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
       <span class="icon-bar"></span>
@@ -31,8 +32,17 @@
      </li>
     </ul>
 
+    
 
     <ul class="nav navbar-nav navbar-right">
+      <li ng-controller="updateButtonCtrl">
+        <button type="button" 
+        ng-click="updateDialog()"
+        class="btn btn-info navbar-btn"
+        ng-show="updateAvailable">
+        Update Available
+        </button>
+      </li>
       <li class="dropdown">
         <a href="javascript:void(0)" data-target="#" 
 		   class="dropdown-toggle" 
@@ -44,4 +54,4 @@
     </ul>
   </div>
 </div>
-
+</div> <!-- End NavCtrl -->

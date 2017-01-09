@@ -10,6 +10,8 @@ var app = angular.module('HccGoApp', ['HccGoApp.WelcomeCtrl',
                               'filePathService',
                               'fileManageService',
                               'dbService',
+                              'updaterService',
+                              'HccGoApp.updatePageCtrl',
                               'HccGoApp.NavCtrl']).config([
   '$routeProvider', function($routeProvider) {
     return $routeProvider.when('/', {
@@ -27,6 +29,9 @@ var app = angular.module('HccGoApp', ['HccGoApp.WelcomeCtrl',
     }).when('/cluster/:clusterId/jobHistory', {
       templateUrl: 'html/jobHistory.html',
       controller: 'jobHistoryCtrl'
+    }).when('/update', {
+      templateUrl: 'html/update.html',
+      controller: 'updatePageCtrl'
     }).otherwise({
       redirectTo: '/'
     });

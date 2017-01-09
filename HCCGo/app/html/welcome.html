@@ -1,10 +1,26 @@
 <div class="navbar navbar-hcc navbar-welcome">
-  <div class="navbar-header">
-    <div class="navbar-brand">
-      <div class="element-title">HCC Go</div>
-      <div class="element-subtitle"><b>Beta</b></div>
+  <div class="col-md-4 col-md-offset-4">
+    <div class="navbar-header">
+      <div class="navbar-brand">
+        <center>
+          <div class="element-title">HCC Go</div>
+          <div class="element-subtitle"><b>Beta</b></div>
+        </center>
+      </div>
     </div>
   </div>
+
+  
+  <ul class="nav navbar-nav navbar-right">
+    <li ng-controller="updateButtonCtrl" ng-show="updateAvailable">
+      <button type="button" 
+      ng-click="updateDialog()"
+      class="btn btn-info navbar-btn"
+      ng-show="updateAvailable">
+      Update Available
+      </button>
+    </li>
+  </ul>
 </div>
 
 <div class="modal fade" id="betaModal">
