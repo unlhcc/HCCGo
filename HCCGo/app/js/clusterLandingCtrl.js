@@ -323,7 +323,7 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
         //Do refresh
         getClusterStats($scope.params.clusterId);
         //If async in then in callback do...
-        refreshingPromise = $timeout(refreshEvery,15000)
+        refreshingPromise = $timeout(refreshEvery,30000)
       }());
     };
     $scope.$on('$destroy',function(){
