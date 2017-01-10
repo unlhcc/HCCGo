@@ -1,7 +1,7 @@
 
 clusterLandingModule = angular.module('HccGoApp.clusterLandingCtrl', ['ngRoute' ]);
 
-clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeout', 'connectionService', '$routeParams', '$location', '$q', 'preferencesManager', 'filePathService', 'notifierService', 'dbService', function($scope, $log, $timeout, connectionService, $routeParams, $location, $q, preferencesManager, filePathService, notifierService, dbService) {
+clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeout', 'connectionService', '$routeParams', '$location', '$q', 'preferencesManager', 'filePathService', 'notifierService', 'dbService', 'dataUsageService', function($scope, $log, $timeout, connectionService, $routeParams, $location, $q, preferencesManager, filePathService, notifierService, dbService, dataUsageService) {
 
   $scope.params = $routeParams;
   $scope.jobs = [];
@@ -54,7 +54,7 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
     bindto: '#homeUsageGauge',
     data: {
       columns: [
-        ['Loading', 0]
+        ['Used', 0]
       ],
       type: 'gauge'
     },
@@ -84,7 +84,7 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
     bindto: '#workUsageGauge',
     data: {
       columns: [
-        ['Loading', 0]
+        ['Used', 0]
       ],
       type: 'gauge'
     },
@@ -272,70 +272,27 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
 
     // Make sure the jobs data is always shown
 
-
-    clusterInterface.getStorageInfo().then(function(data) {
-
-
-      var homeUsageGauge = c3.generate({
-        bindto: '#homeUsageGauge',
-        data: {
+    dataUsageService.getDataUsage(clusterInterface).then(function(data) {
+      
+      homeUsageGauge.load({
           columns: [
             ['Used', data[0].blocksUsed]
-          ],
-          type: 'gauge'
-        },
-        gauge: {
-          units: 'Gigabytes',
-          label: {
-            format: function(value, ratio) {
-                return value.toFixed(2);
-            }
-          },
-          max: data[0].blocksQuota,
-
-        },
-        color: {
-          pattern: [ '#60B044', '#F6C600', '#F97600', '#FF0000' ],
-          threshold: {
-            values: [30, 60, 90, 100]
-          }
-        },
-        size: {
-          height: 180
-        }
-
+          ]
       });
 
-      var workUsageGauge = c3.generate({
-        bindto: '#workUsageGauge',
-        data: {
+      // POSSIBLE FUTURE DEPRECATION: Messing with interals instead of using load function
+      homeUsageGauge.internal.config.gauge_units = 'Gigabytes';
+      homeUsageGauge.internal.config.gauge_max = data[0].blocksQuota;
+
+      workUsageGauge.load({
           columns: [
             ['Used', data[1].blocksUsed]
-          ],
-          type: 'gauge'
-        },
-        gauge: {
-          units: 'Gigabytes',
-          label: {
-            format: function(value, ratio) {
-                return value.toFixed(2);
-            }
-          },
-          max: data[1].blocksLimit,
-
-        },
-        color: {
-          pattern: [ '#60B044', '#F6C600', '#F97600', '#FF0000' ],
-          threshold: {
-            values: [30, 60, 90, 100]
-          }
-        },
-        size: {
-          height: 180
-        }
-
+          ]
       });
 
+      // POSSIBLE FUTURE DEPRECATION: Messing with interals instead of using load function
+      workUsageGauge.internal.config.gauge_units = 'Gigabytes';
+      workUsageGauge.internal.config.gauge_max = data[1].blocksLimit;
     });
 
 
