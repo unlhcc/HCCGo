@@ -271,7 +271,7 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
 
 
     // Make sure the jobs data is always shown
-
+    //TODO Seperate into different function
     dataUsageService.getDataUsage(clusterInterface).then(function(data) {
       
       homeUsageGauge.load({
@@ -323,7 +323,7 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
         //Do refresh
         getClusterStats($scope.params.clusterId);
         //If async in then in callback do...
-        refreshingPromise = $timeout(refreshEvery,30000)
+        refreshingPromise = $timeout(refreshEvery,300000)
       }());
     };
     $scope.$on('$destroy',function(){
