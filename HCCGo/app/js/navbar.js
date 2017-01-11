@@ -1,7 +1,7 @@
 navBar = angular.module('HccGoApp.NavCtrl', ['ngRoute' ]);
 
-navBar.controller('NavCtrl', ['$route', '$scope', '$routeParams', '$location', '$log', 'preferencesManager', 'connectionService',
-   function($route,$scope,$routeParams,$location,$log,preferencesManager,connectionService) {
+navBar.controller('NavCtrl', ['$route', '$scope', '$routeParams', '$location', '$log', 'preferencesManager', 'connectionService', 'updaterService', '$rootScope', 
+   function($route,$scope,$routeParams,$location,$log,preferencesManager,connectionService, updaterService, $rootScope) {
    // This controller intended purely to manage navigation bar
    // No code beyond navigational controls should be used here
    $scope.params = $routeParams;
@@ -29,6 +29,8 @@ navBar.controller('NavCtrl', ['$route', '$scope', '$routeParams', '$location', '
    $scope.jobHistory = function() {
       $location.path("cluster/" + $scope.params.clusterId + "/jobHistory");
    }
+   
+   
 
    /* For Reference
    $scope.onViewLoad = function viewLoad() {
