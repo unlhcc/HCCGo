@@ -28,53 +28,58 @@ app.on('ready', function() {
     });
 
     mainWindow.loadURL('file://' + __dirname + '/app/index.html');
-	
+
     globalShortcut.register('Alt+F12', () => {
         mainWindow.webContents.openDevTools();
     });
-	
+
     mainWindow.once('ready-to-show', () => {
         mainWindow.show();
-        
+
         // Check for updates!
         var os = require('os');
 
         var platform = os.platform() + '_' + os.arch();
         var version = app.getVersion();
 
-        autoUpdater.setFeedURL('https://hccgo.herokuapp.com/update/'+platform+'/'+version);
-        
+        try {
+            autoUpdater.setFeedURL('https://hccgo.herokuapp.com/update/'+platform+'/'+version);
+        } catch(e) {
+            console.log("Application is not signed, auto-updates will not work");
+            console.log(e);
+        }
+
         autoUpdater.on('error', function(error, msg) {
             console.log("Erorr is " + error);
             var arg = {err: error, msg: msg};
             mainWindow.webContents.send('updater-error', arg);
         });
-        
+
         autoUpdater.on('checking-for-update', function() {
             mainWindow.webContents.send('checking-for-update', null);
         });
 
-        
+
         autoUpdater.on('update-available', function() {
             mainWindow.webContents.send('update-available');
         });
-        
+
         autoUpdater.on('update-not-available', function() {
             mainWindow.webContents.send('update-not-available');
         });
-        
+
         autoUpdater.on('update-downloaded', function(event, releaseNotes, releaseName, releaseDate, updateURL) {
             mainWindow.webContents.send('update-downloaded', {releaseNotes: releaseNotes, releaseName: releaseName, releaseDate: releaseDate, updateURL: updateURL});
         });
-        
+
         ipcMain.on('updateRestart', function(event, arg) {
             autoUpdater.quitAndInstall();
         })
-        
+
         autoUpdater.checkForUpdates()
-        
+
     });
-    
+
 
     var template = [{
         label: "Edit",
@@ -147,7 +152,7 @@ app.on('ready', function() {
         {
           role: 'about'
         },
-        { 
+        {
           label: "Check for Updates", click: function() {
           autoUpdater.checkForUpdates();
         }},
@@ -223,10 +228,10 @@ app.on('ready', function() {
 
 
     Menu.setApplicationMenu(Menu.buildFromTemplate(template));
-    
-    // Auto-update
-    
-    
 
-    
+    // Auto-update
+
+
+
+
 });
