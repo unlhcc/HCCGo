@@ -64,11 +64,13 @@ welcomeModule.controller('welcomeCtrl', ['$scope', '$log', '$timeout', 'connecti
       $scope.$apply(function() {
         
         if (err) {
+          analytics.event('login', 'fail');
           logger.error("Got error from connection");
           $('#loginSubmit').prop('disabled', false);
           $('#loginForm').fadeTo('fast', 1.0);
         } else {
           
+          analytics.event('login', 'success');
           $location.path("/cluster/" + $scope.selectedCluster.label);
         $log.debug("Cluster label: " + $scope.selectedCluster.label);
           
