@@ -11,7 +11,6 @@ clusterUploadModule.controller('clusterFileSystemCtrl', ['$scope', '$log', '$tim
    const async = require("async");
 
    $scope.params = $routeParams
-   var clusterInterface = null;
    $scope.sourceDir = fileManageService.getSourceDir();
 
    $scope.wdSwitcher = function(dir) {
@@ -57,31 +56,14 @@ clusterUploadModule.controller('clusterFileSystemCtrl', ['$scope', '$log', '$tim
   
    $scope.verifyUpload = function () {
       angular.element('#btnUpload').attr('disabled', '');
-      $scope.userUpAuth = fileManageService.setUserUpAuth(true);
+	  $scope.userUpAuth = fileManageService.setUserUpAuth(true);
       $scope.processStatus = fileManageService.setProcessStatus(true);
-
-      connectionService.localSize(String($scope.localWD + "/" + localFocus)).then( function(ldata) {
-          if ($scope.remoteWD.indexOf(fileManageService.getWorkWD()) > -1) {
-              connectionService.runCommand("lfs quota -g `id -g` /work").then(function(data) {
-                  $scope.processStatus = fileManageService.setProcessStatus(false);
-                  $scope.accuSize = fileManageService.setAccuSize(ldata);
-
-                  reported_output = data.split("\n")[2];
-                  split_output = $.trim(reported_output).split(/[ ]+/);
-                  $scope.diskAvail = fileManageService.setDiskAvail(Math.floor(((split_output[3] - split_output[1]) / split_output[3])*100));
-                  $scope.diskQuota = fileManageService.setDiskQuota(Math.floor(((ldata / Math.pow(1024, 1)) / split_output[3])*100));
-              });
-          } else {
-              connectionService.runCommand("quota -w -f /home").then(function(data) {
-                  $scope.processStatus = fileManageService.setProcessStatus(false);
-                  $scope.accuSize = fileManageService.setAccuSize(ldata);
-
-                  reported_output = data.split("\n")[2];              
-                  split_output = reported_output.split(/[ ]+/);
-                  $scope.diskAvail = fileManageService.setDiskAvail(Math.floor(((split_output[2] - split_output[1]) / split_output[2])*100));
-                  $scope.diskQuota = fileManageService.setDiskQuota(Math.floor(((ldata / Math.pow(1024, 1)) / split_output[2])*100));
-              });
-          }
+      fileManageService.verifyUpload().then(function(val) {
+		  $scope.userUpAuth = fileManageService.getUserUpAuth();
+		  $scope.processStatus = fileManageService.getProcessStatus();
+		  $scope.accuSize = fileManageService.getAccuSize();
+		  $scope.diskAvail = fileManageService.getDiskAvail();
+		  $scope.diskQuota = fileManageService.getDiskQuota();
       });
    }
 
@@ -90,6 +72,21 @@ clusterUploadModule.controller('clusterFileSystemCtrl', ['$scope', '$log', '$tim
       notifierService.warning('Action cancelled by user.');
    }
 
+   let progressCal = function() {
+     async.until(function(){
+       return fileManageService.getFinalizer();
+	 },function(done){
+	   $scope.$apply(function(scope) {
+	     scope.filesTotal = fileManageService.getFilesTotal();
+	     scope.counter = fileManageService.getCounter();
+	     scope.totalProgress = fileManageService.getTotalProgress();
+	   });
+	   done(); // Loop finished
+	 },function(err){
+	 
+	 });
+   }
+   
    // Upload entire directory
    $scope.uploadCall = function() {
       // Disable upload button to prevent double clicking
@@ -98,8 +95,6 @@ clusterUploadModule.controller('clusterFileSystemCtrl', ['$scope', '$log', '$tim
 
       // Runs file upload
       connectionService.uploadFile(String($scope.localWD + "/" + localFocus), String($scope.remoteWD + "/"), function(total_transferred,counter,filesTotal,currentTotal,sizeTotal){
-         $scope.processStatus = fileManageService.setProcessStatus(false);
-         
          $scope.filesTotal = fileManageService.setFilesTotal(filesTotal);
          $scope.counter = fileManageService.setCounter(counter);
          
@@ -115,7 +110,14 @@ clusterUploadModule.controller('clusterFileSystemCtrl', ['$scope', '$log', '$tim
          
        }, function(err) {
          // Error occured in ConnectionService
+		 notifierService.error(err, 'Error in ConnectionService');
        });
+	   
+	   fileManageService.uploadCall(function(){
+	       $scope.processStatus = fileManageService.getProcessStatus();
+	   }).then(function(val) {
+	       $scope.processStatus = fileManageService.getProcessStatus();
+	   });
    }
 
    $scope.verifyDownload = function () {
@@ -171,7 +173,8 @@ clusterUploadModule.controller('clusterFileSystemCtrl', ['$scope', '$log', '$tim
          localRead($scope.localWD);
          
        }, function(err) {
-         // Error occured in ConnectionService
+         // Error occurred in ConnectionService
+		 notifierService.error(err, 'Error in ConnectionService');
        });
    } 
    
@@ -215,23 +218,8 @@ clusterUploadModule.controller('clusterFileSystemCtrl', ['$scope', '$log', '$tim
       $scope.userDownAuth = fileManageService.setUserDownAuth(false);
    }
 
-   preferencesManager.getClusters().then(function(clusters) {
-   // Get the cluster type
-   var clusterType = $.grep(clusters, function(e) {return e.label == $scope.params.clusterId})[0].type;
-
-   switch (clusterType) {
-     case "slurm":
-      clusterInterface = new SlurmClusterInterface(connectionService, $q);
-      break;
-     case "condor":
-      clusterInterface = new CondorClusterInterface(connectionService, $q);
-      break;
-   }
-
-   });
-   
    // jQuery controls
-  /* 
+   /* 
    angular.element('input[type=radio][name=radUp]').change(function() {
        if(this.value == 'file') {
            angular.element("#fileToUpload").removeAttr('directory');
@@ -245,7 +233,7 @@ clusterUploadModule.controller('clusterFileSystemCtrl', ['$scope', '$log', '$tim
            $log.debug("radio is folder");
        }
    });
-*/
+   */
    // Initialize variables
    let remoteFocus = fileManageService.getRemoteFocus();    // Stores id of highlight object of remote origin
    let localFocus = fileManageService.getLocalFocus();     // Stores id of highlight object of local origin

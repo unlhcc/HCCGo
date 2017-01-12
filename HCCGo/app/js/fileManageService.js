@@ -31,12 +31,18 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
    let _filesTotal = 0;
    let _counter = 0;
    let _totalProgress = 0;
+   let _finalizer = true;
 
    /**
    * To handle state information for the file management
    *
    */
 
+   // Return if upload/download process is finished
+   service.getFinalizer = function(){
+       return _finalizer;
+   }
+   
    service.getSourceDir = function(){
        return _sourceDir;
    }
@@ -327,6 +333,77 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
 
        return deferred.promise;
    }
+   
+   service.verifyUpload = function () {
+      let deferred = $q.defer();
+      connectionService.localSize(String(_localWD + "/" + _localFocus)).then( function(ldata) {
+          if (_remoteWD.indexOf(_workWD()) > -1) {
+              connectionService.runCommand("lfs quota -g `id -g` /work").then(function(data) {
+                  _processStatus = false;
+                  _accuSize = ldata;
+
+                  let reported_output = data.split("\n")[2];
+                  let split_output = $.trim(reported_output).split(/[ ]+/);
+                  _diskAvail = Math.floor(((split_output[3] - split_output[1]) / split_output[3])*100);
+                  _diskQuota = Math.floor(((ldata / Math.pow(1024, 1)) / split_output[3])*100);
+				  
+				  deferred.resolve(null);
+              });
+          } else {
+              connectionService.runCommand("quota -w -f /home").then(function(data) {
+                  _processStatus = false;
+                  _accuSize = ldata;
+
+                  let reported_output = data.split("\n")[2];              
+                  let split_output = reported_output.split(/[ ]+/);
+                  _diskAvail = Math.floor(((split_output[2] - split_output[1]) / split_output[2])*100);
+                  _diskQuota = Math.floor(((ldata / Math.pow(1024, 1)) / split_output[2])*100);
+				  
+				  deferred.resolve(null);
+              });
+          }
+      });
+	  
+	  return deferred.promise;
+   }
+   
+   // Upload entire directory
+   service.uploadCall = function(begun) {
+      let deferred = $q.defer();
+      let boolStarter = true;
+	  
+	  _finalizer = false;
+      // Runs file upload
+      connectionService.uploadFile(String(_localWD + "/" + _localFocus), String(_remoteWD + "/"), 
+	   function(total_transferred,counter,filesTotal,currentTotal,sizeTotal){
+	     // Only want this if to execute once
+		 if(boolStarter) {
+             _processStatus = false;
+			 _uploadStatus = true;
+			 _filesTotal = filesTotal;
+			 boolStarter = false;
+		 }         
+
+         _counter = counter;       
+
+         _totalProgress = Math.floor(((total_transferred + currentTotal)/sizeTotal)*100);
+
+       }, function() {
+         // update view
+         notifierService.success('Your file transfer was succesfully!', 'Files Transfer!');
+		 _finalizer = true;
+         _processFinished = true;
+         remoteRead(_remoteWD);
+         deferred.resolve(null);
+       }, function(err) {
+         // Error occurred in ConnectionService
+		 notifierService.error(err, 'Error in ConnectionService');
+		 _finalizer = true;
+		 deferred.reject(err);
+       });
+	   
+	   return deferred.promise;
+   }
 
    // Value initialization
    //
@@ -362,9 +439,7 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
        }
    }
 
-
    localRead(_localWD);    // Sets local display
-
   
    return service;
   
