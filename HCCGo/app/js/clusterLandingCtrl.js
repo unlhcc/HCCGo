@@ -59,7 +59,7 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
       type: 'gauge'
     },
     gauge: {
-      units: 'Loading',
+      units: 'Gigabytes',
       label: {
         format: function(value, ratio) {
             return value.toFixed(2);
@@ -89,7 +89,7 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
       type: 'gauge'
     },
     gauge: {
-      units: 'Loading',
+      units: 'Gigabytes',
       label: {
         format: function(value, ratio) {
             return value.toFixed(2);
@@ -116,6 +116,9 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
 
   }
 
+  $scope.updateGraphs = function() {
+    updateGraphs();
+  }
   $scope.removeCompletedJob = function(index) {
     // deletes the document from db and removes it from list
     var job = $scope.jobs[index];
@@ -294,7 +297,6 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
         });
 
         // POSSIBLE FUTURE DEPRECATION: Messing with interals instead of using load function
-        homeUsageGauge.internal.config.gauge_units = 'Gigabytes';
         homeUsageGauge.internal.config.gauge_max = data[0].blocksQuota;
 
         workUsageGauge.load({
@@ -304,7 +306,6 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
         });
 
         // POSSIBLE FUTURE DEPRECATION: Messing with interals instead of using load function
-        workUsageGauge.internal.config.gauge_units = 'Gigabytes';
         workUsageGauge.internal.config.gauge_max = data[1].blocksLimit;
     });    
   }
