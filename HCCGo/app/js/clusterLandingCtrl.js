@@ -272,7 +272,7 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
 
     // Make sure the jobs data is always shown
     //TODO Seperate into different function
-    updateGraphs();
+
 
 
   }
@@ -324,26 +324,44 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
     getClusterStats($scope.params.clusterId);
 
     // Update the cluster every 15 seconds
-    var refreshingPromise;
-    var isRefreshing = false;
-    $scope.startRefreshing = function(){
-      if(isRefreshing) return;
-      isRefreshing = true;
+    var refreshingClusterPromise;
+    var isRefreshingCluster = false;
+    $scope.startRefreshingCluster = function(){
+      if(isRefreshingCluster) return;
+      isRefreshingCluster = true;
       (function refreshEvery(){
         //Do refresh
         getClusterStats($scope.params.clusterId);
         //If async in then in callback do...
-        refreshingPromise = $timeout(refreshEvery,300000)
+        refreshingClusterPromise = $timeout(refreshEvery,15000);
       }());
     };
     $scope.$on('$destroy',function(){
-      if(refreshingPromise) {
-        $timeout.cancel(refreshingPromise);
+      if(refreshingClusterPromise) {
+        $timeout.cancel(refreshingClusterPromise);
       }
     });
 
-    $scope.startRefreshing();
-  })
+    // Update the graphs every 5 minutes
+    var refreshingGraphsPromise;
+    var isRefreshingGraphs = false;
+    $scope.startRefreshingGraphs = function(){
+      if(isRefreshingGraphs) return;
+      isRefreshingGraphs = true;
+      (function refreshEvery() {
+        updateGraphs();
+        refreshingGraphsPromise = $timeout(refreshEvery, 300000);
+      }());
+    };
+    $scope.$on('$destroy', function() {
+      if (refreshingGraphsPromise) {
+        $timeout.cancel(refreshingGraphsPromise);
+      }
+    });
+
+    $scope.startRefreshingCluster();
+    $scope.startRefreshingGraphs();
+  });
 
 
 }]);
