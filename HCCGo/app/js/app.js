@@ -7,6 +7,7 @@ var app = angular.module('HccGoApp', ['HccGoApp.WelcomeCtrl',
                               'HccGoApp.clusterFileSystemCtrl',
                               'HccGoApp.jobSubmissionCtrl',
                               'HccGoApp.jobHistoryCtrl',
+                              'HccGoApp.jobViewCtrl',
                               'filePathService',
                               'dbService',
                               'updaterModule',
@@ -28,6 +29,9 @@ var app = angular.module('HccGoApp', ['HccGoApp.WelcomeCtrl',
     }).when('/cluster/:clusterId/jobHistory', {
       templateUrl: 'html/jobHistory.html',
       controller: 'jobHistoryCtrl'
+    }).when('/cluster/:clusterId/jobview/:jobId', {
+      templateUrl: 'html/jobView.html',
+      controller: 'jobViewCtrl'
     }).when('/update', {
       templateUrl: 'html/update.html',
       controller: 'updatePageCtrl'

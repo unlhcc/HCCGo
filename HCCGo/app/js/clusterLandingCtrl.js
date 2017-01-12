@@ -125,6 +125,11 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
     });
   }
 
+  $scope.viewOutErr = function(index) {
+    // view the selected job's stander out and err
+    $location.path("cluster/" + $routeParams.clusterId + "/jobview/" + $scope.jobs[index]._id);  
+  }
+
   function getClusterStats(clusterId) {
 
     // Begin spinning the refresh image
