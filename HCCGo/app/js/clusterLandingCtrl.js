@@ -130,6 +130,7 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
     // Begin spinning the refresh image
     $(".mdi-action-autorenew").addClass("spinning-image");
 
+
     // Array to concat together running and completed jobs
     //var jobList = [];
     async = require("async");
@@ -261,7 +262,6 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
             $scope.jobs = recent_completed[0].concat(completed_jobs, cluster_jobs);
           }
 
-
         });
 
       }
@@ -272,32 +272,42 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
 
     // Make sure the jobs data is always shown
     //TODO Seperate into different function
-    dataUsageService.getDataUsage(clusterInterface).then(function(data) {
-      
-      homeUsageGauge.load({
-          columns: [
-            ['Used', data[0].blocksUsed]
-          ]
-      });
-
-      // POSSIBLE FUTURE DEPRECATION: Messing with interals instead of using load function
-      homeUsageGauge.internal.config.gauge_units = 'Gigabytes';
-      homeUsageGauge.internal.config.gauge_max = data[0].blocksQuota;
-
-      workUsageGauge.load({
-          columns: [
-            ['Used', data[1].blocksUsed]
-          ]
-      });
-
-      // POSSIBLE FUTURE DEPRECATION: Messing with interals instead of using load function
-      workUsageGauge.internal.config.gauge_units = 'Gigabytes';
-      workUsageGauge.internal.config.gauge_max = data[1].blocksLimit;
-    });
+    updateGraphs();
 
 
   }
 
+  function updateGraphs() {
+
+      $("#homeUsageGauge").addClass("loading");
+      $("#workUsageGauge").addClass("loading");
+
+      dataUsageService.getDataUsage(clusterInterface).then(function(data) {
+
+        $("#homeUsageGauge").removeClass("loading");
+        $("#workUsageGauge").removeClass("loading");
+
+        homeUsageGauge.load({
+            columns: [
+              ['Used', data[0].blocksUsed]
+            ]
+        });
+
+        // POSSIBLE FUTURE DEPRECATION: Messing with interals instead of using load function
+        homeUsageGauge.internal.config.gauge_units = 'Gigabytes';
+        homeUsageGauge.internal.config.gauge_max = data[0].blocksQuota;
+
+        workUsageGauge.load({
+            columns: [
+              ['Used', data[1].blocksUsed]
+            ]
+        });
+
+        // POSSIBLE FUTURE DEPRECATION: Messing with interals instead of using load function
+        workUsageGauge.internal.config.gauge_units = 'Gigabytes';
+        workUsageGauge.internal.config.gauge_max = data[1].blocksLimit;
+    });    
+  }
   preferencesManager.getClusters().then(function(clusters) {
     // Get the cluster type
     var clusterType = $.grep(clusters, function(e) {return e.label == $scope.params.clusterId})[0].type;
