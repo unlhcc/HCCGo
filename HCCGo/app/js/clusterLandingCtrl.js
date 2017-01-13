@@ -1,7 +1,7 @@
 
 clusterLandingModule = angular.module('HccGoApp.clusterLandingCtrl', ['ngRoute' ]);
 
-clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeout', 'connectionService', '$routeParams', '$location', '$q', 'preferencesManager', 'filePathService', 'notifierService', 'dbService', function($scope, $log, $timeout, connectionService, $routeParams, $location, $q, preferencesManager, filePathService, notifierService, dbService) {
+clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeout', 'connectionService', '$routeParams', '$location', '$q', 'preferencesManager', 'filePathService', 'notifierService', 'dbService', 'dataUsageService', function($scope, $log, $timeout, connectionService, $routeParams, $location, $q, preferencesManager, filePathService, notifierService, dbService, dataUsageService) {
 
   $scope.params = $routeParams;
   $scope.jobs = [];
@@ -54,12 +54,12 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
     bindto: '#homeUsageGauge',
     data: {
       columns: [
-        ['Loading', 0]
+        ['Used', 0]
       ],
       type: 'gauge'
     },
     gauge: {
-      units: 'Loading',
+      units: 'Gigabytes',
       label: {
         format: function(value, ratio) {
             return value.toFixed(2);
@@ -84,12 +84,12 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
     bindto: '#workUsageGauge',
     data: {
       columns: [
-        ['Loading', 0]
+        ['Used', 0]
       ],
       type: 'gauge'
     },
     gauge: {
-      units: 'Loading',
+      units: 'Gigabytes',
       label: {
         format: function(value, ratio) {
             return value.toFixed(2);
@@ -116,6 +116,9 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
 
   }
 
+  $scope.updateGraphs = function(force) {
+    updateGraphs(force);
+  }
   $scope.removeCompletedJob = function(index) {
     // deletes the document from db and removes it from list
     var job = $scope.jobs[index];
@@ -129,6 +132,7 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
 
     // Begin spinning the refresh image
     $(".mdi-action-autorenew").addClass("spinning-image");
+
 
     // Array to concat together running and completed jobs
     //var jobList = [];
@@ -261,86 +265,42 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
             $scope.jobs = recent_completed[0].concat(completed_jobs, cluster_jobs);
           }
 
-
         });
 
       }
     );
 
-
-
-
-    // Make sure the jobs data is always shown
-
-
-    clusterInterface.getStorageInfo().then(function(data) {
-
-
-      var homeUsageGauge = c3.generate({
-        bindto: '#homeUsageGauge',
-        data: {
-          columns: [
-            ['Used', data[0].blocksUsed]
-          ],
-          type: 'gauge'
-        },
-        gauge: {
-          units: 'Gigabytes',
-          label: {
-            format: function(value, ratio) {
-                return value.toFixed(2);
-            }
-          },
-          max: data[0].blocksQuota,
-
-        },
-        color: {
-          pattern: [ '#60B044', '#F6C600', '#F97600', '#FF0000' ],
-          threshold: {
-            values: [30, 60, 90, 100]
-          }
-        },
-        size: {
-          height: 180
-        }
-
-      });
-
-      var workUsageGauge = c3.generate({
-        bindto: '#workUsageGauge',
-        data: {
-          columns: [
-            ['Used', data[1].blocksUsed]
-          ],
-          type: 'gauge'
-        },
-        gauge: {
-          units: 'Gigabytes',
-          label: {
-            format: function(value, ratio) {
-                return value.toFixed(2);
-            }
-          },
-          max: data[1].blocksLimit,
-
-        },
-        color: {
-          pattern: [ '#60B044', '#F6C600', '#F97600', '#FF0000' ],
-          threshold: {
-            values: [30, 60, 90, 100]
-          }
-        },
-        size: {
-          height: 180
-        }
-
-      });
-
-    });
-
-
   }
 
+  function updateGraphs(force) {
+
+      $("#homeUsageGauge").addClass("loading");
+      $("#workUsageGauge").addClass("loading");
+
+      dataUsageService.getDataUsage(clusterInterface, force).then(function(data) {
+
+        $("#homeUsageGauge").removeClass("loading");
+        $("#workUsageGauge").removeClass("loading");
+
+        homeUsageGauge.load({
+            columns: [
+              ['Used', data[0].blocksUsed]
+            ]
+        });
+
+        // POSSIBLE FUTURE DEPRECATION: Messing with interals instead of using load function
+        homeUsageGauge.internal.config.gauge_max = data[0].blocksQuota;
+
+        workUsageGauge.load({
+            columns: [
+              ['Used', data[1].blocksUsed]
+            ]
+        });
+
+        // POSSIBLE FUTURE DEPRECATION: Messing with interals instead of using load function
+        workUsageGauge.internal.config.gauge_max = data[1].blocksLimit;
+    });    
+  }
   preferencesManager.getClusters().then(function(clusters) {
     // Get the cluster type
     var clusterType = $.grep(clusters, function(e) {return e.label == $scope.params.clusterId})[0].type;
@@ -355,28 +315,47 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
     }
 
     getClusterStats($scope.params.clusterId);
+    updateGraphs();
 
     // Update the cluster every 15 seconds
-    var refreshingPromise;
-    var isRefreshing = false;
-    $scope.startRefreshing = function(){
-      if(isRefreshing) return;
-      isRefreshing = true;
+    var refreshingClusterPromise;
+    var isRefreshingCluster = false;
+    $scope.startRefreshingCluster = function(){
+      if(isRefreshingCluster) return;
+      isRefreshingCluster = true;
       (function refreshEvery(){
         //Do refresh
         getClusterStats($scope.params.clusterId);
         //If async in then in callback do...
-        refreshingPromise = $timeout(refreshEvery,15000)
+        refreshingClusterPromise = $timeout(refreshEvery,15000);
       }());
     };
     $scope.$on('$destroy',function(){
-      if(refreshingPromise) {
-        $timeout.cancel(refreshingPromise);
+      if(refreshingClusterPromise) {
+        $timeout.cancel(refreshingClusterPromise);
       }
     });
 
-    $scope.startRefreshing();
-  })
+    // Update the graphs every 5 minutes
+    var refreshingGraphsPromise;
+    var isRefreshingGraphs = false;
+    $scope.startRefreshingGraphs = function(){
+      if(isRefreshingGraphs) return;
+      isRefreshingGraphs = true;
+      (function refreshEvery() {
+        updateGraphs();
+        refreshingGraphsPromise = $timeout(refreshEvery, 300000);
+      }());
+    };
+    $scope.$on('$destroy', function() {
+      if (refreshingGraphsPromise) {
+        $timeout.cancel(refreshingGraphsPromise);
+      }
+    });
+
+    $scope.startRefreshingCluster();
+    $scope.startRefreshingGraphs();
+  });
 
 
 }]);
