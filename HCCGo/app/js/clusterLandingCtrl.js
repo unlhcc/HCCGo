@@ -116,8 +116,8 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
 
   }
 
-  $scope.updateGraphs = function() {
-    updateGraphs();
+  $scope.updateGraphs = function(force) {
+    updateGraphs(force);
   }
   $scope.removeCompletedJob = function(index) {
     // deletes the document from db and removes it from list
@@ -270,22 +270,14 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
       }
     );
 
-
-
-
-    // Make sure the jobs data is always shown
-    //TODO Seperate into different function
-
-
-
   }
 
-  function updateGraphs() {
+  function updateGraphs(force) {
 
       $("#homeUsageGauge").addClass("loading");
       $("#workUsageGauge").addClass("loading");
 
-      dataUsageService.getDataUsage(clusterInterface).then(function(data) {
+      dataUsageService.getDataUsage(clusterInterface, force).then(function(data) {
 
         $("#homeUsageGauge").removeClass("loading");
         $("#workUsageGauge").removeClass("loading");
@@ -323,6 +315,7 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
     }
 
     getClusterStats($scope.params.clusterId);
+    updateGraphs();
 
     // Update the cluster every 15 seconds
     var refreshingClusterPromise;
