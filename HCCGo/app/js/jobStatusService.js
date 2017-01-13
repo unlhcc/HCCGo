@@ -4,5 +4,5 @@ jobStatusService.service('jobStatusService', function() {
 
 	return {
 		
-	}
+	};
 });

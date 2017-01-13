@@ -19,6 +19,8 @@ dataUsageService.service('dataUsageService',['$q', '$log', function($q, $log) {
 	 	 * Gets storage usage from cluster
 		 * @method getDataUsage
 		 * @memberof HCCGo.dataUsageService
+         * @param {GenericClusterInterface} clusterInterface - Interface to grab the data from
+         * @param {boolean} force - Flag denoting if the user wants to force update the graphs
 		 * @returns {Promise} Promise object to be resolved in the controller
 		 */
 	 	getDataUsage: function(clusterInterface, force = false){
