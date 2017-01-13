@@ -2,7 +2,7 @@
 connectionModule = angular.module('ConnectionServiceModule', [])
 
 connectionModule.factory('connectionService',['$log', '$q', '$routeParams', function($log, $q, $routeParams) {
-  
+
    var connectionList = {crane: null,
                      tusker: null,
                      sandhills: null,
@@ -16,7 +16,7 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
    * To initiate ssh connections to remote clusters.
    *
    */
-      
+
    // Returns the context of the connection (if cluster is Sandhills, use Sandhills connection etc...)
    var getClusterContext = function() {
       switch($routeParams.clusterId) {
@@ -36,7 +36,7 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
             return 'crane';
       }
    }
-   
+
    // Checks if connection for a cluster exists
    var getConnection = function(host) {
       // Check if the host exists in the connection list
@@ -74,8 +74,8 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
       }
 
    };
-   
-  
+
+
   /**
     * Make a random 5 character string to use for random file id's
     */
@@ -89,15 +89,15 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
     return text;
   }
 
-   
+
   // Check the writability of a file
   var checkWritable = function(file) {
-    
+
     var deferred = $q.defer();
     if (!file) {
       deferred.resolve(false);
     }
-    
+
     // Write to the file to test
     async.waterfall([
       // Get the sftp module
@@ -109,21 +109,21 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
           }
           return callback(null, sftp);
         });
-        
+
         if (!sftp_return) {
           callback("Unable to get sftp handle");
           logger.log("Unable to get sftp handle");
           return callback("Unable to get sftp handle");
         }
-        
+
       }, function(sftp, callback){
-        
+
         // Check for writeable directory
         path = require('path');
         // Try to write to a test file
         var dirname_path = path.dirname(file);
         var test_path = path.join(dirname_path, ".hccgo-test" + makeid());
-        
+
         sftp.open(test_path, 'w', function(err, handle) {
           if (err){
             sftp.end();
@@ -140,7 +140,7 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
       },
       // Now, delete the file
       function(sftp, test_path, callback) {
-        
+
         sftp.unlink(test_path, function(err) {
           if (err) {
             sftp.end();
@@ -148,10 +148,10 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
           }
           sftp.end();
           return callback(null);
-          
-          
+
+
         });
-        
+
       }
     ], function(err, results) {
       // Now, the end results
@@ -240,33 +240,33 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
    var runCommandQueue = async.queue(function (task, callback) {
       // Starts Command session
       connectionList[getClusterContext()].exec(task.name, function(err, stream) {
-         
+
          cumulData = "";
-         
+
          if (err) {
            $log.error("Error running command " + task.name + ": "+ err);
            callback(err, cumulData);
            return;
          }
-         
+
          stream.on('data', function(data) {
-           
+
            $log.debug("Got data: " + data);
            cumulData += data;
-           
+
          }).on('close', function(code, signal) {
-           
+
            $log.debug('Stream :: close :: code: ' + code + ', signal: ' + signal);
            callback(null, cumulData);   // Once the command actually completes full data stored here
-           
+
          });
       });
    }, 1);
- 
+
    var runCommand = function(command) {
 
       var deferred = $q.defer();         // Used to return promise data
-      
+
       runCommandQueue.push({name: command}, function(err, cumulData) {
           if (err) {
               deferred.reject("Error running command " + command + ": " + err);
@@ -277,17 +277,17 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
 
       return deferred.promise;   // Asynchronous command, doesn't really return anything until deferred.resolve is called
    }
-  
+
    var getUsername = function() {
       var deferred = $q.defer();
-    
+
       runCommand('whoami').then(function(data) {
-      
+
          deferred.resolve(data.trim());
-      
+
       })
       return deferred.promise;
-    
+
    }
 
   var test = function() {
@@ -311,14 +311,14 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
      });
      return deferred.promise;
    }
-   
+
    var readDirQueue = async.cargo(function (task, callback) {
       // Starts SFTP session
       connectionList[getClusterContext()].sftp(function (err, sftp) {
          // Debug to console
          // $log.debug("SFTP has begun");
          // $log.debug("Reading server");
-         
+
          // Read directory
          async.each(task, function(worker, done) {
             sftp.readdir(worker.name, function(err, list) {
@@ -341,12 +341,12 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
          });
       });
    }, 20);
- 
+
    // Reads filesystem directory on server
    var readDir = function(directory) {
       var deferred = $q.defer();
-      
-      readDirQueue.push({name: directory, 
+
+      readDirQueue.push({name: directory,
           caller: function(dir) {
               deferred.resolve(dir);
               return 0;
@@ -355,10 +355,10 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
                   deferred.reject(err);
               }
       });
-      
+
       return deferred.promise;
    }
-   
+
    // Creates directory on server
    // Publicly available
    var makeDir = function(dirList, root, dest, callback) {
@@ -487,20 +487,52 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
         return deferred.promise;
    }
 
+   // get a file size in KB
+   var getFileSize = function(filesString) {
+     // takes in a string of filenames separated by spaces
+     var deferred = $q.defer();
+
+     runCommand('ls -s --block-size=KB ' + filesString).then(function(data) {
+       var lines = data.split('\n');
+       sizes = {};
+       for(var i = 0; i < lines.length; i++) {
+         if(lines[i].length > 0) {
+           var key = lines[i].trim().split(" ")[1];
+           var value = lines[i].trim().split(" ")[0];
+           sizes[key] = value;
+         }
+       }
+       deferred.resolve(sizes);
+     });
+
+     return deferred.promise;
+   }
+
+   // get the text of a file
+   var getFileText = function(filePath) {
+     var deferred = $q.defer();
+
+     runCommand('cat ' + filePath).then(function(data) {
+        deferred.resolve(data.trim());
+     });
+
+     return deferred.promise;
+   }
+
    var uploaderQueue = async.cargo(function (task, callback) {
       // Starts SFTP session
       connectionList[getClusterContext()].sftp(function (err, sftp) {
         async.each(task, function(worker, done) {
             var parityCheck = true;
             var totalCollector = 0;
-            sftp.fastPut(worker.local, worker.remote, 
+            sftp.fastPut(worker.local, worker.remote,
                 {step:function(total_transferred,chunk,total){
                        if (parityCheck) {
                            totalCollector = total;
                            parityCheck = false;
                        }
                        worker.data(total_transferred);
-            },concurrency:25}, 
+            },concurrency:25},
             function(err){
                 // Cleans up processing
                 worker.finish(totalCollector);
@@ -525,7 +557,7 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
    }, 10);
 
     var uploadFile = function (src, dest, callback, finished, error) {
-        var localFiles = []; 
+        var localFiles = [];
         var mkFolders = [];
         var filesTotal = 0;
         var currentTotal = 0;
@@ -574,7 +606,7 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
                            $log.debug("New Folders: ");
                            $log.debug(mkFolders);
                            // Set destination directory setting
-                           dest = dest + path.basename(src) + '/'; 
+                           dest = dest + path.basename(src) + '/';
                            water(err, true);
                        });
                    } else if (stats.isFile()) {
@@ -602,10 +634,10 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
                   // Process to console
                   // $log.debug( "SFTP has begun");
                   // $log.debug( "Value of localPath: " + file );
-              
+
                   uploaderQueue.push({
-                      name: file, local: file, 
-                      remote: dest + path.relative(src,file), 
+                      name: file, local: file,
+                      remote: dest + path.relative(src,file),
                       data: function(total_transferred) {
                           callback(total_transferred, counter, filesTotal, currentTotal, sizeTotal);
                           return 0;
@@ -620,7 +652,7 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
                }, function(err) {
                   water(err);
                });
-            }], 
+            }],
             function(err) {
                 if(err) {
                     $log.debug(err);
@@ -638,7 +670,7 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
          // Debug to console
          // $log.debug("SFTP Stat has begun");
          // $log.debug("Reading server file");
-         
+
          // Read directory
          async.each(task, function(worker, done) {
             sftp.stat(worker.name, function(err, stats) {
@@ -661,11 +693,11 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
          });
       });
    }, 20);
- 
+
    // Reads filesystem directory on server
    var remoteStat = function(directory) {
       var deferred = $q.defer();
-      
+
       remoteStatQueue.push({name: directory,
           caller: function(stat){
               deferred.resolve(stat);
@@ -675,7 +707,7 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
                   deferred.reject(err);
               }
       });
-      
+
       return deferred.promise;
    }
 
@@ -685,14 +717,14 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
         async.each(task, function(worker, done) {
           var totalCollector = 0;
           var parityCheck = true;
-          sftp.fastGet(worker.local, worker.remote, 
+          sftp.fastGet(worker.local, worker.remote,
              {step:function(total_transferred,chunk,total){
                        if (parityCheck) {
                            totalCollector = total;
                            parityCheck = false;
                        }
                        worker.data(total_transferred);
-             },concurrency:25}, 
+             },concurrency:25},
              function(err){
                 // Finishes processing and sends total
                 worker.finish(totalCollector);
@@ -718,13 +750,13 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
 
    // Functionality to download a file from the server
    var downloadFile = function(localPath, remotePath, callback, finished, error) {
-        var remoteFiles = []; 
+        var remoteFiles = [];
         var mkFolders = [];
         var filesTotal = 0;
         var currentTotal = 0;
         var sizeTotal = 0;
         var counter = 0;
-        
+
         var BFSFolders = function(currDir, bfs) {
             readDir(currDir).then(function(data) {
                 async.each(data, function(file, done) {
@@ -764,7 +796,7 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
                            $log.debug("New Folders: ");
                            $log.debug(mkFolders);
                            // Set destination directory setting
-                           localPath = localPath + path.basename(remotePath) + '/'; 
+                           localPath = localPath + path.basename(remotePath) + '/';
                            water(err, true);
                        });
                    } else if (data.isFile()) {
@@ -777,7 +809,7 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
                });
             },
             function(arg, water) {
-               if (arg) {      
+               if (arg) {
                    // Get the attributes of the source directory
                    lmakeDir(mkFolders, remotePath, localPath, function(err) {
                        water(err);
@@ -791,8 +823,8 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
                async.each(remoteFiles, function(file, done) {
                   // Process to console
                   downloaderQueue.push({
-                      name: file, local: file, 
-                      remote: localPath + path.relative(remotePath,file), 
+                      name: file, local: file,
+                      remote: localPath + path.relative(remotePath,file),
                       data: function(total_transferred) {
                           callback(total_transferred, counter, filesTotal, currentTotal, sizeTotal);
                           return 0;
@@ -808,7 +840,7 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
                   //sftp.end();
                   water(err);
                });
-            }], 
+            }],
             function(err) {
                 if(err) {
                     $log.debug(err);
@@ -819,7 +851,7 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
        });
 
    }
-  
+
    return {
    getConnection: getConnection,
    runCommand: runCommand,
@@ -835,11 +867,13 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
    getWorkWD: getWorkWD,
    uploadJobFile: uploadJobFile,
    checkWritable: checkWritable,
+   getFileText: getFileText,
+   getFileSize: getFileSize,
    initiateConnection: function initiateConnection(username, password, hostname, cluster, logger, needInput, completed) {
-     
+
      var Client = require('ssh2').Client;
      var conn = new Client();
-     
+
      conn.on('ready', function() {
       completed(null);
       logger.log('Client :: ready')
@@ -849,10 +883,10 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
          console.log(err)
          return;
         }
-        
+
         stream.on('close', function(code, signal) {
          logger.log('Stream :: close :: code: ' + code + ', signal: ' + signal)
-         
+
         }).on('data', function(data) {
          logger.log('STDOUT' + data);
         }).stderr.on('data', function(data) {
@@ -863,11 +897,11 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
       logger.error(err);
       completed(err);
      //}).on('close', function() {
-         
+
      }).on('keyboard-interactive', function(name, instructions,  instructionsLang, prompts, finishFunc) {
       logger.log("Name: " + name + ", instructions: " + instructions + "prompts" + prompts);
       console.log(prompts);
-      
+
       if (prompts[0].prompt == "Password: ") {
         finishFunc([password]);
       } else {
@@ -876,8 +910,8 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
          finishFunc([input]);
         });
       }
-      
-      
+
+
      }).connect({
       host: hostname,
       username: username,
@@ -887,7 +921,7 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
         //logger.log(message);
       }
      });
-      
+
       switch(cluster) {
       case "Crane":
          connectionList['crane'] = conn;
@@ -905,9 +939,9 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
          return false;
      }
      $log.debug(connectionList);
-    
+
    }
 
    }
-  
+
 }]);

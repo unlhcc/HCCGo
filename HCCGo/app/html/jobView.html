@@ -3,10 +3,13 @@
 <div class="container">
   <div class="row">
     <div class="col-md-12">
-      <h3 class="text-center">{{params.jobId}}</h3>
       <div class="well">
-        <p>Standard Out:</p>
-        <p>Standard Err:</p>
+        <h3 class="text-center">{{job.jobName}} - {{job.jobId}}</h3>
+        <hr />
+        <p><strong>Output:</strong> {{job.outText}}</p>
+        <p><strong>Error:</strong> {{job.errText}}</p>
+        <p><strong>Time Elapsed:</strong> {{job.elapsed}}</p>
+        <p><strong>Required Memory:</strong> {{job.reqMem}}</p>
       </div>
     </div>
   </div>

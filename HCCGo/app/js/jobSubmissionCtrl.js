@@ -196,6 +196,16 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
           var doc = {
             "jobId": data.split(" ")[3].trim(),
             "complete": false,
+            "cluster": $scope.params.clusterId,
+            "runtime": job.runtime,
+            "memory": job.memory,
+            "jobname": job.jobname,
+            "location": job.location,
+            "errorPath": job.error,
+            "outputPath": job.output,
+            "modules": ((job.modules != null) ? job.modules : []),
+            "commands": job.commands,
+            "timestamp": now,
             "cluster": $scope.params.clusterId
           }
           submittedJobsDB.insert(doc, function(err, newDoc) {
