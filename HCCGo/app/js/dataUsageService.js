@@ -15,14 +15,14 @@ dataUsageService.service('dataUsageService',['$q', '$log', function($q, $log) {
     var lastRequestedTime = 0;
 	return {
 
-	   /**
-	 	 * Gets storage usage from cluster
-		 * @method getDataUsage
-		 * @memberof HCCGo.dataUsageService
+       /**
+     	 * Gets storage usage from cluster
+    	 * @method getDataUsage
+    	 * @memberof HCCGo.dataUsageService
          * @param {GenericClusterInterface} clusterInterface - Interface to grab the data from
          * @param {boolean} force - Flag denoting if the user wants to force update the graphs
-		 * @returns {Promise} Promise object to be resolved in the controller
-		 */
+    	 * @returns {Promise} Promise object to be resolved in the controller
+    	 */
 	 	getDataUsage: function(clusterInterface, force = false){
 	 	    var toReturn = $q.defer();
             if (Date.now() - lastRequestedTime >= 300000 || force){
