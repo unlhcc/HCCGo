@@ -16,25 +16,29 @@ jobViewModule.controller('jobViewCtrl', ['$scope', '$log', '$timeout', 'connecti
       $scope.job = result;
     }
     else {
-      connectionService.getFileSize(result.outputPath + ' ' + result.errorPath).then(function(data) {
-        if(parseInt(data[result.outputPath].replace("kB","")) > 5000) {
-          result.outText = "The output file is too large to be displayed here."
-        }
-        else {
+      // In parallel, get the size of the output and error
+      connectionService.getFileSize(result.outputPath).then(function(size) {
+        // If the file is larger than 5MB
+        if(size > 5*1025*1024) {
+          $scope.outText = "The Output file is too large to be displayed here."
+        } else {
           connectionService.getFileText(result.outputPath).then(function(data) {
-            result.outText = data;
+            $scope.outText = data;
           });
         }
-        if(parseInt(data[result.errorPath].replace("kB","")) > 5000) {
-          result.errText = "The error file is too large to be displayed here."
-        }
-        else {
-          connectionService.getFileText(result.errorPath).then(function(data) {
-            result.errText = data.length>0 ? data : "(none)";
-          });
-        }
-        $scope.job = result;
+        
       });
+      
+      connectionService.getFileSize(result.errorPath).then(function(size) {
+        if(size > 5*1025*1024) {
+          $scope.errText = "The Error file is too large to be displayed here."
+        }
+        connectionService.getFileText(result.errorPath).then(function(data) {
+          $scope.errText = data.length>0 ? data : "(none)";
+        });
+      });
+      
+      
     }
   });
 
