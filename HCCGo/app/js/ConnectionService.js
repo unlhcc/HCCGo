@@ -487,28 +487,29 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
         return deferred.promise;
    }
 
-   // get a file size in KB
-   var getFileSize = function(filesString) {
+   // get a file size in bytes
+   var getFileSize = function(filePath) {
      // takes in a string of filenames separated by spaces
      var deferred = $q.defer();
-
-     runCommand('ls -s --block-size=KB ' + filesString).then(function(data) {
-       var lines = data.split('\n');
-       sizes = {};
-       for(var i = 0; i < lines.length; i++) {
-         if(lines[i].length > 0) {
-           var key = lines[i].trim().split(" ")[1];
-           var value = lines[i].trim().split(" ")[0];
-           sizes[key] = value;
-         }
+     
+     // Use stat from sftp
+     connectionList[getClusterContext()].sftp(function (err, sftp) {
+       if(err) {
+         return deferred.reject("Error getting SFTP object: " + err);
        }
-       deferred.resolve(sizes);
+       sftp.stat(filePath, function(err, stats) {
+         if(err) {
+           return deferred.reject("Error getting stat: " + err);
+         }
+         return deferred.resolve(stats.size);
+       });
      });
 
      return deferred.promise;
    }
 
    // get the text of a file
+   // TODO: This should use sftp's open stream
    var getFileText = function(filePath) {
      var deferred = $q.defer();
 
