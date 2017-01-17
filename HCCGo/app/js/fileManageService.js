@@ -6,7 +6,8 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
    const async = require('async');
    const path = require('path');
    const fs = require('fs');
-   
+   const disk = require('diskusage');
+ 
    const _sourceDir = {name: ".."};
 
    let service = {};
@@ -366,6 +367,23 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
 	  
 	  return deferred.promise;
    }
+
+   service.verifyDownload = function () {
+      let deferred = $q.defer();
+
+      connectionService.runCommand("du -sb " + String(_remoteWD + "/" + _remoteFocus)).then(function (data) {
+          _processStatus = false;
+          let data_response = data.split(/[	]+/); //NOTE: Matches tab spaces
+          _accuSize = data_response[0];
+          disk.check($scope.localWD, function(err, info) {
+              _diskQuota = Math.floor((data_response[0]/info.available)*100);
+              _diskAvail = Math.floor((info.free/info.total)*100);
+              deferred.resolve(null);
+          });
+      });
+
+      return deferred.promise;
+   }
    
    // Upload entire directory
    service.uploadCall = function(begun) {
@@ -382,6 +400,7 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
 			 _uploadStatus = true;
 			 _filesTotal = filesTotal;
 			 boolStarter = false;
+             begun();
 		 }         
 
          _counter = counter;       
@@ -390,7 +409,7 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
 
        }, function() {
          // update view
-         notifierService.success('Your file transfer was succesfully!', 'Files Transfer!');
+         notifierService.success('Your file transfer was succesfull!', 'Transfer!');
 		 _finalizer = true;
          _processFinished = true;
          remoteRead(_remoteWD);
@@ -404,6 +423,47 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
 	   
 	   return deferred.promise;
    }
+
+   service.downloadCall = function (begun) {
+      let deferred = $q.defer();
+      let boolStarter = true;
+
+      _finalizer = false;
+      // Runs file upload
+      connectionService.downloadFile(String(_localWD + "/"), 
+        String(_remoteWD + "/" + _remoteFocus),
+        function(total_transferred,counter,filesTotal,currentTotal,sizeTotal){
+         // Parity check
+         if(boolStarter) {
+             _processStatus = false;
+             _uploadStatus = true;
+             _filesTotal = filesTotal;
+             boolStarter = false;
+             begun();
+         }
+
+         // Callback function for progress bar
+         _counter = counter;
+         
+         // Work on progress bar
+         _totalProgress = Math.floor(((total_transferred + currentTotal)/sizeTotal)*100);
+       }, function() {
+         // update view
+         notifierService.success('Your file transfer was succesfull!', 'Transfered!');
+         _finalizer = true;
+         _processFinished = true;   // Show finished message
+         localRead(_localWD);
+         deferred.resolve(null);
+         
+       }, function(err) {
+         // Error occurred in ConnectionService
+		 notifierService.error(err, 'Error in ConnectionService');
+         _finalizer = true;
+         deferred.reject(err);
+       });
+
+       return deferred.promise;
+   } 
 
    // Value initialization
    //

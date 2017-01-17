@@ -5,7 +5,6 @@ clusterUploadModule.controller('clusterFileSystemCtrl', ['$scope', '$log', '$tim
                                                          function($scope, $log, $timeout, connectionService, $routeParams, $location, $q, preferencesManager, notifierService, fileManageService) {
 
    // Initialization functions
-   const disk = require('diskusage');
    const path = require("path");
    const fs = require("fs");
    const async = require("async");
@@ -83,7 +82,9 @@ clusterUploadModule.controller('clusterFileSystemCtrl', ['$scope', '$log', '$tim
 	   });
 	   done(); // Loop finished
 	 },function(err){
-	 
+       if(err) {
+           notifierService.error(err, 'Issue gathering progress data');
+       }
 	 });
    }
    
@@ -94,30 +95,12 @@ clusterUploadModule.controller('clusterFileSystemCtrl', ['$scope', '$log', '$tim
       $scope.userUpAuth = fileManageService.setUserUpAuth(false);
 
       // Runs file upload
-      connectionService.uploadFile(String($scope.localWD + "/" + localFocus), String($scope.remoteWD + "/"), function(total_transferred,counter,filesTotal,currentTotal,sizeTotal){
-         $scope.filesTotal = fileManageService.setFilesTotal(filesTotal);
-         $scope.counter = fileManageService.setCounter(counter);
-         
-         $scope.$apply(function(scope) {
-            scope.uploadStatus = fileManageService.setUploadStatus(true);
-            scope.totalProgress = fileManageService.setTotalProgress(Math.floor(((total_transferred + currentTotal)/sizeTotal)*100));
-         });
-       }, function() {
-         // update view
-         notifierService.success('Your file transfer was succesfully!', 'Files Transfer!');
-         $scope.processFinished = fileManageService.setProcessFinished(true);
-         remoteRead($scope.remoteWD);
-         
-       }, function(err) {
-         // Error occured in ConnectionService
-		 notifierService.error(err, 'Error in ConnectionService');
-       });
-	   
-	   fileManageService.uploadCall(function(){
-	       $scope.processStatus = fileManageService.getProcessStatus();
-	   }).then(function(val) {
-	       $scope.processStatus = fileManageService.getProcessStatus();
-	   });
+	  fileManageService.uploadCall(function(){
+          progressCal();
+	      $scope.processStatus = fileManageService.getProcessStatus();
+	  }).then(function(val) {
+	      $scope.processStatus = fileManageService.getProcessStatus();
+	  });
    }
 
    $scope.verifyDownload = function () {
@@ -125,14 +108,11 @@ clusterUploadModule.controller('clusterFileSystemCtrl', ['$scope', '$log', '$tim
       $scope.userDownAuth = fileManageService.setUserDownAuth(true);
       $scope.processStatus = fileManageService.setProcessStatus(true);
 
-      connectionService.runCommand("du -sb " + String($scope.remoteWD + "/" + remoteFocus)).then(function (data) {
-          $scope.processStatus = false;
-          var data_response = data.split(/[	]+/); //NOTE: Matches tab spaces
-          $scope.accuSize = fileManageService.setAccuSize(data_response[0]);
-          disk.check($scope.localWD, function(err, info) {
-              $scope.diskQuota = fileManageService.setDiskQuota(Math.floor((data_response[0]/info.available)*100));
-              $scope.diskAvail = fileManageService.setDiskAvail(Math.floor((info.free/info.total)*100));
-          });
+      fileManageService.verifyDownload().then(function(val) {
+          $scope.processStatus = fileManageService.setProcessStatus(false);
+          $scope.accuSize = fileManageService.getAccuSize();
+          $scope.diskQuota = fileManageService.getDiskQuota();
+          $scope.diskAvail = fileManageService.getDiskAvail();
       });
    }
 
@@ -145,37 +125,12 @@ clusterUploadModule.controller('clusterFileSystemCtrl', ['$scope', '$log', '$tim
       $scope.processStatus = fileManageService.setProcessStatus(true);
       $scope.userDownAuth = fileManageService.setUserDownAuth(false);
 
-      // Runs file upload
-      connectionService.downloadFile(String($scope.localWD + "/"), 
-        String($scope.remoteWD + "/" + remoteFocus),
-        function(total_transferred,counter,filesTotal,currentTotal,sizeTotal){
-         // Callback function for progress bar
-         //$log.debug("Total transferred: " + total_transferred);
-         //$log.debug("Chunks: " + chunk);
-         //$log.debug("Total: " + total);
-         $scope.processStatus = fileManageService.setProcessStatus(false);     // Rotating processing indicator no longer needed
-
-         $scope.filesTotal = fileManageService.setFilesTotal(filesTotal);
-         $scope.counter = fileManageService.setCounter(counter);
-         
-         // Work on progress bar
-         $scope.$apply(function(scope) {
-            scope.uploadStatus = fileManageService.setUploadStatus(true);
-            //scope.max = total;
-            scope.totalProgress = fileManageService.setTotalProgress(Math.floor(((total_transferred + currentTotal)/sizeTotal)*100));
-            //scope.progressValue = Math.floor((total_transferred/total)*100);
-            //$log.debug("Progress: " + ((total_transferred/total)*100) + "%");
-         });
-       }, function() {
-         // update view
-         notifierService.success('Your file transfer was succesfull!', 'File(s) Transfered!');
-         $scope.processFinished = fileManageService.setProcessFinished(true);   // Show finished message
-         localRead($scope.localWD);
-         
-       }, function(err) {
-         // Error occurred in ConnectionService
-		 notifierService.error(err, 'Error in ConnectionService');
-       });
+      fileManageService.downloadCall(function(){
+          progressCal();
+          $scope.processStatus = fileManageService.getProcessStatus();
+      }).then(function(val) {
+          $scope.processStatus = fileManageService.getProcessStatus();
+      });
    } 
    
    // highlight selection and store id
