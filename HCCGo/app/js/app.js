@@ -11,7 +11,7 @@ var app = angular.module('HccGoApp', ['HccGoApp.WelcomeCtrl',
                               'dbService',
                               'updaterModule',
                               'HccGoApp.updatePageCtrl',
-                              'HccGoApp.NavCtrl', 'dataUsageService']).config([
+                              'HccGoApp.NavCtrl', 'dataUsageService', 'jobStatusService']).config([
   '$routeProvider', function($routeProvider) {
     return $routeProvider.when('/', {
       templateUrl: 'html/welcome.html',

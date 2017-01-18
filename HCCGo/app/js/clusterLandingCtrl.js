@@ -1,7 +1,7 @@
 
 clusterLandingModule = angular.module('HccGoApp.clusterLandingCtrl', ['ngRoute' ]);
 
-clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeout', 'connectionService', '$routeParams', '$location', '$q', 'preferencesManager', 'filePathService', 'notifierService', 'dbService', 'dataUsageService', function($scope, $log, $timeout, connectionService, $routeParams, $location, $q, preferencesManager, filePathService, notifierService, dbService, dataUsageService) {
+clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeout', 'connectionService', '$routeParams', '$location', '$q', 'preferencesManager', 'filePathService', 'notifierService', 'dbService', 'dataUsageService','jobStatusService', function($scope, $log, $timeout, connectionService, $routeParams, $location, $q, preferencesManager, filePathService, notifierService, dbService, dataUsageService, jobStatusService) {
 
   $scope.params = $routeParams;
   $scope.jobs = [];
@@ -111,8 +111,8 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
   });
 
 
-  $scope.refreshCluster = function() {
-    getClusterStats($scope.params.clusterId);
+  $scope.refreshCluster = function(force) {
+    getClusterStats($scope.params.clusterId, force);
 
   }
 
@@ -128,17 +128,18 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
     });
   }
 
-  function getClusterStats(clusterId) {
+  function getClusterStats(clusterId, force) {
 
     // Begin spinning the refresh image
     $(".mdi-action-autorenew").addClass("spinning-image");
 
-
+    /*
     // Array to concat together running and completed jobs
     //var jobList = [];
     async = require("async");
     // Get completed jobs from db file
 
+    
     async.parallel([
 
       // Query all the uncompleted jobs in the DB
@@ -269,7 +270,13 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
 
       }
     );
-
+    */
+    jobStatusService.refreshDatabase(db, clusterInterface, $scope.params.clusterId, force).then(function(data) {
+      $scope.numRunning = data.numRunning;
+      $scope.numIdle = data.numIdle;
+      $scope.numError = data.numError;
+      $scope.jobs = data.jobs;
+    })
   }
 
   function updateGraphs(force) {
