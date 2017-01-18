@@ -4,12 +4,12 @@ connectionModule = angular.module('ConnectionServiceModule', [])
 connectionModule.factory('connectionService',['$log', '$q', '$routeParams', '$templateCache', function($log, $q, $routeParams, $templateCache) {
   
    var connectionList = {crane: null,
-                     tusker: null,
-                     sandhills: null,
-                     glidein: null};
-   var async = require('async');
-   var path = require('path');
-   var fs = require('fs');
+                         tusker: null,
+                         sandhills: null,
+                         glidein: null};
+   const async = require('async');
+   const path = require('path');
+   const fs = require('fs');
    $log.debug(connectionList);
 
    /**
@@ -38,7 +38,7 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', '$te
    }
    
    // Checks if connection for a cluster exists
-   var getConnection = function(host) {
+   var getConnection = function() {
       // Check if the host exists in the connection list
       switch($routeParams.clusterId) {
          case "Crane":

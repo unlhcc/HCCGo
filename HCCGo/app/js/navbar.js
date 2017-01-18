@@ -33,12 +33,12 @@ navBar.controller('NavCtrl', ['$route', '$scope', '$routeParams', '$location', '
 
    // For Reference
    $log.debug("Username: " + $scope.username);
-   if($templateCache.get('username') == null){
+   //if($templateCache.get('username') == null){
       connectionService.getUsername().then(function(username) {
           $scope.username = username;
       }) 
-   } else {
-      $scope.username = $templateCache.get('username');
-   }
+   //} else {
+   //   $scope.username = $templateCache.get('username');
+   //}
    
 }]);

@@ -193,25 +193,33 @@ clusterUploadModule.controller('clusterFileSystemCtrl', ['$scope', '$log', '$tim
    let remoteFocus = fileManageService.getRemoteFocus();    // Stores id of highlight object of remote origin
    let localFocus = fileManageService.getLocalFocus();     // Stores id of highlight object of local origin
    let homeWD, workWD;
-   $scope.uploadStatus = fileManageService.getUploadStatus();
-   $scope.boolUp = fileManageService.getBoolUp();
-   $scope.boolDown = fileManageService.getBoolDown();
-   $scope.processStatus = fileManageService.getProcessStatus();
-   $scope.accuSize = fileManageService.getAccuSize();
-   $scope.diskAvail = fileManageService.getDiskAvail();
-   $scope.diskQuota = fileManageService.getDiskQuota();
-   $scope.filesTotal = fileManageService.getFilesTotal();
-   $scope.counter = fileManageService.getCounter();
-   $scope.totalProgress = fileManageService.getTotalProgress();
-   $scope.userDownAuth = fileManageService.getUserDownAuth();
-   $scope.userUpAuth = fileManageService.getUserDownAuth();
-   $scope.remoteFiles = fileManageService.getRemoteFiles();
-   $scope.localFiles = fileManageService.getLocalFiles();
 
-   if (localFocus != "") {
-      angular.element("#l" + localFocus.replace(/\./g, "\\.")).addClass('highlight');
-   } else if (remoteFocus != "") {
-      angular.element("#r" + remoteFocus.replace(/\./g, "\\.")).addClass('highlight');
-   }
+   async.until(function(){
+     return fileManageService.getFinalizer();
+   },function(done){
+     done(); // Loop finished
+   },function(err){
+     //$scope.$apply(function(scope) {
+         $scope.remoteFiles = fileManageService.getRemoteFiles();
+         $scope.localFiles = fileManageService.getLocalFiles();
+         $scope.uploadStatus = fileManageService.getUploadStatus();
+         $scope.boolUp = fileManageService.getBoolUp();
+         $scope.boolDown = fileManageService.getBoolDown();
+         $scope.processStatus = fileManageService.getProcessStatus();
+         $scope.accuSize = fileManageService.getAccuSize();
+         $scope.diskAvail = fileManageService.getDiskAvail();
+         $scope.diskQuota = fileManageService.getDiskQuota();
+         $scope.filesTotal = fileManageService.getFilesTotal();
+         $scope.counter = fileManageService.getCounter();
+         $scope.totalProgress = fileManageService.getTotalProgress();
+         $scope.userDownAuth = fileManageService.getUserDownAuth();
+         $scope.userUpAuth = fileManageService.getUserDownAuth();
+         if (localFocus != "") {
+             angular.element("#l" + localFocus.replace(/\./g, "\\.")).addClass('highlight');
+         } else if (remoteFocus != "") {
+             angular.element("#r" + remoteFocus.replace(/\./g, "\\.")).addClass('highlight');
+         }
+     //});  
+   });
 
 }]);

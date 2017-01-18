@@ -1,7 +1,8 @@
 
 fileManageService = angular.module('fileManageService', [])
 
-fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'connectionService', function($log, $q, $routeParams, connectionService) {
+fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'connectionService', 'notifierService', 
+   function($log, $q, $routeParams, connectionService, notifierService) {
   
    const async = require('async');
    const path = require('path');
@@ -32,7 +33,7 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
    let _filesTotal = 0;
    let _counter = 0;
    let _totalProgress = 0;
-   let _finalizer = true;
+   let _finalizer = false;
 
    /**
    * To handle state information for the file management
@@ -43,7 +44,7 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
    service.getFinalizer = function(){
        return _finalizer;
    }
-   
+
    service.getSourceDir = function(){
        return _sourceDir;
    }
@@ -229,6 +230,7 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
 
    let remoteRead = function(data){
        let _tempFiles = [];
+       _remoteFinal = false;
 
        // REsets file directory listing
        connectionService.readDir(data).then(function (serverResponse) {
@@ -249,6 +251,8 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
               } else {
                   _remoteFiles = _tempFiles;
               }
+
+              _remoteFinal = true;
            });
        });
    }
@@ -256,6 +260,7 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
    let localRead = function(data) {
       // Clears content of localFiles array
       _tempFiles = [];
+      _localFinal = false;
 
       // Resets file directory listing
       fs.readdir(data, function(err, files) {
@@ -278,6 +283,8 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
              } else {
                  _localFiles = _tempFiles;
              }
+
+             _localFinal = true;
          }); 
       });
    }
@@ -468,12 +475,13 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
    // Value initialization
    //
    // Gets directory strings from remote server
+   //
    if (_homeWD == "") {
        connectionService.getHomeWD().then(function(data) {
-           _remoteWD = data;
-           _homeWD = data;
-           remoteRead(_remoteWD);    // Sets remote display
-           $log.debug("Home directory: " + _homeWD);
+          _remoteWD = data;
+          _homeWD = data;
+          remoteRead(_remoteWD);    // Sets remote display
+          $log.debug("Home directory: " + _homeWD);
        });
    }
    if (_workWD == "") {
@@ -488,7 +496,7 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
        $log.debug("Process env: ");
        $log.debug(process.env);
        if (_localWD == "") {
-           _localWD = process.env.HOMEDRIVE + process.env.HOMEPATH;
+          _localWD = process.env.HOMEDRIVE + process.env.HOMEPATH;
        }
    } else {
        // Runs for Mac and Linux systems
@@ -500,6 +508,8 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
    }
 
    localRead(_localWD);    // Sets local display
+
+   _finalizer = true;
   
    return service;
   
