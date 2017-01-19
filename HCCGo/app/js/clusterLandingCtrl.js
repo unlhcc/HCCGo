@@ -119,6 +119,7 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
   $scope.updateGraphs = function(force) {
     updateGraphs(force);
   }
+  
   $scope.removeCompletedJob = function(index) {
     // deletes the document from db and removes it from list
     var job = $scope.jobs[index];
@@ -134,7 +135,7 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
     $("#jobrefresh").addClass("spinning-image");
 
     
-    jobStatusService.refreshDatabase(db, clusterInterface, $scope.params.clusterId, force).then(function(data) {
+    jobStatusService.refreshDatabase(db, clusterInterface, clusterId, force).then(function(data) {
       $scope.numRunning = data.numRunning;
       $scope.numIdle = data.numIdle;
       $scope.numError = data.numError;

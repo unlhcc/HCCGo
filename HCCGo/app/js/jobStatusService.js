@@ -1,15 +1,39 @@
 jobStatusService = angular.module('jobStatusService', []);
 
+/**
+ * The jobStatusService allows for periodic loading of the status of jobs that comes from the clusters.
+ *
+ * A Promise with the data is returned, which is then set properly within the controller
+ *
+ * @ngdoc service
+ * @memberof HCCGo
+ * @class jobStatusService
+ */
 jobStatusService.service('jobStatusService',['$log','$q','notifierService', function($log, $q, notifierService) {
 	var async = require('async');
 	var oldData = null;
 	var lastRequestedTime = 0;
-	// Refresh every 15 seconds
 	return {
+
+	  /**
+     * Makes asynchronous calls to check for job statuses within the database
+     * @method refreshDatabase
+     * @memberof HCCGo.jobStatusService
+     * @param {DataStore} db - Database used for querying job status
+     * @param {GenericClusterInterface} clusterInterface - Used to grab uncompleted jobs from the cluster
+     * @param {integer} clusterId - Unique ID of the cluster for querying the database
+     * @param {boolean} force - Flag denoting if the user wants to force update the database
+     * @returns {Promise} Promise object to be resolved in the controller
+     */
 		refreshDatabase: function(db, clusterInterface, clusterId, force=false) {
 			var toReturn = $q.defer();
-			if (Date.now() - lastRequestedTime >= 15000 || force){
 
+			// Reloads old data if it's been less than 15 seconds and the user hasn't forced an update
+			if (Date.now() - lastRequestedTime < 15000 && !force){
+				lastRequestedTime = Date.now()
+				toReturn.resolve(oldData);
+			}
+			else {
 			async.parallel([
 
 		      // Query all the uncompleted jobs in the DB
@@ -138,6 +162,7 @@ jobStatusService.service('jobStatusService',['$log','$q','notifierService', func
 		          } else {
 		            updatedData.jobs = recent_completed[0].concat(completed_jobs, cluster_jobs);
 		          }
+
 		          lastRequestedTime = Date.now();
 		          oldData = updatedData;
 		          toReturn.resolve(updatedData);
@@ -145,9 +170,7 @@ jobStatusService.service('jobStatusService',['$log','$q','notifierService', func
 		      }
 		    );
 			}
-			else {
-				toReturn.resolve(oldData);
-			}
+
 			return toReturn.promise;
 		}
 	};
