@@ -20,25 +20,24 @@ jobViewModule.controller('jobViewCtrl', ['$scope', '$log', '$timeout', 'connecti
       connectionService.getFileSize(result.outputPath).then(function(size) {
         // If the file is larger than 5MB
         if(size > 5*1025*1024) {
-          $scope.outText = "The Output file is too large to be displayed here."
+          result.outText = "The Output file is too large to be displayed here."
         } else {
           connectionService.getFileText(result.outputPath).then(function(data) {
-            $scope.outText = data;
+            result.outText = data.length>0 ? data : "(none)";
           });
         }
-        
+
       });
-      
+
       connectionService.getFileSize(result.errorPath).then(function(size) {
         if(size > 5*1025*1024) {
-          $scope.errText = "The Error file is too large to be displayed here."
+          result.errText = "The Error file is too large to be displayed here."
         }
         connectionService.getFileText(result.errorPath).then(function(data) {
-          $scope.errText = data.length>0 ? data : "(none)";
+          result.errText = data.length>0 ? data : "(none)";
         });
       });
-      
-      
+      $scope.job = result;
     }
   });
 

@@ -410,7 +410,7 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
 
       async.eachSeries(dirList, function(dir, done) {
           var dirs = [];
-	      var exists = false;
+	        var exists = false;
           dir = dest + path.relative(root,dir);
           $log.debug("Creating folder: " + dir);
           async.until(function() {
@@ -491,7 +491,7 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
    var getFileSize = function(filePath) {
      // takes in a string of filenames separated by spaces
      var deferred = $q.defer();
-     
+
      // Use stat from sftp
      connectionList[getClusterContext()].sftp(function (err, sftp) {
        if(err) {

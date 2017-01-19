@@ -2,14 +2,66 @@
 
 <div class="container">
   <div class="row">
-    <div class="col-md-12">
+    <div class="col-md-4">
+      <div class="well">
+        <h3 class="text-center">Job Stats</h3>
+        <hr />
+        <p><strong>Time Elapsed:</strong> {{job.elapsed}}</p>
+        <p><strong>Required Memory:</strong> {{job.reqMem}}</p>
+      </div>
+    </div>
+    <div class="col-md-8">
       <div class="well">
         <h3 class="text-center">{{job.jobName}} - {{job.jobId}}</h3>
         <hr />
-        <p><strong>Output:</strong> {{outText}}</p>
-        <p><strong>Error:</strong> {{errText}}</p>
-        <p><strong>Time Elapsed:</strong> {{job.elapsed}}</p>
-        <p><strong>Required Memory:</strong> {{job.reqMem}}</p>
+        <div class="panel-group" id="accordion">
+         <div class="panel panel-default">
+           <div class="panel-heading jobhistory">
+             <div class="row">
+               <div class="col-sm-12">
+                 <h4 class="panel-title jobhistory">Output<small class="jobdate"> {{job.outputPath}} </small></h4>
+               </div>
+             </div>
+             <div class="row">
+               <div class="col-sm-12">
+                 <div class="historyinfo">
+                   <button class="btn btn-block btn-sm jobhistory" data-toggle="collapse" data-parent="#accordion" href="#collapse0">
+                     <span class="text-lowercase"><span class="caret"></span> click to expand <span class="caret"></span></span>
+                   </button>
+                 </div>
+               </div>
+             </div>
+           </div>
+           <div id="collapse0" class="panel-collapse collapse">
+             <div class="panel-body">
+               <pre> {{job.outText}} </pre>
+             </div>
+           </div>
+         </div>
+         <div class="panel panel-default">
+           <div class="panel-heading jobhistory">
+             <div class="row">
+               <div class="col-sm-12">
+                 <h4 class="panel-title jobhistory">Error<small class="jobdate"> {{job.errorPath}} </small></h4>
+               </div>
+             </div>
+             <div class="row">
+               <div class="col-sm-12">
+                 <div class="historyinfo">
+                   <button class="btn btn-block btn-sm jobhistory" data-toggle="collapse" data-parent="#accordion" href="#collapse1">
+                     <span class="text-lowercase"><span class="caret"></span> click to expand <span class="caret"></span></span>
+                   </button>
+                 </div>
+               </div>
+             </div>
+           </div>
+           <div id="collapse1" class="panel-collapse collapse">
+             <div class="panel-body">
+               <pre> {{job.errText}} </pre>
+             </div>
+           </div>
+         </div>
+       </div>
       </div>
     </div>
   </div>
