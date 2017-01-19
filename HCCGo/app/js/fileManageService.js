@@ -15,7 +15,7 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
    let _uploadStatus = false;
    let _boolUp = true;
    let _boolDown = false;
-   let _processStatus = true;
+   let _processStatus = false;
    let _localFiles = [];
    let _remoteFiles = [];
    let _homeWD = new String("");
@@ -228,9 +228,8 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
        return _localFocus;
    }
 
-   let remoteRead = function(data){
+   let remoteRead = function(data, finish){
        let _tempFiles = [];
-       _remoteFinal = false;
 
        // REsets file directory listing
        connectionService.readDir(data).then(function (serverResponse) {
@@ -252,15 +251,14 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
                   _remoteFiles = _tempFiles;
               }
 
-              _remoteFinal = true;
+              finish();
            });
        });
    }
 
-   let localRead = function(data) {
+   let localRead = function(data, finish) {
       // Clears content of localFiles array
       _tempFiles = [];
-      _localFinal = false;
 
       // Resets file directory listing
       fs.readdir(data, function(err, files) {
@@ -284,15 +282,15 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
                  _localFiles = _tempFiles;
              }
 
-             _localFinal = true;
+             finish();
          }); 
       });
    }
 
-   service.wdSwitcher = function(dir){
+   service.wdSwitcher = function(){
        let deferred = $q.defer();
        let boolRet = false;
-       boolRet = dir.indexOf(_workWD) > -1;
+       boolRet = _remoteWD.indexOf(_workWD) > -1;
        
        _userDownAuth = false;
        _userUpAuth = false;
@@ -303,9 +301,9 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
            _remoteWD = _workWD;
        }
 
-       remoteRead(_remoteWD);
-
-       deferred.resolve(boolRet);
+       remoteRead(_remoteWD, function() {
+           deferred.resolve(boolRet);
+       });
 
        return deferred.promise;
    }
@@ -319,9 +317,9 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
            _remoteWD = path.dirname(_remoteWD);
        }
 
-       remoteRead(_remoteWD);
-
-       deferred.resolve(null);
+       remoteRead(_remoteWD, function() {
+           deferred.resolve(null);
+       });
 
        return deferred.promise;
    }
@@ -335,9 +333,9 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
            _localWD = path.dirname(_localWD);
        }
 
-       localRead(_localWD);
-
-       deferred.resolve(null);
+       localRead(_localWD, function() {
+           deferred.resolve(null);
+       });
 
        return deferred.promise;
    }
@@ -382,7 +380,7 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
           _processStatus = false;
           let data_response = data.split(/[	]+/); //NOTE: Matches tab spaces
           _accuSize = data_response[0];
-          disk.check($scope.localWD, function(err, info) {
+          disk.check(_localWD, function(err, info) {
               _diskQuota = Math.floor((data_response[0]/info.available)*100);
               _diskAvail = Math.floor((info.free/info.total)*100);
               deferred.resolve(null);
@@ -419,8 +417,9 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
          notifierService.success('Your file transfer was succesfull!', 'Transfer!');
 		 _finalizer = true;
          _processFinished = true;
-         remoteRead(_remoteWD);
-         deferred.resolve(null);
+         remoteRead(_remoteWD, function() {
+             deferred.resolve(null);
+         });
        }, function(err) {
          // Error occurred in ConnectionService
 		 notifierService.error(err, 'Error in ConnectionService');
@@ -459,8 +458,9 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
          notifierService.success('Your file transfer was succesfull!', 'Transfered!');
          _finalizer = true;
          _processFinished = true;   // Show finished message
-         localRead(_localWD);
-         deferred.resolve(null);
+         localRead(_localWD, function() {
+             deferred.resolve(null);
+         });
          
        }, function(err) {
          // Error occurred in ConnectionService
@@ -480,7 +480,7 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
        connectionService.getHomeWD().then(function(data) {
           _remoteWD = data;
           _homeWD = data;
-          remoteRead(_remoteWD);    // Sets remote display
+          remoteRead(_remoteWD, function () {});    // Sets remote display
           $log.debug("Home directory: " + _homeWD);
        });
    }
@@ -507,9 +507,10 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
        }
    }
 
-   localRead(_localWD);    // Sets local display
+   localRead(_localWD, function() {
+       _finalizer = true;
+   });    // Sets local display
 
-   _finalizer = true;
   
    return service;
   

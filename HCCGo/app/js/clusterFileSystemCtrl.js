@@ -9,11 +9,11 @@ clusterUploadModule.controller('clusterFileSystemCtrl', ['$scope', '$log', '$tim
    const fs = require("fs");
    const async = require("async");
 
-   $scope.params = $routeParams
+   $scope.params = $routeParams;
    $scope.sourceDir = fileManageService.getSourceDir();
 
-   $scope.wdSwitcher = function(dir) {
-      fileManageService.wdSwitcher(dir).then(function(val) {
+   $scope.wdSwitcher = function() {
+      fileManageService.wdSwitcher().then(function(val) {
           if(val) {
               angular.element('#lblSwitch').text('Work');
               angular.element('#lblRemote').text('Home');
@@ -34,6 +34,7 @@ clusterUploadModule.controller('clusterFileSystemCtrl', ['$scope', '$log', '$tim
    $scope.cdSSH = function (data) {
       fileManageService.cdSSH(data).then(function(val) {
           $scope.remoteWD = fileManageService.getRemoteWD();
+          $scope.remoteFiles = fileManageService.getRemoteFiles();
 
           // Hides download button
           angular.element('#btnDownload').attr('disabled', '');
@@ -46,6 +47,7 @@ clusterUploadModule.controller('clusterFileSystemCtrl', ['$scope', '$log', '$tim
    $scope.cdLocal = function(data) {
       fileManageService.cdLocal(data).then(function(val) {
           $scope.localWD = fileManageService.getLocalWD();
+          $scope.localFiles = fileManageService.getLocalFiles();
 
           // Hides upload button
           angular.element('#tranContent').text('');
@@ -75,11 +77,9 @@ clusterUploadModule.controller('clusterFileSystemCtrl', ['$scope', '$log', '$tim
      async.until(function(){
        return fileManageService.getFinalizer();
 	 },function(done){
-	   $scope.$apply(function(scope) {
-	     scope.filesTotal = fileManageService.getFilesTotal();
-	     scope.counter = fileManageService.getCounter();
-	     scope.totalProgress = fileManageService.getTotalProgress();
-	   });
+       $scope.filesTotal = fileManageService.getFilesTotal();
+       $scope.counter = fileManageService.getCounter();
+	   $scope.totalProgress = fileManageService.getTotalProgress();
 	   done(); // Loop finished
 	 },function(err){
        if(err) {
@@ -214,6 +214,8 @@ clusterUploadModule.controller('clusterFileSystemCtrl', ['$scope', '$log', '$tim
          $scope.totalProgress = fileManageService.getTotalProgress();
          $scope.userDownAuth = fileManageService.getUserDownAuth();
          $scope.userUpAuth = fileManageService.getUserDownAuth();
+         $scope.localWD = fileManageService.getLocalWD();
+         $scope.remoteWD = fileManageService.getRemoteWD();
          if (localFocus != "") {
              angular.element("#l" + localFocus.replace(/\./g, "\\.")).addClass('highlight');
          } else if (remoteFocus != "") {
