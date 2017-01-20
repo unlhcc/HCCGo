@@ -65,7 +65,7 @@
         <a class="pull-right" href="javascript:void(0)" ng-click="refreshCluster(true)"><i id="jobrefresh" class="mdi-action-autorenew"></i></a>
         <hr />
         <ul>
-          <li class="animate-repeat" ng-repeat="job in jobs | filter:q as results" ng-class="{running: job.running, idle: job.idle, error: job.error, complete: job.complete}">
+          <li class="animate-repeat" ng-repeat="job in jobs | filter:q | orderBy:'timestamp':true" ng-class="{running: job.running, idle: job.idle, error: job.error, complete: job.complete}">
             <div class="row">
               <div class="col-md-1">
                 <i class="mdi-action-trending-neutral" ng-if="job.running" />
