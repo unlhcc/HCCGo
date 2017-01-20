@@ -343,7 +343,7 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
    service.verifyUpload = function () {
       let deferred = $q.defer();
       connectionService.localSize(String(_localWD + "/" + _localFocus)).then( function(ldata) {
-          if (_remoteWD.indexOf(_workWD()) > -1) {
+          if (_remoteWD.indexOf(_workWD) > -1) {
               connectionService.runCommand("lfs quota -g `id -g` /work").then(function(data) {
                   _processStatus = false;
                   _accuSize = ldata;
