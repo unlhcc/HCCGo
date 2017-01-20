@@ -68,9 +68,6 @@
                   <h3 class="jobname">
                     {{job.jobName}}
                     <span class="pull-right">
-                      <a href="javascript:void(0)" ng-click="viewOutErr($index)" ng-if="job.complete">
-                        <i class="glyphicon glyphicon-search"></i>
-                      </a>
                       <a class="deleteButton" href="javascript:void(0)" ng-click="removeCompletedJob($index)" ng-if="job.complete">
                         <i class="glyphicon glyphicon-remove"></i>
                       </a>
