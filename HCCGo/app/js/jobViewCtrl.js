@@ -23,10 +23,25 @@ jobViewModule.controller('jobViewCtrl', ['$scope', '$log', '$timeout', 'connecti
           result.outText = "The Output file is too large to be displayed here."
         } else {
           connectionService.getFileText(result.outputPath).then(function(data) {
-            result.outText = data.length>0 ? data : "(none)";
+            var text = data.length>0 ? data : "(none)";
+            result.outText = text;
+            db.update(
+              { _id: $routeParams.jobId },
+              { $set:
+                {
+                "outText": text
+                }
+              },
+              { returnUpdatedDocs: true },
+              function (err, numReplaced, affectedDocuments) {
+                // update db with data so it doesn't have to be queried again
+                if (err) {
+                  $log.debug("Something went wrong updating the db.");
+                }
+              }
+            );
           });
         }
-
       });
 
       connectionService.getFileSize(result.errorPath).then(function(size) {
@@ -34,7 +49,23 @@ jobViewModule.controller('jobViewCtrl', ['$scope', '$log', '$timeout', 'connecti
           result.errText = "The Error file is too large to be displayed here."
         }
         connectionService.getFileText(result.errorPath).then(function(data) {
-          result.errText = data.length>0 ? data : "(none)";
+          var text = data.length>0 ? data : "(none)";
+          result.errText = text;
+          db.update(
+            { _id: $routeParams.jobId },
+            { $set:
+              {
+              "errText": text
+              }
+            },
+            { returnUpdatedDocs: true },
+            function (err, numReplaced, affectedDocuments) {
+              // update db with data so it doesn't have to be queried again
+              if (err) {
+                $log.debug("Something went wrong updating the db.");
+              }
+            }
+          );
         });
       });
       $scope.job = result;

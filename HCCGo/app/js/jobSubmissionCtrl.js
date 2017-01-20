@@ -206,7 +206,8 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
             "modules": ((job.modules != null) ? job.modules : []),
             "commands": job.commands,
             "timestamp": now,
-            "cluster": $scope.params.clusterId
+            "cluster": $scope.params.clusterId,
+            "jobFile": jobFile
           }
           submittedJobsDB.insert(doc, function(err, newDoc) {
             if(err) console.log(err);

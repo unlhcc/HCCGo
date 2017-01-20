@@ -509,13 +509,30 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
    }
 
    // get the text of a file
-   // TODO: This should use sftp's open stream
    var getFileText = function(filePath) {
      var deferred = $q.defer();
 
-     runCommand('cat ' + filePath).then(function(data) {
-        deferred.resolve(data.trim());
-     });
+    //  runCommand('cat ' + filePath).then(function(data) {
+    //     deferred.resolve(data.trim());
+    //  });
+    connectionList[getClusterContext()].sftp(function (err, sftp) {
+      if(err) {
+        return deferred.reject("Error getting SFTP object: " + err);
+      }
+      var readStream = sftp.createReadStream(filePath);
+      var text = "";
+      readStream.on('error', function (err) {
+        deferred.reject(err);
+      });
+
+      readStream.on('data', function(chunk) {
+        text += chunk;
+      });
+
+      readStream.on('end', function() {
+        deferred.resolve(text);
+      });
+    });
 
      return deferred.promise;
    }
