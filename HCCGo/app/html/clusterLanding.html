@@ -54,8 +54,8 @@
         <input type="search" ng-model="q" placeholder="filter jobs..." />
         <a class="pull-right" href="javascript:void(0)" ng-click="refreshCluster()"><i class="mdi-action-autorenew"></i></a>
         <hr />
-        <ul>
-          <li class="animate-repeat" ng-repeat="job in jobs | filter:q as results" ng-class="{running: job.running, idle: job.idle, error: job.error, complete: job.complete}">
+        <ul class="jobstatus-list">
+          <li class="animate-repeat jobstatus-link" ng-repeat="job in jobs | filter:q as results" ng-class="{running: job.running, idle: job.idle, error: job.error, complete: job.complete}" ng-click="viewOutErr($index)">
             <div class="row">
               <div class="col-md-1">
                 <i class="mdi-action-trending-neutral" ng-if="job.running" />
@@ -63,7 +63,7 @@
                 <i class="mdi-alert-error" ng-if="job.error" />
                 <i class="glyphicon glyphicon-check" ng-if="job.complete" />
               </div>
-              <div class="col-md-10">
+              <div class="col-md-11">
                 <div class="row">
                   <h3 class="jobname">
                     {{job.jobName}}
@@ -86,7 +86,6 @@
                 </div>
               </div>
             </div>
-            <hr />
           </li>
         </ul>
       </div>
