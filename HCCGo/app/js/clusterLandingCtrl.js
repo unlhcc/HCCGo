@@ -116,13 +116,14 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
 
   }
 
-  $scope.removeCompletedJob = function(index) {
+  $scope.removeCompletedJob = function(index, $event) {
     // deletes the document from db and removes it from list
     var job = $scope.jobs[index];
     $scope.jobs.splice(index,1);
     db.remove({ _id: job._id }, { multi: true }, function (err, numRemoved) {
       if(err) console.log("Error deleting document " + err);
     });
+    $event.stopPropagation();
   }
 
   $scope.viewOutErr = function(index) {

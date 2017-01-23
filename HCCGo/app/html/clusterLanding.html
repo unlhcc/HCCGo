@@ -65,7 +65,7 @@
             </div>
             <div class="row-content">
               <div class="action-secondary">
-                <a class="deleteButton" href="javascript:void(0)" ng-click="removeCompletedJob($index)" ng-if="job.complete">
+                <a class="deleteButton" href="javascript:void(0)" ng-click="removeCompletedJob($index, $event)" ng-if="job.complete">
                   <i class="glyphicon glyphicon-remove"></i>
                 </a>
               </div>
