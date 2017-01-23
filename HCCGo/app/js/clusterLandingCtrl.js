@@ -111,7 +111,7 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
   });
 
 
-  $scope.refreshCluster = function(force) {
+  $scope.refreshCluster = function(force=true) {
     getClusterStats($scope.params.clusterId, force);
 
   }

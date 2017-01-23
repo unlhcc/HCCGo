@@ -25,15 +25,18 @@ jobStatusService.service('jobStatusService',['$log','$q','notifierService', func
      * @param {boolean} force - Flag denoting if the user wants to force update the database
      * @returns {Promise} Promise object to be resolved in the controller
      */
-		refreshDatabase: function(db, clusterInterface, clusterId, force=false) {
+		refreshDatabase: function(db, clusterInterface, clusterId, force) {
 			var toReturn = $q.defer();
 
 			// Reloads old data if it's been less than 15 seconds and the user hasn't forced an update
-			if (Date.now() - lastRequestedTime < 15000 && !force){
+			if (!force && Date.now() - lastRequestedTime < 15000 ){
+				
 				lastRequestedTime = Date.now()
+				$log.debug("Resolving with old data!");
 				toReturn.resolve(oldData);
 			}
 			else {
+				$log.debug("Requesting new info...");
 			async.parallel([
 
 		      // Query all the uncompleted jobs in the DB
