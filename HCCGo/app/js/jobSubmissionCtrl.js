@@ -1,7 +1,7 @@
 
 jobSubmissionModule = angular.module('HccGoApp.jobSubmissionCtrl', ['ngRoute' ]);
 
-jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout', 'connectionService', '$routeParams', '$location', '$q', 'preferencesManager', 'notifierService', 'jobService', 'dbService', function($scope, $log, $timeout, connectionService, $routeParams, $location, $q, preferencesManager, notifierService, jobService, dbService) {
+jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout','$rootScope', 'connectionService', '$routeParams', '$location', '$q', 'preferencesManager', 'notifierService', 'jobService', 'dbService', 'jobStatusService', function($scope, $log, $timeout, $rootScope, connectionService, $routeParams, $location, $q, preferencesManager, notifierService, jobService, dbService, jobStatusService) {
 
   $scope.params = $routeParams;
   const DataStore = require('nedb');
@@ -51,6 +51,9 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
     $location.path("cluster/" + $scope.params.clusterId + "/jobHistory");
   }
 
+  $scope.refreshCluster = function() {
+    jobStatusService.refreshDatabase(dbService.getSubmittedJobsDB(), $rootScope.clusterInterface, $rootScope.clusterId, true)
+  }
   // Get available modules
   function getModules() {
     var deferred = $q.defer();
@@ -218,6 +221,7 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
       } else {
         // Everything was successful!
         notifierService.success('Your job was succesfully submitted to the cluster!', 'Job Submitted!');
+        $scope.refreshCluster();
         $location.path("cluster/" + $scope.params.clusterId);
       }
     });
