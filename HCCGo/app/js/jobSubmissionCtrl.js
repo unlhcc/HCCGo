@@ -203,8 +203,9 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
           }
           submittedJobsDB.insert(doc, function(err, newDoc) {
             if(err) console.log(err);
+            callback(null);
           });
-          callback(null);
+
         }, function(err) {
           callback(new Error("Job submission failed!"))
         });
