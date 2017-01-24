@@ -1,11 +1,16 @@
 
 welcomeModule = angular.module('HccGoApp.WelcomeCtrl', [ ]);
 
-welcomeModule.controller('welcomeCtrl', ['$scope', '$log', '$timeout', 'connectionService', 'notifierService', '$location', 'preferencesManager', 'updaterService', function($scope, $log, $timeout, connectionService, notifierService, $location, preferencesManager, updaterService) {
+welcomeModule.controller('welcomeCtrl', ['$scope', '$log', '$timeout', '$window','connectionService', 'notifierService', '$location', 'preferencesManager', 'updaterService', function($scope, $log, $timeout, $window, connectionService, notifierService, $location, preferencesManager, updaterService) {
  
   updaterService.start();
   angular.element('#betaModal').modal('show');
- 
+  
+  $('#betaModal').on('shown.bs.modal', function () {
+  // get the locator for an input in your modal. Here I'm focusing on
+  // the element with the id of myInput
+  $('#focusOn').focus()
+});
   var $selector = $('#clusterSelect').selectize({
     
     createOnBlur: true,
