@@ -1,7 +1,7 @@
 
 clusterLandingModule = angular.module('HccGoApp.clusterLandingCtrl', ['ngRoute' ]);
 
-clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeout', 'connectionService', '$routeParams', '$location', '$q', 'preferencesManager', 'filePathService', 'notifierService', 'dbService', 'dataUsageService','jobStatusService', function($scope, $log, $timeout, connectionService, $routeParams, $location, $q, preferencesManager, filePathService, notifierService, dbService, dataUsageService, jobStatusService) {
+clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeout','$rootScope', 'connectionService', '$routeParams', '$location', '$q', 'preferencesManager', 'filePathService', 'notifierService', 'dbService', 'dataUsageService','jobStatusService', function($scope, $log, $timeout, $rootScope, connectionService, $routeParams, $location, $q, preferencesManager, filePathService, notifierService, dbService, dataUsageService, jobStatusService) {
 
   $scope.params = $routeParams;
   $scope.jobs = [];
@@ -189,9 +189,8 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
         clusterInterface = new CondorClusterInterface(connectionService, $q);
         break;
     }
-
-    getClusterStats($scope.params.clusterId);
-    updateGraphs();
+    $rootScope.clusterInterface = clusterInterface;
+    $rootScope.clusterId = $scope.params.clusterId;
 
     // Update the cluster every 15 seconds
     var refreshingClusterPromise;
