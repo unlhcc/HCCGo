@@ -190,9 +190,7 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
         break;
     }
     $rootScope.clusterInterface = clusterInterface;
-    $rootScope.clusterID = $scope.params.clusterID;
-    getClusterStats($scope.params.clusterId);
-    updateGraphs();
+    $rootScope.clusterId = $scope.params.clusterId;
 
     // Update the cluster every 15 seconds
     var refreshingClusterPromise;
