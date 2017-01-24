@@ -25,7 +25,7 @@ jobStatusService.service('jobStatusService',['$log','$q','notifierService', func
      * @param {integer} clusterId - Unique ID of the cluster for querying the database
      * @param {boolean} force - Flag denoting if the user wants to force update the database
      * @returns {Promise} Promise object to be resolved in the controller
-
+		 */
 		refreshDatabase: function(db, clusterInterface, clusterId, force=false) {
 			
 			// The lastPromise is a single promise that we will hand out to all requesters
