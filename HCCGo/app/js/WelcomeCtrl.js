@@ -51,12 +51,18 @@ welcomeModule.controller('welcomeCtrl', ['$scope', '$log', '$timeout', 'connecti
     $('#loginForm').fadeTo('fast', 0.3);
     
     var connectUrl = selection.getValue();
+    var curValue = 33;
     $scope.selectedCluster = $.grep($scope.clusters, function(e) {return e.url == connectUrl})[0];
     
     this.logger = new DebugLogger($('#LoginDebugWindow'))
     
+    $('#submitprogress').css('width', curValue+'%').attr('aria-valuenow', curValue);
+
     this.logger.log("Got " + $scope.username + " for login");
     
+    curValue = 66;
+    $('#submitprogress').css('width', curValue+'%').attr('aria-valuenow', curValue);
+
     this.logger.log("Starting login process", 'warning');
     logger = this.logger;
     
@@ -67,10 +73,13 @@ welcomeModule.controller('welcomeCtrl', ['$scope', '$log', '$timeout', 'connecti
           logger.error("Got error from connection");
           $('#loginSubmit').prop('disabled', false);
           $('#loginForm').fadeTo('fast', 1.0);
+          curValue = 0;
+          $('#submitprogress').css('width', curValue+'%').attr('aria-valuenow', curValue);
         } else {
-          
+          curValue = 100;
+          $('#submitprogress').css('width', curValue+'%').attr('aria-valuenow', curValue);
           $location.path("/cluster/" + $scope.selectedCluster.label);
-        $log.debug("Cluster label: " + $scope.selectedCluster.label);
+          $log.debug("Cluster label: " + $scope.selectedCluster.label);
           
         }      
       });
