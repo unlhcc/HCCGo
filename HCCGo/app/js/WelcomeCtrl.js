@@ -11,6 +11,9 @@ welcomeModule.controller('welcomeCtrl', ['$scope', '$log', '$timeout', 'connecti
   // the element with the id of myInput
   $('#focusOn').focus()
 });
+  $('#focusOn').on('click', function() {
+    $('#newFocus').focus()
+  });
   var $selector = $('#clusterSelect').selectize({
     
     createOnBlur: true,
