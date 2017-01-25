@@ -11,6 +11,9 @@ welcomeModule.controller('welcomeCtrl', ['$scope', '$log', '$timeout', 'connecti
   // the element with the id of myInput
   $('#focusOn').focus()
 });
+  $('#focusOn').on('click', function() {
+    $('#newFocus').focus()
+  });
   var $selector = $('#clusterSelect').selectize({
     
     createOnBlur: true,
@@ -56,26 +59,33 @@ welcomeModule.controller('welcomeCtrl', ['$scope', '$log', '$timeout', 'connecti
     $('#loginForm').fadeTo('fast', 0.3);
     
     var connectUrl = selection.getValue();
+    var curValue = 33;
     $scope.selectedCluster = $.grep($scope.clusters, function(e) {return e.url == connectUrl})[0];
     
-    this.logger = new DebugLogger($('#LoginDebugWindow'))
     
-    this.logger.log("Got " + $scope.username + " for login");
+    $('#submitprogress').css('width', curValue+'%').attr('aria-valuenow', curValue);
+
+    $log.log("Got " + $scope.username + " for login");
     
-    this.logger.log("Starting login process", 'warning');
-    logger = this.logger;
+    curValue = 66;
+    $('#submitprogress').css('width', curValue+'%').attr('aria-valuenow', curValue);
+
+    $log.log("Starting login process", 'warning');
     
     connectionService.initiateConnection($scope.username, $scope.password, connectUrl, $scope.selectedCluster.label, this.logger, userPrompt,  function(err) {
       $scope.$apply(function() {
         
         if (err) {
-          logger.error("Got error from connection");
+          $log.error("Got error from connection");
           $('#loginSubmit').prop('disabled', false);
           $('#loginForm').fadeTo('fast', 1.0);
+          curValue = 0;
+          $('#submitprogress').css('width', curValue+'%').attr('aria-valuenow', curValue);
         } else {
-          
+          curValue = 100;
+          $('#submitprogress').css('width', curValue+'%').attr('aria-valuenow', curValue);
           $location.path("/cluster/" + $scope.selectedCluster.label);
-        $log.debug("Cluster label: " + $scope.selectedCluster.label);
+          $log.debug("Cluster label: " + $scope.selectedCluster.label);
           
         }      
       });
@@ -84,7 +94,7 @@ welcomeModule.controller('welcomeCtrl', ['$scope', '$log', '$timeout', 'connecti
   
   $scope.transformCustom = function(customUrl) {
     
-    this.logger.log("Got custom attribute: " + customUrl);
+    $log.log("Got custom attribute: " + customUrl);
     return { label: customUrl, url: customUrl, type: 'slurm'};
     
   };

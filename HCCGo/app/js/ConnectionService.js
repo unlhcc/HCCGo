@@ -841,48 +841,45 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', '$lo
      
      conn.on('ready', function() {
       completed(null);
-      logger.log('Client :: ready')
+      $log.log('Client :: ready');
       conn.exec('uptime', function (err, stream) {
         if (err) {
-         logger.error("Error Logging executing");
-         console.log(err)
+         $log.error("Error Logging executing");
          return;
         }
         
         stream.on('close', function(code, signal) {
-         logger.log('Stream :: close :: code: ' + code + ', signal: ' + signal)
+         $log.info('Stream :: close :: code: ' + code + ', signal: ' + signal)
          
         }).on('data', function(data) {
-         logger.log('STDOUT' + data);
+         $log.log('STDOUT' + data);
         }).stderr.on('data', function(data) {
-         logger.log('STDERR' + data);
+         $log.log('STDERR' + data);
         });
       });
      }).on('error', function(err) {
-      logger.error(err);
+      $log.error(err);
       completed(err);
-     //}).on('close', function() {
          
      }).on('keyboard-interactive', function(name, instructions,  instructionsLang, prompts, finishFunc) {
-      logger.log("Name: " + name + ", instructions: " + instructions + "prompts" + prompts);
-      console.log(prompts);
+      $log.log("Name: " + name + ", instructions: " + instructions + "prompts" + prompts);
       
       if (prompts[0].prompt == "Password: ") {
         finishFunc([password]);
       } else {
-        logger.log(prompts[0].prompt);
+        $log.log(prompts[0].prompt);
         needInput(prompts[0].prompt, function(input) {
          finishFunc([input]);
         });
       }
 
       }).on('close', function(hadError) {
-        logger.error("Connection closed");
-        if (hadError) logger.error("Error while closing connection");
+        $log.error("Connection closed");
+        if (hadError) $log.error("Error while closing connection");
         notifierService.error("Disconnected from cluster", "Disconnection");
         $location.path("/");
       }).on('end', function() {
-        logger.error("Connection ended");
+        $log.error("Connection ended");
 
      }).connect({
       host: hostname,
@@ -890,7 +887,7 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', '$lo
       tryKeyboard: true,
       readyTimeout: 99999999,
       debug: function(message) {
-        //logger.log(message);
+      //$log.log(message);
       }
     });
       switch(cluster) {
