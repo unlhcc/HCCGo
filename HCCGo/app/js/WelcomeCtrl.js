@@ -59,23 +59,21 @@ welcomeModule.controller('welcomeCtrl', ['$scope', '$log', '$timeout', 'connecti
     var curValue = 33;
     $scope.selectedCluster = $.grep($scope.clusters, function(e) {return e.url == connectUrl})[0];
     
-    this.logger = new DebugLogger($('#LoginDebugWindow'))
     
     $('#submitprogress').css('width', curValue+'%').attr('aria-valuenow', curValue);
 
-    this.logger.log("Got " + $scope.username + " for login");
+    $log.log("Got " + $scope.username + " for login");
     
     curValue = 66;
     $('#submitprogress').css('width', curValue+'%').attr('aria-valuenow', curValue);
 
-    this.logger.log("Starting login process", 'warning');
-    logger = this.logger;
+    $log.log("Starting login process", 'warning');
     
     connectionService.initiateConnection($scope.username, $scope.password, connectUrl, $scope.selectedCluster.label, this.logger, userPrompt,  function(err) {
       $scope.$apply(function() {
         
         if (err) {
-          logger.error("Got error from connection");
+          $log.error("Got error from connection");
           $('#loginSubmit').prop('disabled', false);
           $('#loginForm').fadeTo('fast', 1.0);
           curValue = 0;
@@ -93,7 +91,7 @@ welcomeModule.controller('welcomeCtrl', ['$scope', '$log', '$timeout', 'connecti
   
   $scope.transformCustom = function(customUrl) {
     
-    this.logger.log("Got custom attribute: " + customUrl);
+    $log.log("Got custom attribute: " + customUrl);
     return { label: customUrl, url: customUrl, type: 'slurm'};
     
   };
