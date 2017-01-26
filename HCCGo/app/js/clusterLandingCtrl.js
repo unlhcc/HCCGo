@@ -1,7 +1,7 @@
 
 clusterLandingModule = angular.module('HccGoApp.clusterLandingCtrl', ['ngRoute' ]);
 
-clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeout', 'connectionService', '$routeParams', '$location', '$q', 'preferencesManager', 'filePathService', 'notifierService', 'dbService', 'dataUsageService','jobStatusService', function($scope, $log, $timeout, connectionService, $routeParams, $location, $q, preferencesManager, filePathService, notifierService, dbService, dataUsageService, jobStatusService) {
+clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeout','$rootScope', 'connectionService', '$routeParams', '$location', '$q', 'preferencesManager', 'filePathService', 'notifierService', 'dbService', 'dataUsageService','jobStatusService', function($scope, $log, $timeout, $rootScope, connectionService, $routeParams, $location, $q, preferencesManager, filePathService, notifierService, dbService, dataUsageService, jobStatusService) {
 
   $scope.params = $routeParams;
   $scope.jobs = [];
@@ -111,7 +111,7 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
   });
 
 
-  $scope.refreshCluster = function(force) {
+  $scope.refreshCluster = function(force=false) {
     getClusterStats($scope.params.clusterId, force);
 
   }
@@ -119,14 +119,20 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
   $scope.updateGraphs = function(force) {
     updateGraphs(force);
   }
-  
-  $scope.removeCompletedJob = function(index) {
+
+  $scope.removeCompletedJob = function(index, $event) {
     // deletes the document from db and removes it from list
     var job = $scope.jobs[index];
     $scope.jobs.splice(index,1);
     db.remove({ _id: job._id }, { multi: true }, function (err, numRemoved) {
       if(err) console.log("Error deleting document " + err);
     });
+    $event.stopPropagation();
+  }
+
+  $scope.viewOutErr = function(index) {
+    // view the selected job's stander out and err
+    $location.path("cluster/" + $routeParams.clusterId + "/jobview/" + $scope.jobs[index]._id);
   }
 
   function getClusterStats(clusterId, force) {
@@ -134,13 +140,13 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
     // Begin spinning the refresh image
     $("#jobrefresh").addClass("spinning-image");
 
-    
+
     jobStatusService.refreshDatabase(db, clusterInterface, clusterId, force).then(function(data) {
       $scope.numRunning = data.numRunning;
       $scope.numIdle = data.numIdle;
       $scope.numError = data.numError;
       $scope.jobs = data.jobs;
-      
+
       // Stop spinning image
       $("#jobrefresh").removeClass("spinning-image");
     })
@@ -175,7 +181,7 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
 
         // POSSIBLE FUTURE DEPRECATION: Messing with interals instead of using load function
         workUsageGauge.internal.config.gauge_max = data[1].blocksLimit;
-    });    
+    });
   }
   preferencesManager.getClusters().then(function(clusters) {
     // Get the cluster type
@@ -189,9 +195,8 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
         clusterInterface = new CondorClusterInterface(connectionService, $q);
         break;
     }
-
-    getClusterStats($scope.params.clusterId);
-    updateGraphs();
+    $rootScope.clusterInterface = clusterInterface;
+    $rootScope.clusterId = $scope.params.clusterId;
 
     // Update the cluster every 15 seconds
     var refreshingClusterPromise;

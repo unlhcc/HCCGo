@@ -13,6 +13,7 @@ jobStatusService.service('jobStatusService',['$log','$q','notifierService', func
 	var async = require('async');
 	var oldData = null;
 	var lastRequestedTime = 0;
+	var lastPromise = null;
 	return {
 
 	  /**
@@ -24,16 +25,15 @@ jobStatusService.service('jobStatusService',['$log','$q','notifierService', func
      * @param {integer} clusterId - Unique ID of the cluster for querying the database
      * @param {boolean} force - Flag denoting if the user wants to force update the database
      * @returns {Promise} Promise object to be resolved in the controller
-     */
+		 */
 		refreshDatabase: function(db, clusterInterface, clusterId, force=false) {
-			var toReturn = $q.defer();
-
-			// Reloads old data if it's been less than 15 seconds and the user hasn't forced an update
-			if (Date.now() - lastRequestedTime < 15000 && !force){
-				lastRequestedTime = Date.now()
-				toReturn.resolve(oldData);
-			}
-			else {
+			
+			// The lastPromise is a single promise that we will hand out to all requesters
+			// If this is the first run, or if it is time for new data
+			if (lastPromise == null || ((Date.now() - lastRequestedTime > 15000) || force)) {
+				lastPromise = $q.defer();
+			  lastRequestedTime = Date.now();
+				
 			async.parallel([
 
 		      // Query all the uncompleted jobs in the DB
@@ -162,16 +162,14 @@ jobStatusService.service('jobStatusService',['$log','$q','notifierService', func
 		          } else {
 		            updatedData.jobs = recent_completed[0].concat(completed_jobs, cluster_jobs);
 		          }
-
-		          lastRequestedTime = Date.now();
-		          oldData = updatedData;
-		          toReturn.resolve(updatedData);
+							
+		          lastPromise.resolve(updatedData);
 		        });
 		      }
 		    );
 			}
 
-			return toReturn.promise;
+			return lastPromise.promise;
 		}
 	};
 }]);
