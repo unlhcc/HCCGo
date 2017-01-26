@@ -120,19 +120,24 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
     updateGraphs(force);
   }
 
-  $scope.removeCompletedJob = function(index, $event) {
+  $scope.removeCompletedJob = function(id, $event) {
     // deletes the document from db and removes it from list
-    var job = $scope.jobs[index];
-    $scope.jobs.splice(index,1);
-    db.remove({ _id: job._id }, { multi: true }, function (err, numRemoved) {
+    for(var i = 0; i < $scope.jobs.length; i++) {
+      if($scope.jobs[i]._id == id) {
+        $scope.jobs.splice(i, 1);
+        break;
+      }
+    }
+    
+    db.remove({ _id: id }, { multi: true }, function (err, numRemoved) {
       if(err) console.log("Error deleting document " + err);
     });
     $event.stopPropagation();
   }
 
-  $scope.viewOutErr = function(index) {
+  $scope.viewOutErr = function(id) {
     // view the selected job's stander out and err
-    $location.path("cluster/" + $routeParams.clusterId + "/jobview/" + $scope.jobs[index]._id);
+    $location.path("cluster/" + $routeParams.clusterId + "/jobview/" + id);
   }
 
   function getClusterStats(clusterId, force) {
