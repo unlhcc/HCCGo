@@ -84,9 +84,9 @@
         <legend style="text-align: center">Loading Bar</legend>
         <div class="progress">
           <div class="progress-bar progress-bar-striped active" id="submitprogress" role="progressbar" aria-valuemax="100">
-            <span id="progresssummary"></span>
           </div>
         </div>
+        <div style="text-align:center"> {{loadingDescription}} </div>
       </div>
     </div>
   </div>
@@ -97,7 +97,7 @@
           <form ng-submit="promptComplete()">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-                <h4 class="modal-title">Server Challenge</h4>
+                <h4 class="modal-title">Two-Factor Authentication Required!</h4>
             </div>
             <div class="modal-body">
                 <p><pre>{{ userPrompt }}</pre></p>

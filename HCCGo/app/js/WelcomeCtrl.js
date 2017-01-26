@@ -16,6 +16,7 @@ welcomeModule.controller('welcomeCtrl', ['$scope', '$log', '$timeout', 'connecti
     $('#newFocus').focus()
   });
 
+  $scope.loadingDescription = "Please enter your credentials.";
   var $selector = $('#clusterSelect').selectize({
     
     createOnBlur: true,
@@ -54,24 +55,24 @@ welcomeModule.controller('welcomeCtrl', ['$scope', '$log', '$timeout', 'connecti
   });
   
 
-  
   $scope.login = function() {
     // Get the input
     $('#loginSubmit').prop('disabled', true);
     $('#loginForm').fadeTo('fast', 0.3);
     
     var connectUrl = selection.getValue();
-    var curValue = 33;
+    var curValue = 25;
     $scope.selectedCluster = $.grep($scope.clusters, function(e) {return e.url == connectUrl})[0];
     
     
     $('#submitprogress').css('width', curValue+'%').attr('aria-valuenow', curValue);
 
     $log.log("Got " + $scope.username + " for login");
-    
-    curValue = 66;
-    $('#submitprogress').css('width', curValue+'%').attr('aria-valuenow', curValue);
 
+    curValue = 50;
+    $('#submitprogress').css('width', curValue+'%').attr('aria-valuenow', curValue);
+    
+    $scope.loadingDescription = "Attempting to login...";
     $log.log("Starting login process", 'warning');
     
     connectionService.initiateConnection($scope.username, $scope.password, connectUrl, $scope.selectedCluster.label, this.logger, userPrompt,  function(err) {
@@ -103,22 +104,22 @@ welcomeModule.controller('welcomeCtrl', ['$scope', '$log', '$timeout', 'connecti
   
   
   userPrompt = function(prompt, finishFunc) {
+    var curValue = 75;
+    $('#submitprogress').css('width', curValue+'%').attr('aria-valuenow', curValue);
+    $scope.loadingDescription = "Two-Factor Authentication Required";
     $scope.$apply(function() {
       $scope.userPrompt = prompt;
-      
       // Event registration must be before show command
       $('#promptModal').on('shown.bs.modal', function () {
         $('#userPromptInput').focus();
       });
       $("#promptModal").modal('show');
-
       $scope.finishFunc = finishFunc;
     });
     
   };
   
   $scope.promptComplete = function() {
-    
     $("#promptModal").modal('hide');
     $scope.finishFunc($scope.userResponse);
     
