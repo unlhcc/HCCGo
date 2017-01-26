@@ -104,10 +104,11 @@ welcomeModule.controller('welcomeCtrl', ['$scope', '$log', '$timeout', 'connecti
   
   
   userPrompt = function(prompt, finishFunc) {
-    var curValue = 75;
-    $('#submitprogress').css('width', curValue+'%').attr('aria-valuenow', curValue);
-    $scope.loadingDescription = "Two-Factor Authentication Required";
+    
     $scope.$apply(function() {
+      var curValue = 75;
+      $('#submitprogress').css('width', curValue+'%').attr('aria-valuenow', curValue);
+      $scope.loadingDescription = "Two-Factor Authentication Required";
       $scope.userPrompt = prompt;
       // Event registration must be before show command
       $('#promptModal').on('shown.bs.modal', function () {
