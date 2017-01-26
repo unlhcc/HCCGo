@@ -127,6 +127,7 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
     db.remove({ _id: job._id }, { multi: true }, function (err, numRemoved) {
       if(err) console.log("Error deleting document " + err);
     });
+    $event.stopPropagation();
   }
 
   $scope.viewOutErr = function(index) {
