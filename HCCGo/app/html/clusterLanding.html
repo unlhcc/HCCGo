@@ -23,19 +23,15 @@
                   <td>{{numError}}</td>
                 </tr>
               </tbody>
-
             </table>
-
-            <!--<button href="javascript:void(0)" class="btn btn-primary btn-lg">Submit Job <i class="mdi-navigation-chevron-right"></i></a>
-         <button ng-click="goToUpload()" class="btn btn-primary">Upload <i class="mdi-navigation-chevron-right"></i></a>-->
-        </div>
+          </div>
         </div>
       </div>
       <div class="row">
         <div class="card">
           <div class="col-md-12">
             <div class="row">
-              <h3>Storage Usage 
+              <h3>Storage Usage
                 <a class="pull-right" href="javascript:void(0)" ng-click="updateGraphs(true)"><i class="
                 mdi-action-autorenew" id="graphrefresh"></i></a>
               </h3>
@@ -52,11 +48,8 @@
               <div id="workUsageGauge"></div>
             </div>
           </div>
-
         </div>
-
       </div>
-
     </div>
 
     <div class="col-md-8 jobdisplay">
@@ -64,43 +57,36 @@
         <input type="search" ng-model="q" placeholder="filter jobs..." />
         <a class="pull-right" href="javascript:void(0)" ng-click="refreshCluster(true)"><i id="jobrefresh" class="mdi-action-autorenew"></i></a>
         <hr />
-        <ul>
-          <li class="animate-repeat" ng-repeat="job in jobs | filter:q | orderBy:'timestamp':true" ng-class="{running: job.running, idle: job.idle, error: job.error, complete: job.complete}">
-            <div class="row">
-              <div class="col-md-1">
-                <i class="mdi-action-trending-neutral" ng-if="job.running" />
-                <i class="mdi-action-query-builder" ng-if="job.idle" />
-                <i class="mdi-alert-error" ng-if="job.error" />
-                <i class="glyphicon glyphicon-check" ng-if="job.complete" />
-              </div>
-              <div class="col-md-10">
-                <div class="row">
-                  <h3 class="jobname">
-                    {{job.jobName}}
-                    <a class="pull-right deleteButton" href="javascript:void(0)" ng-click="removeCompletedJob($index)" ng-if="job.complete">
-                      <i class="glyphicon glyphicon-remove"></i>
-                    </a>
-                  </h3>
-                </div>
-                <div class="row">
-                  <span class="jobid">ID: {{job.jobId}}</span>
-                  <span class="runTime" ng-if="job.running">Runtime: {{job.runTime}}</span>
-                  <span class="runTime" ng-if="job.complete">Runtime: {{job.elapsed}}</span>
-                  <span class="runTime" ng-if="job.complete">Required Memory: {{job.reqMem}}</span>
-                  <span class="startTime" ng-if="!job.running && !job.complete">Estimated Start: {{job.startTime}}</span>
-                </div>
-              </div>
+        <div class="list-group">
+          <div class="list-group-item jobstatus-link" ng-repeat-start="job in jobs | filter:q | orderBy:'timestamp':true" ng-class="{running: job.running, idle: job.idle, error: job.error, complete: job.complete}" ng-click="viewOutErr($index)">
+            <div class="row-action-primary">
+              <i class="mdi-action-trending-neutral" ng-if="job.running" />
+              <i class="mdi-action-query-builder" ng-if="job.idle" />
+              <i class="mdi-alert-error" ng-if="job.error" />
+              <i class="glyphicon glyphicon-check" ng-if="job.complete" />
             </div>
-            <hr />
+            <div class="row-content">
+              <div class="action-secondary">
+                <a class="deleteButton" href="javascript:void(0)" ng-click="removeCompletedJob($index, $event)" ng-if="job.complete">
+                  <i class="glyphicon glyphicon-remove"></i>
+                </a>
+              </div>
+              <h4 class="list-group-item-heading">{{job.jobName}}</h4>
 
-          </li>
-
-        </ul>
-
+              <p class="list-group-item-text">
+                <span class="jobid">ID: {{job.jobId}}</span>
+                <span class="runTime" ng-if="job.running">Runtime: {{job.runTime}}</span>
+                <span class="runTime" ng-if="job.complete">Runtime: {{job.elapsed}}</span>
+                <span class="runTime" ng-if="job.complete">Required Memory: {{job.reqMem}}</span>
+                <span class="startTime" ng-if="!job.running && !job.complete">Estimated Start: {{job.startTime}}</span>
+              </p>
+            </div>
+          </div>
+          <div class="list-group-separator" ng-repeat-end ng-if="!$last"></div>
+        </div>
       </div>
     </div>
 
   </div>
-
 
 </div>

@@ -1,0 +1,64 @@
+<div ng-include="'html/navbar.html'"></div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-4">
+      <div class="well">
+        <h3 class="text-center">Job Stats</h3>
+        <hr />
+        <p><strong>Time Elapsed:</strong> {{job.elapsed}}</p>
+        <p><strong>Required Memory:</strong> {{job.reqMem}}</p>
+      </div>
+    </div>
+    <div class="col-md-8">
+      <div class="well">
+        <h3 class="text-center">{{job.jobName}} - {{job.jobId}}</h3>
+        <hr />
+        <div class="panel-group">
+          <div class="panel panel-default">
+           <div class="panel-heading jobstatus-link" data-toggle="collapse" data-target="#collapse0">
+             <div class="row">
+               <div class="col-sm-12">
+                 <h4 class="panel-title jobhistory">Output<small class="jobdate"> {{job.outputPath}} </small></h4>
+               </div>
+             </div>
+           </div>
+           <div id="collapse0" class="panel-collapse collapse in">
+             <div class="panel-body jobstatus-text">
+               <pre>{{job.outText}}</pre>
+             </div>
+           </div>
+          </div>
+          <div class="panel panel-default">
+           <div class="panel-heading jobstatus-link" data-toggle="collapse" data-target="#collapse1">
+             <div class="row">
+               <div class="col-sm-12">
+                 <h4 class="panel-title jobhistory">Error<small class="jobdate"> {{job.errorPath}} </small></h4>
+               </div>
+             </div>
+            </div>
+            <div id="collapse1" class="panel-collapse collapse in">
+              <div class="panel-body jobstatus-text">
+                <pre>{{job.errText}}</pre>
+              </div>
+            </div>
+          </div>
+          <div class="panel panel-default">
+            <div class="panel-heading jobstatus-link" data-toggle="collapse" data-target="#collapse2">
+              <div class="row">
+                <div class="col-sm-12">
+                  <h4 class="panel-title jobhistory">Job<small class="jobdate"> {{job.location}} </small></h4>
+                </div>
+              </div>
+            </div>
+            <div id="collapse2" class="panel-collapse collapse in">
+              <div class="panel-body jobstatus-text">
+                <pre>{{job.jobFile}}</pre>
+              </div>
+            </div>
+          </div>
+       </div>
+      </div>
+    </div>
+  </div>
+</div>
