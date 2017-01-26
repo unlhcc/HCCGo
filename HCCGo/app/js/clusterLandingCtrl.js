@@ -120,7 +120,7 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
     updateGraphs(force);
   }
 
-  $scope.removeCompletedJob = function(index) {
+  $scope.removeCompletedJob = function(index, $event) {
     // deletes the document from db and removes it from list
     var job = $scope.jobs[index];
     $scope.jobs.splice(index,1);
