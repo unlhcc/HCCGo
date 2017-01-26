@@ -934,7 +934,6 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', '$lo
         $location.path("/");
       }).on('end', function() {
         logger.error("Connection ended");
-
      }).connect({
       host: hostname,
       username: username,
