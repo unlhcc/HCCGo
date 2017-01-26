@@ -6,7 +6,6 @@ preferencesModule.factory('preferencesManager',['$log', '$q','filePathService','
   
   var clustersDefer;
   var preferencesDefer;
-  var jsonfile = require('jsonfile');
   var preferencePath = filePathService.getPreferencePath();
   var fs = require("fs");
 
@@ -31,39 +30,30 @@ preferencesModule.factory('preferencesManager',['$log', '$q','filePathService','
     console.log("Current Directory = " + process.cwd());
     console.log(fs.readdirSync(process.cwd()));
 
-    // Read in preferences file
+    // 
 
     readPrefDefer = $q.defer();
     preferencesDefer = readPrefDefer.promise;
     
     var preferences;
-
-    fs.readFile(preferencePath, function(err, data) {
-	if(err) {
-	$log.error(err);
-        readPrefDefer.reject(err);
-	}
-    
-	preferences = JSON.parse(data);
-        
-	if(!preferences['uuid']) {
-	    //console.log("uuid not set!");
-            var uuid = require('uuid');
-            var buffer = new Array(16);
-            buffer = uuid(null,buffer,0);
- 	    var obj = { uuid :  uuid.unparse(buffer) };
-            jsonfile.writeFile(preferencePath, obj, function(err) {
-		//$log.error(err);
-	    });
-        }
-       
-	readPrefDefer.resolve(preferences.preferences);
-	
-
+    fs.exists(preferencePath, function(exists) {
+      if(!exists) {
+        ws = fs.createWriteStream(preferencePath);
+        var uuid = require('uuid');
+        var buffer = new Array(16);
+        buffer = uuid(null,buffer,0);
+ 	      var obj = { uuid :  uuid.unparse(buffer) };
+        ws.write(JSON.stringify(obj));
+        readPrefDefer.resolve(obj);
+        ws.end();
+      }
+      else {
+        fs.readFile(preferencePath, function(err, data) {
+	      preferences = JSON.parse(data);
+        readPrefDefer.resolve(preferences);
+	      })
+	    }
     })
-	
-        
-    
   }
   
   
@@ -95,7 +85,7 @@ preferencesModule.factory('preferencesManager',['$log', '$q','filePathService','
   var getPreferences = function() {
     var returnDefer2 = $q.defer();
     preferencesDefer.then(function(preferences) {
-	returnDefer2.resolve(preferences);
+	  returnDefer2.resolve(preferences);
     })
     return returnDefer2.promise;
   }
@@ -106,31 +96,32 @@ preferencesModule.factory('preferencesManager',['$log', '$q','filePathService','
      * @param {object} preferences - An object with 1 or more preference pairs
      */
   var setPreferences = function(preference) {
-    fs.readFile(preferencePath, function(err, data) {
-	if(err) {
+    var returnDefer3 = $q.defer()
+    preferencesDefer.then(function(preferences) {
+      fs.readFile(preferencePath, function(err, data) {
+	    if(err) {
           $log.error(err);
-        }
-	else {
-	  var curPreferences = JSON.parse(data);
-	  for(i in preference) {
-	  curPreferences[i] = preference[i];
-	  }
-          //console.log(curPreferences);
-          //console.log(JSON.stringify(curPreferences));
-	  fs.writeFile(preferencePath, JSON.stringify(curPreferences), function(err) {
-	  $log.error(err);
-	  });
-        }
-	
-    });
-	 
+          returnDefer3.reject(err);
+      }
+	    else {
+	    var curPreferences = JSON.parse(data);
+	    for(i in preference) {
+	    curPreferences[i] = preference[i];
+	    }
+      var sw = fs.createWriteStream(preferencePath);
+
+	    sw.write(JSON.stringify(curPreferences));
+      returnDefer3.resolve(curPreferences);
+      sw.end();
+      }
+      })
+    })
+	  return returnDefer3.promise;
     
   }
   
   init();
-  var obj1 = { 'test 1': '5','test2': '10'};
-  //console.log(obj1);
-  setPreferences(obj1);
+
     return {
       getClusters: getClusters,
       setClusters: setClusters,
