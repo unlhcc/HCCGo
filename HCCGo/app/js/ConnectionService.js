@@ -927,9 +927,6 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', '$lo
          finishFunc([input]);
         });
       }
-
-<<<<<<< HEAD
-=======
       }).on('close', function(hadError) {
         logger.error("Connection closed");
         if (hadError) logger.error("Error while closing connection");
@@ -937,7 +934,6 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', '$lo
         $location.path("/");
       }).on('end', function() {
         logger.error("Connection ended");
->>>>>>> master
 
      }).connect({
       host: hostname,
@@ -947,12 +943,7 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', '$lo
       debug: function(message) {
         //logger.log(message);
       }
-<<<<<<< HEAD
-     });
-
-=======
     });
->>>>>>> master
       switch(cluster) {
       case "Crane":
          connectionList['crane'] = conn;

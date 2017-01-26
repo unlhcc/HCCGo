@@ -129,7 +129,6 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
     });
   }
 
-<<<<<<< HEAD
   $scope.viewOutErr = function(index) {
     // view the selected job's stander out and err
     $location.path("cluster/" + $routeParams.clusterId + "/jobview/" + $scope.jobs[index]._id);
