@@ -58,7 +58,7 @@
         <a class="pull-right" href="javascript:void(0)" ng-click="refreshCluster(true)"><i id="jobrefresh" class="mdi-action-autorenew"></i></a>
         <hr />
         <div class="list-group">
-          <div class="list-group-item jobstatus-link" ng-repeat-start="job in jobs | filter:q | orderBy:'timestamp':true" ng-class="{running: job.running, idle: job.idle, error: job.error, complete: job.complete}" ng-click="viewOutErr($index)">
+          <div class="list-group-item jobstatus-link" ng-repeat-start="job in jobs | filter:q | orderBy:'timestamp':true" ng-class="{running: job.running, idle: job.idle, error: job.error, complete: job.complete}" ng-click="viewOutErr(job._id)">
             <div class="row-action-primary">
               <i class="mdi-action-trending-neutral" ng-if="job.running" />
               <i class="mdi-action-query-builder" ng-if="job.idle" />
@@ -67,7 +67,7 @@
             </div>
             <div class="row-content">
               <div class="action-secondary">
-                <a class="deleteButton" href="javascript:void(0)" ng-click="removeCompletedJob($index, $event)" ng-if="job.complete">
+                <a class="deleteButton" href="javascript:void(0)" ng-click="removeCompletedJob(job._id, $event)" ng-if="job.complete">
                   <i class="glyphicon glyphicon-remove"></i>
                 </a>
               </div>
