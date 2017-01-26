@@ -1,8 +1,7 @@
 
 connectionModule = angular.module('ConnectionServiceModule', [])
 
-connectionModule.factory('connectionService',['$log', '$q', '$routeParams', function($log, $q, $routeParams) {
-
+connectionModule.factory('connectionService',['$log', '$q', '$routeParams', '$location', 'notifierService', function($log, $q, $routeParams, $location, notifierService) {
    var connectionList = {crane: null,
                      tusker: null,
                      sandhills: null,
@@ -928,7 +927,13 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
          finishFunc([input]);
         });
       }
-
+      }).on('close', function(hadError) {
+        logger.error("Connection closed");
+        if (hadError) logger.error("Error while closing connection");
+        notifierService.error("Disconnected from cluster", "Disconnection");
+        $location.path("/");
+      }).on('end', function() {
+        logger.error("Connection ended");
 
      }).connect({
       host: hostname,
@@ -938,8 +943,7 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', func
       debug: function(message) {
         //logger.log(message);
       }
-     });
-
+    });
       switch(cluster) {
       case "Crane":
          connectionList['crane'] = conn;
