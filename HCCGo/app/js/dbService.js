@@ -19,6 +19,8 @@ dbService.service('dbService', ['filePathService', function(filePathService) {
   var jobHistoryDB = new DataStore({ filename: jobHistoryPath, autoload: true });
   var submittedJobsPath = filePathService.getSubmittedJobs();
   var submittedJobsDB = new DataStore({ filename: submittedJobsPath, autoload: true });
+ 
+
   return {
     
     /**
@@ -40,6 +42,8 @@ dbService.service('dbService', ['filePathService', function(filePathService) {
     getSubmittedJobsDB: function() {
       return submittedJobsDB;
     }
+
+
   };
 
 }]);
