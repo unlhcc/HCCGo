@@ -250,39 +250,49 @@ div.historyinfo {
   border-top: 1px solid #e5e5e5 !important;
 }
 
-.jobdisplay ul {
+
+/* This is a LESS mixin for the icons */
+.icon-mixin {
+  font-size: 40px;
+}
+
+.jobdisplay .list-group {
   list-style:none;
   overflow-y: auto;
   overflow-x: hidden;
 
   .running {
     i {
+      .icon-mixin;
       color: green;
     }
   }
   .complete {
     i {
-
+      .icon-mixin;
+      color: green;
     }
   }
   .idle {
     i {
+      .icon-mixin;
       color: orange;
     }
   }
 
   .error {
     i {
+      .icon-mixin;
       color: red;
     }
   }
 
   h3.jobname {
     margin-top: 0px;
+  }
 
-    a.deleteButton {
-      color: red;
-    }
+  a.deleteButton i.glyphicon {
+    color: red;
   }
 }
 .spinning-image {
@@ -398,4 +408,24 @@ div.historyinfo {
   transition: status-stroke 1.6s;
 }
 
+.jobstatus-list {
+  padding-left: 0px;
+}
+
+.jobstatus-link {
+  cursor: pointer;
+  transition: background-color 0.3s ease-in-out;
+
+  &:hover {
+    background-color: #EEEEEE;
+  }
+  &:active{
+    background-color: #F5F5F5;
+  }
+}
+
+.jobstatus-text {
+  max-height: 300px;
+  overflow-y: auto;
+}
 
