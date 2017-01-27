@@ -1,6 +1,16 @@
 
 notifierModule = angular.module('NotifierModule', ['toastr'])
 
+
+/**
+ * @memberof HCCGo
+ * @ngdoc service
+ * @class notifierService
+ * @param $log {service} AngularJS Logging Service
+ * @param $q {service} AngularJS Promise service
+ * @param $routeParams {service} AngularJS route parameters
+ * @param toastr {service} Toastr notifications
+ */
 notifierModule.factory('notifierService',['$log', '$q', '$routeParams', 'toastr',
                                            function($log, $q, $routeParams, toastr) {
 
@@ -14,12 +24,14 @@ notifierModule.factory('notifierService',['$log', '$q', '$routeParams', 'toastr'
                           extendedTimeOut: 5000,
                           progressBar: true};
 
-   /**
-   * To notify user of application dependent on window focus
-   *
-   */
-
-  // Get window focus status
+	 /**
+	 * Get window focus status
+	 * To notify user of application dependent on window focus
+	 * @memberof HCCGo.notifierService
+	 * @function getWinFocus
+	 * @returns {Promise} Promise when the focus is established
+	 * 
+	 */
   var getWinFocus = function() {
     var deferred = $q.defer();
 	  ipcRenderer.on('focus-check-message', (event, arg) => {
@@ -30,7 +42,13 @@ notifierModule.factory('notifierService',['$log', '$q', '$routeParams', 'toastr'
 	return deferred.promise;
   }
 
-  // Pop a success message
+  /**
+	 * Pop a success message
+	 * @param {String} msg - Message to display 
+	 * @param {String} title - Title of message
+	 * @memberof HCCGo.notifierService
+	 * @function success
+	 */
   var success = function(msg, title) {
     getWinFocus().then(function (response) {
       if (response) {
@@ -50,7 +68,13 @@ notifierModule.factory('notifierService',['$log', '$q', '$routeParams', 'toastr'
 	  }
 	 });
   }
-  // Pop a warning message
+	
+	/**
+	 * Pop a warning message
+	 * @param {String} msg - Message to display 
+	 * @memberof HCCGo.notifierService
+	 * @function warning
+	 */
   var warning = function(msg) {
     getWinFocus().then(function (response) {
       if (response) {
@@ -71,7 +95,13 @@ notifierModule.factory('notifierService',['$log', '$q', '$routeParams', 'toastr'
 	});
   }
 
-  // Pop a error message
+	/**
+	 * Pop a error message
+	 * @param {String} msg - Message to display
+	 * @param {String} title - Title of message
+	 * @memberof HCCGo.notifierService
+	 * @function error
+	 */
   var error = function(msg, title) {
     getWinFocus().then(function (response) {
       if (response) {
