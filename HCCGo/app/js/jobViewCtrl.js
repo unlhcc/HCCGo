@@ -3,7 +3,7 @@ jobViewModule = angular.module('HccGoApp.jobViewCtrl', ['ngRoute' ]);
 jobViewModule.controller('jobViewCtrl', ['$scope', '$log', '$timeout', 'connectionService', '$routeParams', '$location', '$q', 'preferencesManager', 'notifierService', 'jobService', 'dbService', function($scope, $log, $timeout, connectionService, $routeParams, $location, $q, preferencesManager, notifierService, jobService, dbService) {
 
   $scope.params = $routeParams;
-  
+
   // query the db for the specific job and check if out/err is loaded
   dbService.getSubmittedJobsDB().then(function(db) {
     db.find({_id: $routeParams.jobId}, function (err, docs) {
@@ -50,25 +50,28 @@ jobViewModule.controller('jobViewCtrl', ['$scope', '$log', '$timeout', 'connecti
           connectionService.getFileText(result.errorPath).then(function(data) {
             var text = data.length>0 ? data : "(none)";
             result.errText = text;
-            db.update(
-              { _id: $routeParams.jobId },
-              { $set:
-                {
-                "errText": text
+            // Only save the output if the job is marked complete
+            if (result.complete) {
+              db.update(
+                { _id: $routeParams.jobId },
+                { $set:
+                  {
+                  "outText": text
+                  }
+                },
+                { returnUpdatedDocs: true },
+                function (err, numReplaced, affectedDocuments) {
+                  // update db with data so it doesn't have to be queried again
+                  if (err) {
+                    $log.debug("Something went wrong updating the db.");
+                  }
                 }
-              },
-              { returnUpdatedDocs: true },
-              function (err, numReplaced, affectedDocuments) {
-                // update db with data so it doesn't have to be queried again
-                if (err) {
-                  $log.debug("Something went wrong updating the db.");
-                }
-              }
-            );
+              );
+            }
           });
         });
-        $scope.job = result;
       }
+      $scope.job = result;
     });
   });
 

@@ -214,7 +214,9 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
             "commands": job.commands,
             "timestamp": now,
             "cluster": $scope.params.clusterId,
-            "jobFile": jobFile
+            "jobFile": jobFile,
+            "status": "SUBMITTED",
+            "jobName": job.jobname
           }
           dbService.getSubmittedJobsDB().then(function(submittedJobsDB) {
             submittedJobsDB.insert(doc, function(err, newDoc) {

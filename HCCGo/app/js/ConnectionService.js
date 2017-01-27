@@ -494,12 +494,15 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', '$lo
      // Use stat from sftp
      connectionList[getClusterContext()].sftp(function (err, sftp) {
        if(err) {
+         sftp.end();
          return deferred.reject("Error getting SFTP object: " + err);
        }
        sftp.stat(filePath, function(err, stats) {
          if(err) {
+           sftp.end();
            return deferred.reject("Error getting stat: " + err);
          }
+         sftp.end();
          return deferred.resolve(stats.size);
        });
      });
@@ -521,7 +524,8 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', '$lo
       var readStream = sftp.createReadStream(filePath);
       var text = "";
       readStream.on('error', function (err) {
-        deferred.reject(err);
+        sftp.end();
+        return deferred.reject(err);
       });
 
       readStream.on('data', function(chunk) {
@@ -529,7 +533,8 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', '$lo
       });
 
       readStream.on('end', function() {
-        deferred.resolve(text);
+        sftp.end()
+        return deferred.resolve(text);
       });
     });
 
