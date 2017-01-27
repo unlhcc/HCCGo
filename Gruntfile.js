@@ -53,6 +53,18 @@ module.exports = function(grunt) {
           cleanTargetDir: false
         }
       }
+    },
+    jsdoc: {
+      dist: {
+        src: ['HCCGo/app/js'],
+        options: {
+          destination: 'docs',
+          configure: 'node_modules/angular-jsdoc/common/conf.json',
+          template: 'node_modules/angular-jsdoc/angular-template',
+          tutorial: 'tutorials',
+          readme: './README.md'
+        }
+      }
     }
   });
   grunt.loadNpmTasks('grunt-auto-install');
@@ -60,6 +72,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-shell');
   grunt.loadNpmTasks('grunt-bower-task');
   grunt.loadNpmTasks('grunt-marked');
+  grunt.loadNpmTasks('grunt-jsdoc');
   grunt.registerTask('default', ['less',
                                  'bower',
 				 'auto_install']);
@@ -83,4 +96,5 @@ module.exports = function(grunt) {
                                     'marked',
 				    'auto_install',
 				    'shell:build_electron_linux']);
+  grunt.registerTask('docs', ['jsdoc']);
 };
