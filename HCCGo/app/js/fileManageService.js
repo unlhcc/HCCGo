@@ -229,6 +229,7 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
    }
 
    let remoteRead = function(data, finish){
+       let deferred = $q.defer();
        let _tempFiles = [];
 
        // REsets file directory listing
@@ -247,22 +248,25 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
            }, function(err) {
               if(err) {
                   $log.debug(err);
+                  deferred.reject(err);
               } else {
-                  _remoteFiles = _tempFiles;
+                  deferred.resolve(_tempFiles);
               }
-
-              finish();
            });
        });
+
+       return deferred.promise;
    }
 
    let localRead = function(data, finish) {
       // Clears content of localFiles array
-      _tempFiles = [];
+      let deferred = $q.defer();
+      let _tempFiles = [];
 
       // Resets file directory listing
       fs.readdir(data, function(err, files) {
          async.each(files, function (file, callback) {
+             $log.debug("Local Response: " + file);
              fs.stat(String(_localWD + "/" + file), function (err, stats) {
                  if (err) {
                      callback(err);
@@ -278,13 +282,14 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
          }, function(err) {
              if(err) {
                  $log.debug(err);
+                 deferred.reject(err);
              } else {
-                 _localFiles = _tempFiles;
+                 deferred.resolve(_tempFiles);
              }
-
-             finish();
          }); 
       });
+
+      return deferred.promise;
    }
 
    service.wdSwitcher = function(){
@@ -301,7 +306,8 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
            _remoteWD = _workWD;
        }
 
-       remoteRead(_remoteWD, function() {
+       remoteRead(_remoteWD).then(function(val) {
+           _remoteFiles = val;
            deferred.resolve(boolRet);
        });
 
@@ -317,7 +323,8 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
            _remoteWD = path.dirname(_remoteWD);
        }
 
-       remoteRead(_remoteWD, function() {
+       remoteRead(_remoteWD).then(function(val) {
+           _remoteFiles = val;
            deferred.resolve(null);
        });
 
@@ -333,7 +340,8 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
            _localWD = path.dirname(_localWD);
        }
 
-       localRead(_localWD, function() {
+       localRead(_localWD).then(function(val) {
+           _remoteFiles = val;
            deferred.resolve(null);
        });
 
@@ -417,7 +425,8 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
          notifierService.success('Your file transfer was succesfull!', 'Transfer!');
 		 _finalizer = true;
          _processFinished = true;
-         remoteRead(_remoteWD, function() {
+         remoteRead(_remoteWD).then(function(val) {
+             _remoteFiles = val;
              deferred.resolve(null);
          });
        }, function(err) {
@@ -458,7 +467,8 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
          notifierService.success('Your file transfer was succesfull!', 'Transfered!');
          _finalizer = true;
          _processFinished = true;   // Show finished message
-         localRead(_localWD, function() {
+         localRead(_localWD).then(function(val) {
+             _localFiles = val;
              deferred.resolve(null);
          });
          
@@ -480,7 +490,9 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
        connectionService.getHomeWD().then(function(data) {
           _remoteWD = data;
           _homeWD = data;
-          remoteRead(_remoteWD, function () {});    // Sets remote display
+          remoteRead(_remoteWD).then(function (val) {
+              _remoteFiles = val;
+          });    // Sets remote display
           $log.debug("Home directory: " + _homeWD);
        });
    }
@@ -507,7 +519,8 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
        }
    }
 
-   localRead(_localWD, function() {
+   localRead(_localWD).then(function(val) {
+       _localFiles = val;
        _finalizer = true;
    });    // Sets local display
 

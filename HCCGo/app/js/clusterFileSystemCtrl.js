@@ -74,7 +74,7 @@ clusterUploadModule.controller('clusterFileSystemCtrl', ['$scope', '$log', '$tim
    }
 
    let progressCal = function() {
-     async.until(function(){
+     /*async.until(function(){
        return fileManageService.getFinalizer();
 	 },function(done){
        $scope.filesTotal = fileManageService.getFilesTotal();
@@ -85,7 +85,7 @@ clusterUploadModule.controller('clusterFileSystemCtrl', ['$scope', '$log', '$tim
        if(err) {
            notifierService.error(err, 'Issue gathering progress data');
        }
-	 });
+	 });*/
    }
    
    // Upload entire directory
