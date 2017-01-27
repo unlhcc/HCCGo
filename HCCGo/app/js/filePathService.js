@@ -51,7 +51,7 @@ filePathService.service('filePathService', function() {
     },
 
     /**
-     * Get the preferences JSON file.
+     * Get the preferences JSON filepath.
      * @method getPreferences
      * @memberof HCCGo.filePathService
      * @return {String} Path to the preferences json file.
@@ -59,7 +59,6 @@ filePathService.service('filePathService', function() {
     getPreferencePath: function() {
       return preferencesPath;
     }
-
   };
 
 });

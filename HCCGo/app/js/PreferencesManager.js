@@ -29,9 +29,7 @@ preferencesModule.factory('preferencesManager',['$log', '$q','filePathService','
     
     console.log("Current Directory = " + process.cwd());
     console.log(fs.readdirSync(process.cwd()));
-
-    // 
-
+    // Initialize the file and id if not initialized
     readPrefDefer = $q.defer();
     preferencesDefer = readPrefDefer.promise;
     
@@ -49,8 +47,8 @@ preferencesModule.factory('preferencesManager',['$log', '$q','filePathService','
       }
       else {
         fs.readFile(preferencePath, function(err, data) {
-	      preferences = JSON.parse(data);
-        readPrefDefer.resolve(preferences);
+          preferences = JSON.parse(data);
+          readPrefDefer.resolve(preferences);
 	      })
 	    }
     })
@@ -80,44 +78,44 @@ preferencesModule.factory('preferencesManager',['$log', '$q','filePathService','
      * Get the currently set preferences
      * @method getPreferences
      * @memberof PreferencesManager
-     * @returns javascript object.
+     * @returns {Promise.<object>}
      */
   var getPreferences = function() {
-    var returnDefer2 = $q.defer();
+    var returnDefer = $q.defer();
     preferencesDefer.then(function(preferences) {
-	  returnDefer2.resolve(preferences);
+	  returnDefer.resolve(preferences);
     })
-    return returnDefer2.promise;
+    return returnDefer.promise;
   }
   /**
      * Sets 1 or more preferences
      * @method getPreferences
      * @memberof PreferencesManager
      * @param {object} preferences - An object with 1 or more preference pairs
+     * @returns {Promise.<object>}
      */
   var setPreferences = function(preference) {
-    var returnDefer3 = $q.defer()
+    var returnDefer = $q.defer()
     preferencesDefer.then(function(preferences) {
       fs.readFile(preferencePath, function(err, data) {
-	    if(err) {
+	      if(err) {
           $log.error(err);
-          returnDefer3.reject(err);
-      }
-	    else {
-	    var curPreferences = JSON.parse(data);
-	    for(i in preference) {
-	    curPreferences[i] = preference[i];
-	    }
-      var sw = fs.createWriteStream(preferencePath);
+          returnDefer.reject(err);
+        }
+	      else {
+          var curPreferences = JSON.parse(data);
+  	      for(i in preference) {
+  	      curPreferences[i] = preference[i];
+	      }
+        var sw = fs.createWriteStream(preferencePath);
 
-	    sw.write(JSON.stringify(curPreferences));
-      returnDefer3.resolve(curPreferences);
-      sw.end();
-      }
+  	    sw.write(JSON.stringify(curPreferences));
+        returnDefer.resolve(curPreferences);
+        sw.end();
+        }
       })
     })
-	  return returnDefer3.promise;
-    
+	  return returnDefer.promise;
   }
   
   init();
@@ -126,7 +124,6 @@ preferencesModule.factory('preferencesManager',['$log', '$q','filePathService','
       getClusters: getClusters,
       setClusters: setClusters,
       addCluster: addCluster,
-      
       getPreferences: getPreferences,
       setPreferences: setPreferences
       
