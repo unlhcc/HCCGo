@@ -6,29 +6,24 @@
                   <tr>
                      <td>
                         <div class="panel panel-default width-control">
-                          <div class="panel-heading">Remote <b><span id="lblRemote">Home</span></b> Working Directory: 
-                               <div id="divremoteDir">{{fileManage.remoteWD}}</div>
+                           <div class="panel-heading">Local Working Directory:
+                               <div id="divlocalDir">{{fileManage.localWD}}</div>
                                <nav>
-                                   <ul id="remote-directories" class="pager">
+                                   <ul class="pager">
                                        <li class="previous">
-                                           <a id="remoteBack" ng-click="fileManage.cdSSH(fileManage.sourceDir)">
+                                           <a id="localBack" ng-click="fileManage.cdLocal(fileManage.sourceDir)">
                                                <span aria-hidden="true">&larr;</span>Go Up
-                                           </a>
-                                       </li>
-                                       <li class="previous">
-                                           <a id="remoteSwitch" ng-click="fileManage.wdSwitcher()">
-                                               <span aria-hidden="true">&#8646;</span>Switch to <span id="lblSwitch">Work</span>
                                            </a>
                                        </li>
                                    </ul>
                                </nav>
-                          </div>
-                           <div class="panel-body scroll">Available Folders:
-                              <ul class="jqueryFileTree" 
-                                 ng-repeat="folder in fileManage.remoteFiles">
+                           </div>
+                           <div class="panel-body scroll" >Available Folders:
+                              <ul class="jqueryFileTree"
+                                 ng-repeat="folder in fileManage.localFiles">
                                  <li ng-switch on="folder.Class" class="{{folder.Class}}">
-                                     <a id="r{{folder.name}}" ng-switch-when="directory" ng-click="fileManage.remoteHighlight(folder)" ng-dblclick="fileManage.cdSSH(folder)">{{folder.name}}</a>
-                                     <a id="r{{folder.name}}" ng-switch-default ng-click="fileManage.remoteHighlight(folder)" ng-dblclick="">{{folder.name}}</a>
+                                     <a id="l{{folder.name}}" ng-switch-when="directory" ng-click="fileManage.localHighlight(folder)" ng-dblclick="fileManage.cdLocal(folder)">{{folder.name}}</a>
+                                     <a id="l{{folder.name}}" ng-switch-default ng-click="fileManage.localHighlight(folder)" ng-dblclick="">{{folder.name}}</a>
                                  </li>
                               </ul>
                            </div>
@@ -38,10 +33,10 @@
                         <div class="panel panel-default width-control">
                            <div class="panel-body">
                               <button id="btnDownload" disabled ng-click="fileManage.verifyDownload()" type="button" class="btn btn-primary btn-block">
-                                  <span class="glyphicon glyphicon-arrow-right" aria-hidden="true">Download</span>
+                                  <span class="glyphicon glyphicon-arrow-left" aria-hidden="true">Download</span>
                               </button>
                               <button id="btnUpload" disabled ng-click="fileManage.verifyUpload()" type="button" class="btn btn-primary btn-block">
-                                  <span class="glyphicon glyphicon-arrow-left" aria-hidden="true">Upload</span>
+                                  <span class="glyphicon glyphicon-arrow-right" aria-hidden="true">Upload</span>
                               </button>
                               <br/>
                               <div id="tranContent"></div>
@@ -111,24 +106,29 @@
                      </td>
                      <td>
                         <div class="panel panel-default width-control">
-                           <div class="panel-heading">Local Working Directory:
-                               <div id="divlocalDir">{{fileManage.localWD}}</div>
+                          <div class="panel-heading">Remote <b><span id="lblRemote">Home</span></b> Working Directory: 
+                               <div id="divremoteDir">{{fileManage.remoteWD}}</div>
                                <nav>
-                                   <ul class="pager">
+                                   <ul id="remote-directories" class="pager">
                                        <li class="previous">
-                                           <a id="localBack" ng-click="fileManage.cdLocal(fileManage.sourceDir)">
+                                           <a id="remoteBack" ng-click="fileManage.cdSSH(fileManage.sourceDir)">
                                                <span aria-hidden="true">&larr;</span>Go Up
+                                           </a>
+                                       </li>
+                                       <li class="previous">
+                                           <a id="remoteSwitch" ng-click="fileManage.wdSwitcher()">
+                                               <span aria-hidden="true">&#8646;</span>Switch to <span id="lblSwitch">Work</span>
                                            </a>
                                        </li>
                                    </ul>
                                </nav>
-                           </div>
-                           <div class="panel-body scroll" >Available Folders:
-                              <ul class="jqueryFileTree"
-                                 ng-repeat="folder in fileManage.localFiles">
+                          </div>
+                           <div class="panel-body scroll">Available Folders:
+                              <ul class="jqueryFileTree" 
+                                 ng-repeat="folder in fileManage.remoteFiles">
                                  <li ng-switch on="folder.Class" class="{{folder.Class}}">
-                                     <a id="l{{folder.name}}" ng-switch-when="directory" ng-click="fileManage.localHighlight(folder)" ng-dblclick="fileManage.cdLocal(folder)">{{folder.name}}</a>
-                                     <a id="l{{folder.name}}" ng-switch-default ng-click="fileManage.localHighlight(folder)" ng-dblclick="">{{folder.name}}</a>
+                                     <a id="r{{folder.name}}" ng-switch-when="directory" ng-click="fileManage.remoteHighlight(folder)" ng-dblclick="fileManage.cdSSH(folder)">{{folder.name}}</a>
+                                     <a id="r{{folder.name}}" ng-switch-default ng-click="fileManage.remoteHighlight(folder)" ng-dblclick="">{{folder.name}}</a>
                                  </li>
                               </ul>
                            </div>
