@@ -83,8 +83,10 @@ jobStatusService.service('jobStatusService',['$log','$q','notifierService', func
 						for (var i = 0; i < db_jobs.length; i++) {
 							if (!cluster_jobs.hasOwnProperty(db_jobs[i].jobId) ) {
 								// Recenty completed job (or disappeared from the squeue output)
-								db_jobs[i].status = 'COMPLETED';
+								db_jobs[i].status = 'COMPLETE';
 								recent_completed.push(db_jobs[i]);
+								db_jobs.splice(i, 1);
+								i--;
 							} else {
 								// Job showed up in the cluster jobs output, update it's status
 								cluster_job = cluster_jobs[db_jobs[i].jobId];
@@ -96,11 +98,25 @@ jobStatusService.service('jobStatusService',['$log','$q','notifierService', func
 								}
 								
 								db_jobs[i] = Object.assign(db_jobs[i], cluster_job);
+								
+								// For some reason, I can't update the entire document
 								db.update(
 									{ _id: db_jobs[i]._id },
-									db_jobs[i]
+									{ $set:
+										{
+										"running": cluster_job.running,
+										"idle": cluster_job.idle,
+										"error": cluster_job.error,
+										"status": db_jobs[i].status,
+										"elapsed": cluster_job.runTime
+										}
+									},
+									{},
+									function(err, numAffected, affectedDocuments, upsert) {
+										if (err) $log.error(err);
+									}
 								);
-								
+
 							}
 						}
 
@@ -128,6 +144,9 @@ jobStatusService.service('jobStatusService',['$log','$q','notifierService', func
 		                    { $set:
 		                      {
 		                      "complete": true,
+													"idle": false,
+													"error": false,
+													"running": false,
 		                      "elapsed": job.Elapsed,
 		                      "reqMem": job.ReqMem,
 		                      "jobName": job.JobName,
@@ -141,7 +160,7 @@ jobStatusService.service('jobStatusService',['$log','$q','notifierService', func
 		                        notifierService.success('Your job, ' + affectedDocuments.jobName + ', has been completed', 'Job Completed!');
 		                        $log.debug("Completed job is: " + affectedDocuments);
 
-		                        recent_completed.push(affectedDocuments);
+		                        recent_completed_jobs.push(affectedDocuments);
 		                        return each_callback(null);
 
 		                      }

@@ -25,21 +25,24 @@ jobViewModule.controller('jobViewCtrl', ['$scope', '$log', '$timeout', 'connecti
           connectionService.getFileText(result.outputPath).then(function(data) {
             var text = data.length>0 ? data : "(none)";
             result.outText = text;
-            db.update(
-              { _id: $routeParams.jobId },
-              { $set:
-                {
-                "outText": text
+            // Only save the output if the job is marked complete
+            if (result.complete) {
+              db.update(
+                { _id: $routeParams.jobId },
+                { $set:
+                  {
+                  "outText": text
+                  }
+                },
+                { returnUpdatedDocs: true },
+                function (err, numReplaced, affectedDocuments) {
+                  // update db with data so it doesn't have to be queried again
+                  if (err) {
+                    $log.debug("Something went wrong updating the db.");
+                  }
                 }
-              },
-              { returnUpdatedDocs: true },
-              function (err, numReplaced, affectedDocuments) {
-                // update db with data so it doesn't have to be queried again
-                if (err) {
-                  $log.debug("Something went wrong updating the db.");
-                }
-              }
-            );
+              );
+            }
           });
         }
       });
@@ -51,21 +54,23 @@ jobViewModule.controller('jobViewCtrl', ['$scope', '$log', '$timeout', 'connecti
         connectionService.getFileText(result.errorPath).then(function(data) {
           var text = data.length>0 ? data : "(none)";
           result.errText = text;
-          db.update(
-            { _id: $routeParams.jobId },
-            { $set:
-              {
-              "errText": text
+          if (result.complete) {
+            db.update(
+              { _id: $routeParams.jobId },
+              { $set:
+                {
+                "errText": text
+                }
+              },
+              { returnUpdatedDocs: true },
+              function (err, numReplaced, affectedDocuments) {
+                // update db with data so it doesn't have to be queried again
+                if (err) {
+                  $log.debug("Something went wrong updating the db.");
+                }
               }
-            },
-            { returnUpdatedDocs: true },
-            function (err, numReplaced, affectedDocuments) {
-              // update db with data so it doesn't have to be queried again
-              if (err) {
-                $log.debug("Something went wrong updating the db.");
-              }
-            }
-          );
+            );
+          }
         });
       });
       $scope.job = result;
