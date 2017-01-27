@@ -7,8 +7,6 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
   $scope.jobs = [];
   var clusterInterface = null;
 
-  var db = dbService.getSubmittedJobsDB();
-
   // Generate empty graphs
   var homeUsageGauge = c3.generate({
     bindto: '#homeUsageGauge',
@@ -84,8 +82,10 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
     // deletes the document from db and removes it from list
     var job = $scope.jobs[index];
     $scope.jobs.splice(index,1);
-    db.remove({ _id: job._id }, { multi: true }, function (err, numRemoved) {
-      if(err) console.log("Error deleting document " + err);
+    dbService.getSubmittedJobsDB().then(function(db) {
+      db.remove({ _id: job._id }, { multi: true }, function (err, numRemoved) {
+        if(err) $log.err("Error deleting document " + err);
+      });
     });
     $event.stopPropagation();
   }
@@ -100,8 +100,7 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
     // Begin spinning the refresh image
     $("#jobrefresh").addClass("spinning-image");
 
-
-    jobStatusService.refreshDatabase(db, clusterInterface, clusterId, force).then(function(data) {
+    jobStatusService.refreshDatabase(clusterInterface, clusterId, force).then(function(data) {
       $scope.numRunning = data.numRunning;
       $scope.numIdle = data.numIdle;
       $scope.numError = data.numError;
@@ -109,7 +108,7 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
 
       // Stop spinning image
       $("#jobrefresh").removeClass("spinning-image");
-    })
+    });
   }
 
   function updateGraphs(force) {

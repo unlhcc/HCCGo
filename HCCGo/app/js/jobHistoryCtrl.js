@@ -37,13 +37,13 @@ jobHistoryModule.service('jobService', function() {
 
   }
 
-  // query db
-  var jobHistoryDB = dbService.getJobHistoryDB();
   // Get completed jobs from db file
-  jobHistoryDB.find({}, function (err, docs) {
-    // if data already loaded, just add them to the list
-    $scope.jobs = docs;
-    if(err) console.log("Error fetching completed jobs: " + err);
+  dbService.getJobHistoryDB().then(function(jobHistoryDB) {
+    jobHistoryDB.find({}, function (err, docs) {
+      // if data already loaded, just add them to the list
+      $scope.jobs = docs;
+      if(err) console.log("Error fetching completed jobs: " + err);
+    });
   });
 
   $scope.deleteJob = function(job) {
@@ -57,8 +57,10 @@ jobHistoryModule.service('jobService', function() {
           });
           // remove from angular binding
           $scope.jobs.splice(index,1);
-          db.remove({ _id: job._id }, { multi: true }, function (err, numRemoved) {
-            if(err) console.log("Error deleting document " + err);
+          dbService.getJobHistoryDB().then(function(db) {
+            db.remove({ _id: job._id }, { multi: true }, function (err, numRemoved) {
+              if(err) $log.err("Error deleting document " + err);
+            });
           });
         }
       }

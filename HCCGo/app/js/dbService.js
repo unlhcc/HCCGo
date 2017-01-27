@@ -12,16 +12,16 @@ dbService = angular.module('dbService', []);
  * @memberof HCCGo
  * @class dbService
  */
-dbService.service('dbService', ['filePathService', '$log', function(filePathService, $log) {
+dbService.service('dbService', ['filePathService', '$log', '$q', function(filePathService, $log, $q) {
 
   const DataStore = require('nedb');
   var path = require('path');
   var dataPath = filePathService.getDataPath();
   var jobHistory = path.join(__dirname, 'data/jobHistory.json');
   var jobHistoryPath = filePathService.getJobHistory();
-  var jobHistoryDB;
+  var jobHistoryDB = $q.defer();
   var submittedJobsPath = filePathService.getSubmittedJobs();
-  var submittedJobsDB;
+  var submittedJobsDB = $q.defer();
 
   // Check if app data folder is there, if not, create one with default json file
   var fs = require('fs');
@@ -31,14 +31,14 @@ dbService.service('dbService', ['filePathService', '$log', function(filePathServ
       fs.mkdir(dataPath, function() {
           // create default files
           fs.createWriteStream(jobHistoryPath);
-          jobHistoryDB = new DataStore({ filename: jobHistoryPath, autoload: true });
+          jobHistoryDB.resolve(new DataStore({ filename: jobHistoryPath, autoload: true }));
           $.getJSON(jobHistory, function(json) {
             jobHistoryDB.insert(json.jobs[0], function(err, newDoc) {
               if(err) $log.err(err);
             });
           });
           fs.createWriteStream(submittedJobsPath);
-          submittedJobsDB = new DataStore({ filename: submittedJobsPath, autoload: true });
+          submittedJobsDB.resolve(new DataStore({ filename: submittedJobsPath, autoload: true }));
       });
     }
     else {
@@ -47,7 +47,7 @@ dbService.service('dbService', ['filePathService', '$log', function(filePathServ
         if(!fileExists) {
           // jobhistory file doesn't exist
           fs.createWriteStream(jobHistoryPath);
-          jobHistoryDB = new DataStore({ filename: jobHistoryPath, autoload: true });
+          jobHistoryDB.resolve(new DataStore({ filename: jobHistoryPath, autoload: true }));
           $.getJSON(jobHistory, function(json) {
             jobHistoryDB.insert(json.jobs[0], function(err, newDoc) {
               if(err) $log.err(err);
@@ -55,7 +55,7 @@ dbService.service('dbService', ['filePathService', '$log', function(filePathServ
           });
         }
         else {
-          jobHistoryDB = new DataStore({ filename: jobHistoryPath, autoload: true });
+          jobHistoryDB.resolve(new DataStore({ filename: jobHistoryPath, autoload: true }));
         }
       });
       fs.exists(submittedJobsPath, function(fileExists) {
@@ -63,7 +63,7 @@ dbService.service('dbService', ['filePathService', '$log', function(filePathServ
           // jobsubmission file doesn't exist
           fs.createWriteStream(submittedJobsPath);
         }
-        submittedJobsDB = new DataStore({ filename: submittedJobsPath, autoload: true });
+        submittedJobsDB.resolve(new DataStore({ filename: submittedJobsPath, autoload: true }));
       });
     }
   });
@@ -77,7 +77,7 @@ dbService.service('dbService', ['filePathService', '$log', function(filePathServ
      * @returns {nedb} Nedb (reference) object to query.
      */
     getJobHistoryDB: function() {
-      return jobHistoryDB;
+      return jobHistoryDB.promise;
     },
 
     /**
@@ -87,7 +87,7 @@ dbService.service('dbService', ['filePathService', '$log', function(filePathServ
      * @returns {nedb} Nedb (reference) object to query.
      */
     getSubmittedJobsDB: function() {
-      return submittedJobsDB;
+      return submittedJobsDB.promise;
     }
   };
 
