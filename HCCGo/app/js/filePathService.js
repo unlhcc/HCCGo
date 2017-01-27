@@ -17,6 +17,8 @@ filePathService.service('filePathService', function() {
   dataPath = path.join(dataPath, 'HCCGo');
   var jobHistoryPath = path.join(dataPath, 'jobHistory.db');
   var submittedJobsPath = path.join(dataPath, 'submittedJobs.db')
+  var preferencesPath = path.join(dataPath, 'preferences.json')
+	
   return {
     /**
      * Get the job history path.  The job history is a nedb database.
@@ -46,6 +48,16 @@ filePathService.service('filePathService', function() {
      */
     getSubmittedJobs: function() {
       return submittedJobsPath;
+    },
+
+    /**
+     * Get the preferences JSON filepath.
+     * @method getPreferences
+     * @memberof HCCGo.filePathService
+     * @return {String} Path to the preferences json file.
+     */
+    getPreferencePath: function() {
+      return preferencesPath;
     }
   };
 
