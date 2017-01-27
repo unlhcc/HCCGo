@@ -174,7 +174,7 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
       }
       dbService.getJobHistoryDB().then(function(jobHistoryDB) {
         jobHistoryDB.insert(newJob, function(err, newDoc) {
-          if(err) $log.err(err);
+          if(err) $log.error(err);
         });
       });
     }
@@ -220,7 +220,7 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
           }
           dbService.getSubmittedJobsDB().then(function(submittedJobsDB) {
             submittedJobsDB.insert(doc, function(err, newDoc) {
-              if(err) $log.err(err);
+              if(err) $log.error(err);
               callback(null);
             });
           });

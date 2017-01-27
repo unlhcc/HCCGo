@@ -9,7 +9,7 @@ jobViewModule.controller('jobViewCtrl', ['$scope', '$log', '$timeout', 'connecti
     db.find({_id: $routeParams.jobId}, function (err, docs) {
       var result = docs[0];
       if (err) {
-        $log.err("Error querying the DB for job states");
+        $log.error("Error querying the DB for job states");
       }
       else if (result.hasOwnProperty("outText") && result.hasOwnProperty("errText")) {
         $scope.job = result;
@@ -56,7 +56,7 @@ jobViewModule.controller('jobViewCtrl', ['$scope', '$log', '$timeout', 'connecti
                 { _id: $routeParams.jobId },
                 { $set:
                   {
-                  "outText": text
+                  "errText": text
                   }
                 },
                 { returnUpdatedDocs: true },

@@ -41,7 +41,7 @@ jobStatusService.service('jobStatusService',['$log','$q','notifierService', 'dbS
 			        db.find({complete: false, cluster: clusterId}, function (err, docs) {
 
 			          if (err) {
-			            $log.err("Error querying the DB for job states");
+			            $log.error("Error querying the DB for job states");
 			            return callback("Error querying the DB for job states");
 			          }
 
@@ -54,7 +54,7 @@ jobStatusService.service('jobStatusService',['$log','$q','notifierService', 'dbS
 						dbService.getSubmittedJobsDB().then(function(db) {
 			        db.find({complete: true, cluster: clusterId}, function (err, docs) {
 			          if (err) {
-			            $log.err("Error querying the DB for job states");
+			            $log.error("Error querying the DB for job states");
 			            return callback("Error querying the DB for job states");
 			          }
 			          return callback(null, docs);

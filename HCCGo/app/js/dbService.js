@@ -34,7 +34,7 @@ dbService.service('dbService', ['filePathService', '$log', '$q', function(filePa
           jobHistoryDB.resolve(new DataStore({ filename: jobHistoryPath, autoload: true }));
           $.getJSON(jobHistory, function(json) {
             jobHistoryDB.insert(json.jobs[0], function(err, newDoc) {
-              if(err) $log.err(err);
+              if(err) $log.error(err);
             });
           });
           fs.createWriteStream(submittedJobsPath);
@@ -50,7 +50,7 @@ dbService.service('dbService', ['filePathService', '$log', '$q', function(filePa
           jobHistoryDB.resolve(new DataStore({ filename: jobHistoryPath, autoload: true }));
           $.getJSON(jobHistory, function(json) {
             jobHistoryDB.insert(json.jobs[0], function(err, newDoc) {
-              if(err) $log.err(err);
+              if(err) $log.error(err);
             });
           });
         }
