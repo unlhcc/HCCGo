@@ -8,32 +8,8 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
    const path = require('path');
    const fs = require('fs');
    const disk = require('diskusage');
- 
-   const _sourceDir = {name: ".."};
 
    let service = {};
-   let _uploadStatus = false;
-   let _boolUp = true;
-   let _boolDown = false;
-   let _processStatus = false;
-   let _localFiles = [];
-   let _remoteFiles = [];
-   let _homeWD = new String("");
-   let _workWD = new String("");
-   let _localWD = new String("");
-   let _remoteWD = new String("");
-   let _remoteFocus = new String("");
-   let _localFocus = new String("");
-   let _processFinished = false;
-   let _userDownAuth = false;
-   let _userUpAuth = false;
-   let _accuSize = 0;
-   let _diskAvail = 0;
-   let _diskQuota = 0;
-   let _filesTotal = 0;
-   let _counter = 0;
-   let _totalProgress = 0;
-   let _finalizer = false;
 
    /**
    * To handle state information for the file management
@@ -41,196 +17,52 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
    */
 
    // Return if upload/download process is finished
-   service.getFinalizer = function(){
-       return _finalizer;
-   }
+   service.sourceDir = {name: ".."};
 
-   service.getSourceDir = function(){
-       return _sourceDir;
-   }
+   service.totalProgress = 0;
 
-   service.getTotalProgress = function(){
-       return _totalProgress;
-   }
+   service.counter = 0;
 
-   service.setTotalProgress = function(x){
-       _totalProgress = x;
-       return _totalProgress;
-   }
+   service.filesTotal = 0;
 
-   service.getCounter = function(){
-       return _counter;
-   }
+   service.diskQuota = 0;
 
-   service.setCounter = function(x){
-       _counter = x;
-       return _counter;
-   }
+   service.diskAvail = 0;
 
-   service.getFilesTotal = function(){
-       return _filesTotal;
-   }
+   service.accuSize = 0;
 
-   service.setFilesTotal = function(x){
-       _filesTotal = x;
-       return _filesTotal;
-   }
+   service.userDownAuth = false;
 
-   service.getDiskQuota = function(){
-       return _diskQuota;
-   }
+   service.userUpAuth = false;
 
-   service.setDiskQuota = function(x){
-       _diskQuota = x;
-       return _diskQuota;
-   }
+   service.processFinished = false;
 
-   service.getDiskAvail = function(){
-       return _diskAvail;
-   }
+   service.uploadStatus = false;
 
-   service.setDiskAvail = function(x){
-       _diskAvail = x;
-       return _diskAvail;
-   }
+   service.boolUp = true;
 
-   service.getAccuSize = function(){
-       return _accuSize;
-   }
+   service.boolDown = false;
 
-   service.setAccuSize = function(x){
-       _accuSize = x;
-       return _accuSize;
-   }
+   service.processStatus = false;
 
-   service.getUserDownAuth = function(){
-       return _userDownAuth;
-   }
+   service.localFiles = [];
 
-   service.setUserDownAuth = function(x){
-       _userDownAuth = x;
-       return _userDownAuth;
-   }
+   service.remoteFiles = [];
 
-   service.getUserUpAuth = function(){
-       return _userUpAuth;
-   }
+   service.homeWD = new String("");
 
-   service.setUserUpAuth = function(x){
-       _userUpAuth = x;
-       return _userUpAuth;
-   }
+   service.workWD = new String("");
 
-   service.getProcessFinished = function(){
-       return _processFinished;
-   }
+   service.localWD = new String("");
 
-   service.setProcessFinished = function(x){
-       _processFinished = x;
-       return _processFinished;
-   }
+   service.remoteWD = new String("");
 
-   service.getUploadStatus = function(){
-       return _uploadStatus;
-   }
+   service.remoteFocus = new String("");
 
-   service.setUploadStatus = function(x){
-       _uploadStatus = x;
-       return _uploadStatus;
-   }
-
-   service.getBoolUp = function(){
-       return _boolUp;
-   }
-
-   service.getBoolDown = function(){
-       return _boolDown;
-   }
-
-   service.getProcessStatus = function(){
-       return _processStatus;
-   }
-
-   service.setProcessStatus = function(x){
-       _processStatus = x;
-       return _processStatus;
-   }
-
-   service.getLocalFiles = function(){
-       return _localFiles;
-   }
-
-   service.setLocalFiles = function(x){
-       _localFiles = x;
-       return _localFiles;
-   }
-
-   service.getRemoteFiles = function(){
-       return _remoteFiles;
-   }
-
-   service.setRemoteFiles = function(x){
-       _remoteFiles = x;
-       return _remoteFiles;
-   }
-
-   service.getHomeWD = function(){
-       return _homeWD;
-   }
-
-   service.setHomeWD = function(x){
-       _homeWD = x;
-       return _homeWD;
-   }
-
-   service.getWorkWD = function(){
-       return _workWD;
-   }
-
-   service.setWorkWD = function(x){
-       _workWD = x;
-       return _workWD;
-   }
-
-   service.getLocalWD = function(){
-       return _localWD;
-   }
-
-   service.setLocalWD = function(x){
-       _localWD = x;
-       return _localWD;
-   }
-
-   service.getRemoteWD = function(){
-       return _remoteWD;
-   }
-
-   service.setRemoteWD = function(x){
-       _remoteWD = x;
-       return _remoteWD;
-   }
-
-   service.getRemoteFocus = function(){
-       return _remoteFocus;
-   }
-
-   service.setRemoteFocus = function(x){
-       _remoteFocus = x;
-       return _remoteFocus;
-   }
-
-   service.getLocalFocus = function(){
-       return _localFocus;
-   }
-
-   service.setLocalFocus = function(x){
-       _localFocus = x;
-       return _localFocus;
-   }
+   service.localFocus = new String("");
 
    let remoteRead = function(data, finish){
-       let deferred = $q.defer();
-       let _tempFiles = [];
+       service.remoteFiles = [];
 
        // REsets file directory listing
        connectionService.readDir(data).then(function (serverResponse) {
@@ -238,9 +70,9 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
            async.each(serverResponse, function(file, callback){
               $log.debug("Server Response: " + file.filename);
               if (file.longname.charAt(0) == 'd') {
-                  _tempFiles.unshift({Class: "directory", name: file.filename});
+                  service.remoteFiles.unshift({Class: "directory", name: file.filename});
               } else {
-                  _tempFiles.push({Class: "ext_txt", name: file.filename});
+                  service.remoteFiles.push({Class: "ext_txt", name: file.filename});
               }
 
               // Indicates iteree is over
@@ -248,32 +80,26 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
            }, function(err) {
               if(err) {
                   $log.debug(err);
-                  deferred.reject(err);
-              } else {
-                  deferred.resolve(_tempFiles);
               }
            });
        });
-
-       return deferred.promise;
    }
 
    let localRead = function(data, finish) {
       // Clears content of localFiles array
-      let deferred = $q.defer();
-      let _tempFiles = [];
+	  service.localFiles = [];
 
       // Resets file directory listing
       fs.readdir(data, function(err, files) {
          async.each(files, function (file, callback) {
              $log.debug("Local Response: " + file);
-             fs.stat(String(_localWD + "/" + file), function (err, stats) {
+             fs.stat(String(service.localWD + "/" + file), function (err, stats) {
                  if (err) {
                      callback(err);
                  } else if (stats.isDirectory()) {
-                     _tempFiles.unshift({Class: "directory", name: file});
+                     service.localFiles.unshift({Class: "directory", name: file});
                  } else if (stats.isFile()) {
-                     _tempFiles.push({Class: "ext_txt", name: file});
+                     service.localFiles.push({Class: "ext_txt", name: file});
                  }
              });
 
@@ -282,179 +108,161 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
          }, function(err) {
              if(err) {
                  $log.debug(err);
-                 deferred.reject(err);
-             } else {
-                 deferred.resolve(_tempFiles);
              }
          }); 
       });
-
-      return deferred.promise;
    }
 
-   service.wdSwitcher = function(){
-       let deferred = $q.defer();
-       let boolRet = false;
-       boolRet = _remoteWD.indexOf(_workWD) > -1;
-       
-       _userDownAuth = false;
-       _userUpAuth = false;
+   service.wdSwitcher = function(){       
+       service.userDownAuth = false;
+       service.userUpAuth = false;
 
-       if(boolRet) {
-           _remoteWD = _homeWD;
+       if(service.remoteWD.indexOf(service.workWD) > -1) {
+           service.remoteWD = service.homeWD;
+		   angular.element('#lblSwitch').text('Work');
+           angular.element('#lblRemote').text('Home');
        } else {
-           _remoteWD = _workWD;
+           service.remoteWD = service.workWD;
+		   angular.element('#lblSwitch').text('Home');
+           angular.element('#lblRemote').text('Work');
        }
 
-       remoteRead(_remoteWD).then(function(val) {
-           _remoteFiles = val;
-           deferred.resolve(boolRet);
-       });
-
-       return deferred.promise;
+       remoteRead(service.remoteWD);
    }
 
    service.cdSSH = function(data) {
-       let deferred = $q.defer();
-
        if (data.name != "..") {
-           _remoteWD = _remoteWD + "/" + data.name;
+           service.remoteWD = service.remoteWD + "/" + data.name;
        } else {
-           _remoteWD = path.dirname(_remoteWD);
+           service.remoteWD = path.dirname(service.remoteWD);
        }
 
-       remoteRead(_remoteWD).then(function(val) {
-           _remoteFiles = val;
-           deferred.resolve(null);
-       });
-
-       return deferred.promise;
+	   // Hides download button
+       angular.element('#btnDownload').attr('disabled', '');
+       angular.element('#tranContent').text('');
+	   
+       remoteRead(service.remoteWD);
    }
 
    service.cdLocal = function(data) {
-       let deferred = $q.defer();
-
        if (data.name != "..") {
-           _localWD = _localWD + "/" + data.name;
+           service.localWD = service.localWD + "/" + data.name;
        } else {
-           _localWD = path.dirname(_localWD);
+           service.localWD = path.dirname(service.localWD);
        }
 
-       localRead(_localWD).then(function(val) {
-           _remoteFiles = val;
-           deferred.resolve(null);
-       });
-
-       return deferred.promise;
+       // Hides upload button
+       angular.element('#tranContent').text('');
+       angular.element('#btnUpload').attr('disabled', '');
+	   
+       localRead(service.localWD);
    }
    
    service.verifyUpload = function () {
-      let deferred = $q.defer();
-      connectionService.localSize(String(_localWD + "/" + _localFocus)).then( function(ldata) {
-          if (_remoteWD.indexOf(_workWD) > -1) {
+	  angular.element('#btnUpload').attr('disabled', '');
+	  service.userUpAuth = true;
+	  service.processStatus = true;
+	  
+      connectionService.localSize(String(service.localWD + "/" + service.localFocus)).then( function(ldata) {
+          if (service.remoteWD.indexOf(service.workWD) > -1) {
               connectionService.runCommand("lfs quota -g `id -g` /work").then(function(data) {
-                  _processStatus = false;
-                  _accuSize = ldata;
+                  service.processStatus = false;
+                  service.accuSize = ldata;
 
                   let reported_output = data.split("\n")[2];
                   let split_output = $.trim(reported_output).split(/[ ]+/);
-                  _diskAvail = Math.floor(((split_output[3] - split_output[1]) / split_output[3])*100);
-                  _diskQuota = Math.floor(((ldata / Math.pow(1024, 1)) / split_output[3])*100);
+                  service.diskAvail = Math.floor(((split_output[3] - split_output[1]) / split_output[3])*100);
+                  service.diskQuota = Math.floor(((ldata / Math.pow(1024, 1)) / split_output[3])*100);
 				  
 				  deferred.resolve(null);
               });
           } else {
               connectionService.runCommand("quota -w -f /home").then(function(data) {
-                  _processStatus = false;
-                  _accuSize = ldata;
+                  service.processStatus = false;
+                  service.accuSize = ldata;
 
                   let reported_output = data.split("\n")[2];              
                   let split_output = reported_output.split(/[ ]+/);
-                  _diskAvail = Math.floor(((split_output[2] - split_output[1]) / split_output[2])*100);
-                  _diskQuota = Math.floor(((ldata / Math.pow(1024, 1)) / split_output[2])*100);
-				  
-				  deferred.resolve(null);
+                  service.diskAvail = Math.floor(((split_output[2] - split_output[1]) / split_output[2])*100);
+                  service.diskQuota = Math.floor(((ldata / Math.pow(1024, 1)) / split_output[2])*100);
               });
           }
       });
-	  
-	  return deferred.promise;
+   }
+   
+   service.verifyUploadCancel = function() {
+	  service.userUpAuth = false;
+      notifierService.warning('Action cancelled by user.');
    }
 
    service.verifyDownload = function () {
-      let deferred = $q.defer();
+	  angular.element('#btnDownload').attr('disabled', '');
+	  service.userDownAuth = true;
+	  service.processStatus = true;
 
-      connectionService.runCommand("du -sb " + String(_remoteWD + "/" + _remoteFocus)).then(function (data) {
-          _processStatus = false;
+      connectionService.runCommand("du -sb " + String(service.remoteWD + "/" + service.remoteFocus)).then(function (data) {
+          service.processStatus = false;
           let data_response = data.split(/[	]+/); //NOTE: Matches tab spaces
-          _accuSize = data_response[0];
-          disk.check(_localWD, function(err, info) {
-              _diskQuota = Math.floor((data_response[0]/info.available)*100);
-              _diskAvail = Math.floor((info.free/info.total)*100);
-              deferred.resolve(null);
+          service.accuSize = data_response[0];
+          disk.check(service.localWD, function(err, info) {
+              service.diskQuota = Math.floor((data_response[0]/info.available)*100);
+              service.diskAvail = Math.floor((info.free/info.total)*100);
           });
       });
-
-      return deferred.promise;
+   }
+   
+   service.verifyDownloadCancel = function () {
+	  service.userDownAuth = false;
+      notifierService.warning('Action cancelled by user.');
    }
    
    // Upload entire directory
-   service.uploadCall = function(begun) {
-      let deferred = $q.defer();
+   service.uploadCall = function() {
       let boolStarter = true;
+	  service.processStatus = true;
+	  service.userUpAuth = false;
 	  
-	  _finalizer = false;
       // Runs file upload
-      connectionService.uploadFile(String(_localWD + "/" + _localFocus), String(_remoteWD + "/"), 
+      connectionService.uploadFile(String(service.localWD + "/" + service.localFocus), String(service.remoteWD + "/"), 
 	   function(total_transferred,counter,filesTotal,currentTotal,sizeTotal){
 	     // Only want this if to execute once
 		 if(boolStarter) {
-             _processStatus = false;
-			 _uploadStatus = true;
-			 _filesTotal = filesTotal;
+			 service.uploadStatus = true;
+			 service.filesTotal = filesTotal;
 			 boolStarter = false;
-             begun();
 		 }         
 
-         _counter = counter;       
+         service.counter = counter;       
 
-         _totalProgress = Math.floor(((total_transferred + currentTotal)/sizeTotal)*100);
+         service.totalProgress = Math.floor(((total_transferred + currentTotal)/sizeTotal)*100);
 
        }, function() {
          // update view
          notifierService.success('Your file transfer was succesfull!', 'Transfer!');
-		 _finalizer = true;
-         _processFinished = true;
-         remoteRead(_remoteWD).then(function(val) {
-             _remoteFiles = val;
-             deferred.resolve(null);
-         });
+		 service.processStatus = false;
+         service.processFinished = true;
+         remoteRead(service.remoteWD);
        }, function(err) {
          // Error occurred in ConnectionService
+		 service.processStatus = false;
 		 notifierService.error(err, 'Error in ConnectionService');
-		 _finalizer = true;
-		 deferred.reject(err);
        });
-	   
-	   return deferred.promise;
    }
 
-   service.downloadCall = function (begun) {
-      let deferred = $q.defer();
+   service.downloadCall = function () {
       let boolStarter = true;
+	  service.processStatus = true;
+	  service.userDownAuth = false;
 
-      _finalizer = false;
       // Runs file upload
-      connectionService.downloadFile(String(_localWD + "/"), 
-        String(_remoteWD + "/" + _remoteFocus),
+      connectionService.downloadFile(String(service.localWD + "/"), 
+        String(service.remoteWD + "/" + service.remoteFocus),
         function(total_transferred,counter,filesTotal,currentTotal,sizeTotal){
          // Parity check
          if(boolStarter) {
-             _processStatus = false;
              _uploadStatus = true;
              _filesTotal = filesTotal;
              boolStarter = false;
-             begun();
          }
 
          // Callback function for progress bar
@@ -464,42 +272,73 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
          _totalProgress = Math.floor(((total_transferred + currentTotal)/sizeTotal)*100);
        }, function() {
          // update view
+         localRead(service.localWD);
+		 service.processStatus = false;
          notifierService.success('Your file transfer was succesfull!', 'Transfered!');
-         _finalizer = true;
-         _processFinished = true;   // Show finished message
-         localRead(_localWD).then(function(val) {
-             _localFiles = val;
-             deferred.resolve(null);
-         });
-         
+         service.processFinished = true;   // Show finished message         
        }, function(err) {
          // Error occurred in ConnectionService
+		 service.processStatus = false;
 		 notifierService.error(err, 'Error in ConnectionService');
-         _finalizer = true;
-         deferred.reject(err);
        });
-
-       return deferred.promise;
    } 
+   
+   service.remoteHighlight = function(id) {
+	  angular.element("#btnDownload").removeAttr('disabled');       // Shows download button
+      angular.element("#btnUpload").attr('disabled', '');           // Hides upload button
+      angular.element("#l" + service.localFocus.replace(/\./g, "\\.")).removeClass('highlight');
+      service.localFocus = "";
+      angular.element("#r" + service.remoteFocus.replace(/\./g, "\\.")).removeClass('highlight');
+      service.remoteFocus = id.name;
+      angular.element("#r" + id.name.replace(/\./g, "\\.")).addClass('highlight');
+
+      // Change button context
+      angular.element("#tranContent").text("Download: " + service.remoteFocus);
+
+      // Sets all 'processing' displays to be hidden
+      service.processStatus = false;
+      service.uploadStatus = false;
+      service.processFinished = false;
+      service.userUpAuth = false;
+      service.userDownAuth = false;
+   }
+   
+   service.localHighlight = function(id) {
+      angular.element("#btnDownload").attr('disabled', '');         // Hides download button
+      angular.element("#btnUpload").removeAttr('disabled');         // Shows upload button
+      angular.element("#r" + service.remoteFocus.replace(/\./g, "\\.")).removeClass('highlight');
+      service.remoteFocus = "";
+      angular.element("#l" + service.localFocus.replace(/\./g, "\\.")).removeClass('highlight');
+      service.localFocus = id.name;
+      angular.element("#l" + id.name.replace(/\./g, "\\.")).addClass('highlight');
+
+      // Change button context
+      angular.element("#tranContent").text("Upload: " + service.localFocus);
+
+      // Sets all 'processing' displays to be hidden
+      service.processStatus = false;
+      service.uploadStatus = false;
+      service.processFinished = false;
+      service.userUpAuth = false;
+      service.userDownAuth = false;
+   }
 
    // Value initialization
    //
    // Gets directory strings from remote server
    //
-   if (_homeWD == "") {
+   if (service.homeWD == "") {
        connectionService.getHomeWD().then(function(data) {
-          _remoteWD = data;
-          _homeWD = data;
-          remoteRead(_remoteWD).then(function (val) {
-              _remoteFiles = val;
-          });    // Sets remote display
-          $log.debug("Home directory: " + _homeWD);
+          service.remoteWD = data;
+          service.homeWD = data;
+          remoteRead(service.remoteWD);    // Sets remote display
+          $log.debug("Home directory: " + service.homeWD);
        });
    }
-   if (_workWD == "") {
+   if (service.workWD == "") {
        connectionService.getWorkWD().then(function(data) {
-           _workWD = data;
-           $log.debug("Work directory: " + _workWD);
+           service.workWD = data;
+           $log.debug("Work directory: " + service.workWD);
        });
    }
 
@@ -507,23 +346,19 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
    if (process.platform === 'win32') {
        $log.debug("Process env: ");
        $log.debug(process.env);
-       if (_localWD == "") {
-          _localWD = process.env.HOMEDRIVE + process.env.HOMEPATH;
+       if (service.localWD == "") {
+          service.localWD = process.env.HOMEDRIVE + process.env.HOMEPATH;
        }
    } else {
        // Runs for Mac and Linux systems
        // Establishes Displayed files
        $log.debug("process working directory: " + process.env.HOME);
-       if (_localWD == "") {
-           _localWD = process.env.HOME;
+       if (service.localWD == "") {
+           service.localWD = process.env.HOME;
        }
    }
 
-   localRead(_localWD).then(function(val) {
-       _localFiles = val;
-       _finalizer = true;
-   });    // Sets local display
-
+   localRead(service.localWD);    // Sets local display
   
    return service;
   
