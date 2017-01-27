@@ -6,48 +6,8 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
   $scope.params = $routeParams;
   $scope.jobs = [];
   var clusterInterface = null;
-  var path = require('path');
-  var jobHistory = path.join(__dirname, 'data/jobHistory.json');
 
-  // Check if app data folder is there, if not, create one with default json file
-  var jobHistoryPath = filePathService.getJobHistory();
-  var dataPath = filePathService.getDataPath();
-  var submittedJobsPath = filePathService.getSubmittedJobs();
-  var db;
-  var fs = require('fs');
-  fs.exists(dataPath, function(exists) {
-    if(!exists) {
-        fs.mkdir(dataPath, function() {
-            // create default files
-            fs.createWriteStream(jobHistoryPath);
-            var jobHistoryDB = dbService.getJobHistoryDB();
-            $.getJSON(jobHistory, function(json) {
-              jobHistoryDB.insert(json.jobs[0], function(err, newDoc) {
-                if(err) console.log(err);
-              });
-            });
-            fs.createWriteStream(submittedJobsPath);
-        });
-    }
-    else {
-      fs.exists(jobHistoryPath, function(fileExists) {
-        if(!fileExists) {
-          fs.createWriteStream(jobHistoryPath);
-          var jobHistoryDB = dbService.getJobHistoryDB();
-          $.getJSON(jobHistory, function(json) {
-            jobHistoryDB.insert(json.jobs[0], function(err, newDoc) {
-              if(err) console.log(err);
-            });
-          });
-        }
-      });
-      fs.exists(submittedJobsPath, function(fileExists) {
-        if(!fileExists)
-          fs.createWriteStream(submittedJobsPath);
-      });
-    }
-  });
-  db = dbService.getSubmittedJobsDB();
+  var db = dbService.getSubmittedJobsDB();
 
   // Generate empty graphs
   var homeUsageGauge = c3.generate({

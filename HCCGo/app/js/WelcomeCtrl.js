@@ -1,18 +1,18 @@
 
 welcomeModule = angular.module('HccGoApp.WelcomeCtrl', [ ]);
 
-welcomeModule.controller('welcomeCtrl', ['$scope', '$log', '$timeout', 'connectionService', 'notifierService', '$location', 'preferencesManager', 'updaterService', function($scope, $log, $timeout, connectionService, notifierService, $location, preferencesManager, updaterService) {
- 
+welcomeModule.controller('welcomeCtrl', ['$scope', '$log', '$timeout', 'connectionService', 'notifierService', '$location', 'preferencesManager', 'updaterService', 'dbService', function($scope, $log, $timeout, connectionService, notifierService, $location, preferencesManager, updaterService, dbService) {
+
   updaterService.start();
   angular.element('#betaModal').modal('show');
-  
+
   $('#betaModal').on('shown.bs.modal', function () {
   // get the locator for an input in your modal. Here I'm focusing on
   // the element with the id of myInput
   $('#focusOn').focus()
 });
   var $selector = $('#clusterSelect').selectize({
-    
+
     createOnBlur: true,
     labelField: 'label',
     searchField: 'label',
@@ -33,13 +33,13 @@ welcomeModule.controller('welcomeCtrl', ['$scope', '$log', '$timeout', 'connecti
        new_object.type = 'slurm';
        $scope.clusters.push(new_object);
        callback(new_object);
-      
+
      }
-    
+
   });
-  
+
   var selection = $selector[0].selectize;
-  
+
   preferencesManager.getClusters().then(function(clusters) {
     $scope.clusters = clusters;
     selection.addOption(clusters);
@@ -47,53 +47,53 @@ welcomeModule.controller('welcomeCtrl', ['$scope', '$log', '$timeout', 'connecti
     selection.refreshOptions(false);
     selection.refreshItems();
   });
-  
 
-  
+
+
   $scope.login = function() {
     // Get the input
     $('#loginSubmit').prop('disabled', true);
     $('#loginForm').fadeTo('fast', 0.3);
-    
+
     var connectUrl = selection.getValue();
     $scope.selectedCluster = $.grep($scope.clusters, function(e) {return e.url == connectUrl})[0];
-    
+
     this.logger = new DebugLogger($('#LoginDebugWindow'))
-    
+
     this.logger.log("Got " + $scope.username + " for login");
-    
+
     this.logger.log("Starting login process", 'warning');
     logger = this.logger;
-    
+
     connectionService.initiateConnection($scope.username, $scope.password, connectUrl, $scope.selectedCluster.label, this.logger, userPrompt,  function(err) {
       $scope.$apply(function() {
-        
+
         if (err) {
           logger.error("Got error from connection");
           $('#loginSubmit').prop('disabled', false);
           $('#loginForm').fadeTo('fast', 1.0);
         } else {
-          
+
           $location.path("/cluster/" + $scope.selectedCluster.label);
         $log.debug("Cluster label: " + $scope.selectedCluster.label);
-          
-        }      
+
+        }
       });
     });
   };
-  
+
   $scope.transformCustom = function(customUrl) {
-    
+
     this.logger.log("Got custom attribute: " + customUrl);
     return { label: customUrl, url: customUrl, type: 'slurm'};
-    
+
   };
-  
-  
+
+
   userPrompt = function(prompt, finishFunc) {
     $scope.$apply(function() {
       $scope.userPrompt = prompt;
-      
+
       // Event registration must be before show command
       $('#promptModal').on('shown.bs.modal', function () {
         $('#userPromptInput').focus();
@@ -102,14 +102,14 @@ welcomeModule.controller('welcomeCtrl', ['$scope', '$log', '$timeout', 'connecti
 
       $scope.finishFunc = finishFunc;
     });
-    
+
   };
-  
+
   $scope.promptComplete = function() {
-    
+
     $("#promptModal").modal('hide');
     $scope.finishFunc($scope.userResponse);
-    
+
   };
-  
+
 }]);

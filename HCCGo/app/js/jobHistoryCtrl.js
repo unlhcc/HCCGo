@@ -38,7 +38,6 @@ jobHistoryModule.service('jobService', function() {
   }
 
   // query db
-  const DataStore = require('nedb');
   var jobHistoryDB = dbService.getJobHistoryDB();
   // Get completed jobs from db file
   jobHistoryDB.find({}, function (err, docs) {
