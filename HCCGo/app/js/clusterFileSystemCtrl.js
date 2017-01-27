@@ -13,4 +13,8 @@ clusterUploadModule.controller('clusterFileSystemCtrl', ['$scope', '$log', '$tim
       angular.element("#r" + fileManageService.remoteFocus.replace(/\./g, "\\.")).addClass('highlight');
    }
 
+   $scope.$watch(function() { return fileManageService.localFiles },
+                 function() { $timeout(function() {
+                                       }, 2000); });
+
 }]);

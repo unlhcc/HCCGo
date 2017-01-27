@@ -25,5 +25,5 @@ const disk = spawn("\"" + path.join(__dirname, 'node_modules', '.bin', rebuilder
 		  { cwd: path.join(__dirname ,'node_modules' ,'diskusage'),
 		    env: process.env,
 			shell: true });
-console.log('ref output: ' + disk.output);
-console.log('ref error: ' + disk.error);
+console.log('disk output: ' + disk.output);
+console.log('disk error: ' + disk.error);

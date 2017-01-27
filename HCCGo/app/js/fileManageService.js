@@ -62,7 +62,7 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
    service.localFocus = new String("");
 
    let remoteRead = function(data, finish){
-       service.remoteFiles = [];
+       let _tempFiles = [];
 
        // REsets file directory listing
        connectionService.readDir(data).then(function (serverResponse) {
@@ -70,9 +70,9 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
            async.each(serverResponse, function(file, callback){
               $log.debug("Server Response: " + file.filename);
               if (file.longname.charAt(0) == 'd') {
-                  service.remoteFiles.unshift({Class: "directory", name: file.filename});
+                  _tempFiles.unshift({Class: "directory", name: file.filename});
               } else {
-                  service.remoteFiles.push({Class: "ext_txt", name: file.filename});
+                  _tempFiles.push({Class: "ext_txt", name: file.filename});
               }
 
               // Indicates iteree is over
@@ -80,6 +80,8 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
            }, function(err) {
               if(err) {
                   $log.debug(err);
+              } else {
+                  service.remoteFiles = _tempFiles;
               }
            });
        });
@@ -87,7 +89,7 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
 
    let localRead = function(data, finish) {
       // Clears content of localFiles array
-	  service.localFiles = [];
+	  let _tempFiles = [];
 
       // Resets file directory listing
       fs.readdir(data, function(err, files) {
@@ -97,9 +99,9 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
                  if (err) {
                      callback(err);
                  } else if (stats.isDirectory()) {
-                     service.localFiles.unshift({Class: "directory", name: file});
+                     _tempFiles.unshift({Class: "directory", name: file});
                  } else if (stats.isFile()) {
-                     service.localFiles.push({Class: "ext_txt", name: file});
+                     _tempFiles.push({Class: "ext_txt", name: file});
                  }
              });
 
@@ -108,6 +110,8 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
          }, function(err) {
              if(err) {
                  $log.debug(err);
+             } else {
+                 service.localFiles = _tempFiles;
              }
          }); 
       });
@@ -260,16 +264,16 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
         function(total_transferred,counter,filesTotal,currentTotal,sizeTotal){
          // Parity check
          if(boolStarter) {
-             _uploadStatus = true;
-             _filesTotal = filesTotal;
+             service.uploadStatus = true;
+             service.filesTotal = filesTotal;
              boolStarter = false;
          }
 
          // Callback function for progress bar
-         _counter = counter;
+         service.counter = counter;
          
          // Work on progress bar
-         _totalProgress = Math.floor(((total_transferred + currentTotal)/sizeTotal)*100);
+         service.totalProgress = Math.floor(((total_transferred + currentTotal)/sizeTotal)*100);
        }, function() {
          // update view
          localRead(service.localWD);
