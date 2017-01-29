@@ -103,22 +103,30 @@ jobStatusService.service('jobStatusService',['$log','$q','notifierService', 'dbS
 								db_jobs[i] = Object.assign(db_jobs[i], cluster_job);
 
 								// For some reason, I can't update the entire document
-								db.update(
-									{ _id: db_jobs[i]._id },
-									{ $set:
-										{
-										"running": cluster_job.running,
-										"idle": cluster_job.idle,
-										"error": cluster_job.error,
-										"status": db_jobs[i].status,
-										"elapsed": cluster_job.runTime
-										}
-									},
-									{},
-									function(err, numAffected, affectedDocuments, upsert) {
-										if (err) $log.error(err);
-									}
-								);
+								// Have to do a weird anonymous function for the db_jobs[i] because
+								// by the time the function is executed, db_jobs could be different (splicing)
+								// I also added cluster_job, but it probably isn't necessary
+								dbService.getSubmittedJobsDB().then( (function(db_job, cluster_job) {
+									return function(db) {
+										db.update(
+											{ _id: db_job._id },
+											{ $set:
+												{
+												"running": cluster_job.running,
+												"idle": cluster_job.idle,
+												"error": cluster_job.error,
+												"status": db_job.status,
+												"elapsed": cluster_job.runTime
+												}
+											},
+											{},
+											function(err, numAffected, affectedDocuments, upsert) {
+												if (err) $log.error(err);
+											}
+										)};
+									// Call the function I just created above, it will return a 
+									// new anonymous function.
+									})(db_jobs[i], cluster_job));
 
 							}
 						}
