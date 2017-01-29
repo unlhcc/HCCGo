@@ -8,8 +8,13 @@ preferencesModule.factory('preferencesManager',['$log', '$q', 'filePathService',
   var preferencesDefer;
   var preferencePath = filePathService.getPreferencePath();
   var fs = require("fs");
-
-  var init = function() {
+  
+  /**
+     * Initializes and reads preferences.json and reads clusters.json, resolves promises for method execution
+     * @method init
+     * @memberof PreferencesManager
+     */
+    var init = function() {
     // Read in the clusters file
     readClustersDefer = $q.defer();
     clustersDefer = readClustersDefer.promise;
@@ -38,10 +43,8 @@ preferencesModule.factory('preferencesManager',['$log', '$q', 'filePathService',
     fs.exists(preferencePath, function(exists) {
       if(!exists) {
         ws = fs.createWriteStream(preferencePath);
-        var uuid = require('uuid');
-        var buffer = new Array(16);
-        buffer = uuid(null,buffer,0);       
-        var obj = { uuid : uuid.unparse(buffer) };
+        var uuid = require('uuid');       
+        var obj = { uuid : uuid(null,0) };
         ws.write(JSON.stringify(obj));
         readPrefDefer.resolve(obj);
       }
