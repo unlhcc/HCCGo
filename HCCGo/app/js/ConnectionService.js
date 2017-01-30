@@ -890,6 +890,7 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', '$lo
 
      var Client = require('ssh2').Client;
      var conn = new Client();
+     try {
 
      conn.on('ready', function() {
       completed(null);
@@ -943,6 +944,10 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', '$lo
       //$log.log(message);
       }
     });
+     }
+     catch(err) {
+         completed(err);
+     }
       switch(cluster) {
       case "Crane":
          connectionList['crane'] = conn;
