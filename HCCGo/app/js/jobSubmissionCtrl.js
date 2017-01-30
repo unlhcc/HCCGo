@@ -8,16 +8,6 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
   var submittedJobsDB = dbService.getSubmittedJobsDB();
   var jobHistoryDB = dbService.getJobHistoryDB();
 
-  // Initialize the ace editor
-  require("ace-builds/src-noconflict/ace");
-  ace.config.set("basePath", "../node_modules/ace-builds/src-noconflict/");
-  var editor = ace.edit("commands");
-  editor.setShowPrintMargin(false);
-  editor.setOptions({fontSize:14});
-  editor.setTheme("ace/theme/chrome");
-  editor.getSession().setMode("ace/mode/sh");
-  $('#commands').css({"height":"80px"});
-
   //enable tooltips
   $('[data-toggle="tooltip"]').tooltip();
 
