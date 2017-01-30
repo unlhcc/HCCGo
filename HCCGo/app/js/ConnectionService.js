@@ -102,7 +102,7 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', '$lo
       // Get the sftp module
       function(callback) {
         var sftp_return = connectionList[getClusterContext()].sftp(function (err, sftp) {
-          logger.log("Got sftp now");
+          $log.log("Got sftp now");
           if (err){
             return callback(err);
           }
@@ -111,7 +111,7 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', '$lo
 
         if (!sftp_return) {
           callback("Unable to get sftp handle");
-          logger.log("Unable to get sftp handle");
+          $log.log("Unable to get sftp handle");
           return callback("Unable to get sftp handle");
         }
 
@@ -219,7 +219,7 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', '$lo
       runCommand('sbatch ' + location).then(function(data) {
         deferred.resolve(data);
       }, function(data) { // thrown on failure
-        logger.log("Error log: " + data)
+        $log.log("Error log: " + data)
         return deferred.reject("An error occurred when submitting the job.");
       });
       return deferred.promise;
@@ -886,7 +886,7 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', '$lo
    checkWritable: checkWritable,
    getFileText: getFileText,
    getFileSize: getFileSize,
-   initiateConnection: function initiateConnection(username, password, hostname, cluster, logger, needInput, completed) {
+   initiateConnection: function initiateConnection(username, password, hostname, cluster, needInput, completed) {
 
      var Client = require('ssh2').Client;
      var conn = new Client();
