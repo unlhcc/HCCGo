@@ -121,7 +121,7 @@ welcomeModule.controller('welcomeCtrl', ['$scope', '$log', '$timeout', 'connecti
   $scope.promptComplete = function() {
     $("#promptModal").modal('hide');
     $scope.finishFunc($scope.userResponse);
-    var curValue = 100;
+    var curValue = 90;
     $('#submitprogress').css('width', curValue+'%').attr('aria-valuenow', curValue);
     $scope.loadingDescription = "Waiting on authentication...";
   };
