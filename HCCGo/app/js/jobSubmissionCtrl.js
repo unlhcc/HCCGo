@@ -14,8 +14,8 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
   editor.setTheme("ace/theme/chrome");
   editor.getSession().setMode("ace/mode/sh");
   editor.setShowPrintMargin(false);
-  $('#commands').css({'height':'80px','font-size':'1em'});
-  
+  $('#commands').css({'height':'13em','font-size':'1em'});
+
   //enable tooltips
   $('[data-toggle="tooltip"]').tooltip();
 
