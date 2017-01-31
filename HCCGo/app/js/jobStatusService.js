@@ -150,7 +150,8 @@ jobStatusService.service('jobStatusService',['$log','$q','notifierService', func
 		                      "elapsed": job.Elapsed,
 		                      "reqMem": job.ReqMem,
 		                      "jobName": job.JobName,
-													"status": "COMPLETE"
+													"status": "COMPLETE",
+													"reportedStatus": job.State
 		                      }
 		                    },
 		                    { returnUpdatedDocs: true },
