@@ -7,6 +7,13 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
   const DataStore = require('nedb');
   var submittedJobsDB = dbService.getSubmittedJobsDB();
   var jobHistoryDB = dbService.getJobHistoryDB();
+  
+  //initialize editor
+  ace.config.set('basePath','../../bower_components/ace-builds/src-noconflict');
+  var editor = ace.edit("commands");
+  editor.setTheme("ace/theme/chrome");
+  editor.getSession().setMode("ace/mode/sh");
+  editor.setShowPrintMargin(false);
 
   //enable tooltips
   $('[data-toggle="tooltip"]').tooltip();
@@ -45,6 +52,7 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
       output: loadedJob.output,
       commands: loadedJob.commands
     };
+    editor.setValue($scope.job.commands);
   }
 
   $scope.cancel = function() {
@@ -129,7 +137,7 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
               jobFile += "\nmodule load " + job.modules[i];
           }
       }
-
+      job.commands = editor.getValue();
       jobFile += "\n" + job.commands + "\n";
 
     var now = Date.now();

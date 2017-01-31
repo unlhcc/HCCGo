@@ -19,32 +19,50 @@
     "jquery-file-tree": "~1.0.1",
     "angular-toastr": "~1.7.0",
     "bootbox": "~4.4.0",
-    "tether": "^1.4.0"
+    "tether": "^1.4.0",
+    "ace-builds": "^1.2.6"
   },
   "exportsOverride": {
     "selectize": {
-		"": [
-            "dist/css/selectize.bootstrap3.css",
-            "dist/js/selectize.js"
+      "": [
+        "dist/css/selectize.bootstrap3.css",
+        "dist/js/selectize.js"
       ]
     },
-      "bootstrap": {
-           "css"	: ["**/*.css","**/*.map"],
-            "js" 	: "**/*.js",
-            "less" 	: "**/*.less",
-            "fonts"	: ["**/*.eot","**/*.svg","**/*.ttf","**/*.woff","**/*.woff2"]
+    "bootstrap": {
+      "css": [
+        "**/*.css",
+        "**/*.map"
+      ],
+      "js": "**/*.js",
+      "less": "**/*.less",
+      "fonts": [
+        "**/*.eot",
+        "**/*.svg",
+        "**/*.ttf",
+        "**/*.woff",
+        "**/*.woff2"
+      ]
     },
-        "bootstrap-material-design": {
-            ""	: ["**/*.css","**/*.map","**/*.js",
-                "**/*.less","**/*.eot","**/*.svg",
-                "**/*.ttf","**/*.woff"]
-	},
-        "jquery-file-tree": {
-            "img": [
-                "**/img/*.png",
-                "**/img/*.gif"],
-            "css": "**/*.css",
-            "js": "**/*.js"
+    "bootstrap-material-design": {
+      "": [
+        "**/*.css",
+        "**/*.map",
+        "**/*.js",
+        "**/*.less",
+        "**/*.eot",
+        "**/*.svg",
+        "**/*.ttf",
+        "**/*.woff"
+      ]
+    },
+    "jquery-file-tree": {
+      "img": [
+        "**/img/*.png",
+        "**/img/*.gif"
+      ],
+      "css": "**/*.css",
+      "js": "**/*.js"
     }
   },
   "resolutions": {
