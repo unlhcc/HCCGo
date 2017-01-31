@@ -891,7 +891,12 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', '$lo
      var Client = require('ssh2').Client;
      var conn = new Client();
      try {
-
+     
+     if (username.length === 0 || password.length === 0)
+     {
+         completed("0 Length username or password given");
+     }
+     
      conn.on('ready', function() {
       completed(null);
       $log.log('Client :: ready');
