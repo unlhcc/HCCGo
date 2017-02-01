@@ -929,6 +929,10 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', '$lo
       } else {
         $log.log(prompts[0].prompt);
         needInput(prompts[0].prompt, function(input) {
+            if (input < 1 || input > 3)
+            {
+                completed("Duo error");
+            }
          finishFunc([input]);
         });
       }
