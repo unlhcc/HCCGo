@@ -48,7 +48,7 @@ app.on('ready', function() {
             console.log("Application is not signed, auto-updates will not work");
             console.log(e);
         }
-
+        
         autoUpdater.on('error', function(error, msg) {
             console.log("Erorr is " + error);
             var arg = {err: error, msg: msg};

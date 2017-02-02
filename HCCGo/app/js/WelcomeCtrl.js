@@ -1,7 +1,7 @@
 
 welcomeModule = angular.module('HccGoApp.WelcomeCtrl', [ ]);
 
-welcomeModule.controller('welcomeCtrl', ['$scope', '$log', '$timeout', 'connectionService', 'notifierService', '$location', 'preferencesManager', 'updaterService', function($scope, $log, $timeout, connectionService, notifierService, $location, preferencesManager, updaterService) {
+welcomeModule.controller('welcomeCtrl', ['$scope', '$log', '$timeout', 'connectionService', 'notifierService', '$location', 'preferencesManager', 'updaterService', 'analyticsService', function($scope, $log, $timeout, connectionService, notifierService, $location, preferencesManager, updaterService, analyticsService) {
  
   updaterService.start();
   angular.element('#betaModal').modal('show');
@@ -84,9 +84,11 @@ welcomeModule.controller('welcomeCtrl', ['$scope', '$log', '$timeout', 'connecti
           curValue = 0;
           $('#submitprogress').css('width', curValue+'%').attr('aria-valuenow', curValue);
           $scope.loadingDescription = "Login failed. Please try again.";
+          analyticsService.event('login', 'fail');
         } 
         else {
           $scope.$apply(function() {
+            analyticsService.event('login', 'success');
             $location.path("/cluster/" + $scope.selectedCluster.label);
             $log.debug("Cluster label: " + $scope.selectedCluster.label);
           });
