@@ -7,11 +7,12 @@ var app = angular.module('HccGoApp', ['HccGoApp.WelcomeCtrl',
                               'HccGoApp.clusterFileSystemCtrl',
                               'HccGoApp.jobSubmissionCtrl',
                               'HccGoApp.jobHistoryCtrl',
+                              'HccGoApp.jobViewCtrl',
                               'filePathService',
                               'dbService',
                               'updaterModule',
                               'HccGoApp.updatePageCtrl',
-                              'HccGoApp.NavCtrl']).config([
+                              'HccGoApp.NavCtrl', 'dataUsageService', 'jobStatusService']).config([
   '$routeProvider', function($routeProvider) {
     return $routeProvider.when('/', {
       title: 'Welcome',
@@ -33,6 +34,9 @@ var app = angular.module('HccGoApp', ['HccGoApp.WelcomeCtrl',
       title: 'Job History',
       templateUrl: 'html/jobHistory.html',
       controller: 'jobHistoryCtrl'
+    }).when('/cluster/:clusterId/jobview/:jobId', {
+      templateUrl: 'html/jobView.html',
+      controller: 'jobViewCtrl'
     }).when('/update', {
       title: 'Update',
       templateUrl: 'html/update.html',

@@ -1,12 +1,19 @@
 
 jobSubmissionModule = angular.module('HccGoApp.jobSubmissionCtrl', ['ngRoute' ]);
 
-jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout', 'connectionService', '$routeParams', '$location', '$q', 'preferencesManager', 'notifierService', 'jobService', 'dbService', function($scope, $log, $timeout, connectionService, $routeParams, $location, $q, preferencesManager, notifierService, jobService, dbService) {
+jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout','$rootScope', 'connectionService', '$routeParams', '$location', '$q', 'preferencesManager', 'notifierService', 'jobService', 'dbService', 'jobStatusService', function($scope, $log, $timeout, $rootScope, connectionService, $routeParams, $location, $q, preferencesManager, notifierService, jobService, dbService, jobStatusService) {
 
   $scope.params = $routeParams;
   const DataStore = require('nedb');
   var submittedJobsDB = dbService.getSubmittedJobsDB();
   var jobHistoryDB = dbService.getJobHistoryDB();
+  
+  //initialize editor
+  ace.config.set('basePath','lib/ace-builds/src-noconflict');
+  var editor = ace.edit("commands");
+  editor.setTheme("ace/theme/chrome");
+  editor.getSession().setMode("ace/mode/sh");
+  editor.setShowPrintMargin(false);
 
   //enable tooltips
   $('[data-toggle="tooltip"]').tooltip();
@@ -45,12 +52,16 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
       output: loadedJob.output,
       commands: loadedJob.commands
     };
+    editor.setValue($scope.job.commands);
   }
 
   $scope.cancel = function() {
     $location.path("cluster/" + $scope.params.clusterId + "/jobHistory");
   }
 
+  $scope.refreshCluster = function() {
+    jobStatusService.refreshDatabase(dbService.getSubmittedJobsDB(), $rootScope.clusterInterface, $rootScope.clusterId, true)
+  }
   // Get available modules
   function getModules() {
     var deferred = $q.defer();
@@ -126,7 +137,7 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
               jobFile += "\nmodule load " + job.modules[i];
           }
       }
-
+      job.commands = editor.getValue();
       jobFile += "\n" + job.commands + "\n";
 
     var now = Date.now();
@@ -196,12 +207,26 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
           var doc = {
             "jobId": data.split(" ")[3].trim(),
             "complete": false,
-            "cluster": $scope.params.clusterId
+            "cluster": $scope.params.clusterId,
+            "runtime": job.runtime,
+            "memory": job.memory,
+            "jobname": job.jobname,
+            "location": job.location,
+            "errorPath": job.error,
+            "outputPath": job.output,
+            "modules": ((job.modules != null) ? job.modules : []),
+            "commands": job.commands,
+            "timestamp": now,
+            "cluster": $scope.params.clusterId,
+            "jobFile": jobFile,
+            "status": "SUBMITTED",
+            "jobName": job.jobname
           }
           submittedJobsDB.insert(doc, function(err, newDoc) {
             if(err) console.log(err);
+            callback(null);
           });
-          callback(null);
+
         }, function(err) {
           callback(new Error("Job submission failed!"))
         });
@@ -218,6 +243,7 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
       } else {
         // Everything was successful!
         notifierService.success('Your job was succesfully submitted to the cluster!', 'Job Submitted!');
+        $scope.refreshCluster();
         $location.path("cluster/" + $scope.params.clusterId);
       }
     });
