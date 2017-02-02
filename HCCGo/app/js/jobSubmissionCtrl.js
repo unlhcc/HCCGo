@@ -49,10 +49,12 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
     $location.path("cluster/" + $scope.params.clusterId + "/jobHistory");
   }
 
+  /**
+   * Force a refresh of the job statuses.
+   *
+   */
   $scope.refreshCluster = function() {
-    dbService.getSubmittedJobsDB().then(function(submittedJobsDB) {
-      jobStatusService.refreshDatabase(submittedJobsDB, $rootScope.clusterInterface, $rootScope.clusterId, true)
-    });
+    jobStatusService.refreshDatabase($rootScope.clusterInterface, $rootScope.clusterId, true);
   }
   // Get available modules
   function getModules() {
