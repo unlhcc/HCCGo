@@ -895,7 +895,13 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', '$lo
 
      var Client = require('ssh2').Client;
      var conn = new Client();
-
+     try {
+     
+     if (username.length === 0 || password.length === 0)
+     {
+         completed("0 Length username or password given");
+     }
+     
      conn.on('ready', function() {
       completed(null);
       $log.log('Client :: ready');
@@ -928,6 +934,10 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', '$lo
       } else {
         $log.log(prompts[0].prompt);
         needInput(prompts[0].prompt, function(input) {
+            if (input < 1 || input > 3)
+            {
+                completed("Duo error");
+            }
          finishFunc([input]);
         });
       }
@@ -948,6 +958,10 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', '$lo
       //$log.log(message);
       }
     });
+     }
+     catch(err) {
+         completed(err);
+     }
       switch(cluster) {
       case "Crane":
          connectionList['crane'] = conn;

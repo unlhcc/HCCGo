@@ -76,7 +76,6 @@ welcomeModule.controller('welcomeCtrl', ['$scope', '$log', '$timeout', 'connecti
     $log.log("Starting login process", 'warning');
     
     connectionService.initiateConnection($scope.username, $scope.password, connectUrl, $scope.selectedCluster.label, userPrompt,  function(err) {
-      $scope.$apply(function() {
         
         if (err) {
           $log.error("Got error from connection");
@@ -84,12 +83,14 @@ welcomeModule.controller('welcomeCtrl', ['$scope', '$log', '$timeout', 'connecti
           $('#loginForm').fadeTo('fast', 1.0);
           curValue = 0;
           $('#submitprogress').css('width', curValue+'%').attr('aria-valuenow', curValue);
-        } else {
-          $location.path("/cluster/" + $scope.selectedCluster.label);
-          $log.debug("Cluster label: " + $scope.selectedCluster.label);
-          
+          $scope.loadingDescription = "Login failed. Please try again.";
+        } 
+        else {
+          $scope.$apply(function() {
+            $location.path("/cluster/" + $scope.selectedCluster.label);
+            $log.debug("Cluster label: " + $scope.selectedCluster.label);
+          });
         }      
-      });
     });
   };
   
