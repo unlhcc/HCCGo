@@ -12,7 +12,8 @@ var app = angular.module('HccGoApp', ['HccGoApp.WelcomeCtrl',
                               'dbService',
                               'updaterModule',
                               'HccGoApp.updatePageCtrl',
-                              'HccGoApp.NavCtrl', 'dataUsageService', 'jobStatusService']).config([
+                              'HccGoApp.NavCtrl', 'dataUsageService', 'jobStatusService',
+                              'AnalyticsModule']).config([
   '$routeProvider', function($routeProvider) {
     return $routeProvider.when('/', {
       title: 'Welcome',
@@ -35,6 +36,7 @@ var app = angular.module('HccGoApp', ['HccGoApp.WelcomeCtrl',
       templateUrl: 'html/jobHistory.html',
       controller: 'jobHistoryCtrl'
     }).when('/cluster/:clusterId/jobview/:jobId', {
+      title: 'Job View',
       templateUrl: 'html/jobView.html',
       controller: 'jobViewCtrl'
     }).when('/update', {
@@ -47,8 +49,8 @@ var app = angular.module('HccGoApp', ['HccGoApp.WelcomeCtrl',
   }
 ]);
 
-app.run(['$rootScope', '$route', function($rootScope, $route) {
+app.run(['$rootScope', '$route', 'analyticsService', function($rootScope, $route, analyticsService) {
     $rootScope.$on('$routeChangeSuccess', function() {
-        if($route.current.title) analytics.screenView($route.current.title); //screenView value is Dashboard
+        if($route.current.title) analyticsService.screenView($route.current.title); //screenView value is Dashboard
     });
 }]);

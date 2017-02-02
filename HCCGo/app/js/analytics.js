@@ -5,38 +5,59 @@
  */
 
 
-var analytics = {
-    apiVersion: '1',
-    trackID: 'UA-90202403-1',
-    clientID: null,
-    userID: null,
-	appName: 'HCCGo',
-	appVersion: '0.1.0',
-	debug: false,
-	performanceTracking: true,
-	errorTracking: true,
-	userLanguage: "en",
-    currency: "EUR",
-    lastScreenName: '',
+ AnalyticsModule = angular.module('AnalyticsModule', [])
 
-    sendRequest: function(data, callback){
+ AnalyticsModule.factory('analyticsService',['$log', '$q', 'preferencesManager', function($log, $q, preferencesManager) {
+
+    var apiVersion = '1';
+    var trackID = 'UA-90202403-1';
+    var clientID = null;
+    var userID = null;
+	var appName = 'HCCGo';
+	var appVersion = '0.2.0';
+	var debug = false;
+	var performanceTracking = true;
+	var errorTracking = true;
+	var userLanguage = "en";
+    var currency = "USD";
+    var lastScreenName = '';
+    
+    clientDefer = $q.defer();
+    
+    preferencesManager.getPreferences().then(function(pref) {
+      clientDefer.resolve(pref.uuid);
+      this.clientID = pref.uuid;
+    });
+    
+    
+    
+    var sendRequest = function(data, callback) {
+        clientDefer.promise.then(function(clientId) {
+            clientID = clientId;
+            _sendRequest(data, callback);
+        })
+    }
+        
+        
+    var _sendRequest = function(data, callback) {
+        
         if(!this.clientID || this.clientID == null)
-            this.clientID = this.generateClientID();
+            this.clientID = generateClientID();
 
         if(!this.userID || this.userID == null)
-            this.userID = this.generateClientID();
+            this.userID = generateClientID();
 
-        var postData = "v="+this.apiVersion
-                        +"&tid="+this.trackID
-                        +"&cid="+this.clientID
-                        +"&uid="+this.userID
-                        +"&an="+this.appName
-                        +"&av="+this.appVersion
-                        +"&sr="+this.getScreenResolution()
-                        +"&vp="+this.getViewportSize()
-                        +"&sd="+this.getColorDept()
+        var postData = "v="+apiVersion
+                        +"&tid="+trackID
+                        +"&cid="+clientID
+                        +"&uid="+userID
+                        +"&an="+appName
+                        +"&av="+appVersion
+                        +"&sr="+getScreenResolution()
+                        +"&vp="+getViewportSize()
+                        +"&sd="+getColorDept()
                         +"&ul="+this.userLanguage
-                        +"&ua="+this.getUserAgent()
+                        +"&ua="+getUserAgent()
                         +"&ds=app";
 
         Object.keys(data).forEach(function(key) {
@@ -57,7 +78,7 @@ var analytics = {
         http.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 
         http.onreadystatechange = function() {
-            if(analytics.debug)
+            if(this.debug)
                 console.log(http.response);
 
             if(http.readyState == 4 && http.status == 200) {
@@ -71,42 +92,48 @@ var analytics = {
             }
         }
         http.send(postData);
-    },
-    generateClientID: function()
+    }
+    
+    var generateClientID = function()
     {
         var id = "";
         var possibilities = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
         for( var i=0; i < 5; i++ )
             id += possibilities.charAt(Math.floor(Math.random() * possibilities.length));
         return id;
-    },
-    getScreenResolution: function(){
+    }
+    
+    var getScreenResolution = function(){
         return screen.width+"x"+screen.height;
-    },
-    getColorDept: function(){
+    }
+    
+    var getColorDept = function(){
         return screen.colorDepth+"-bits";
-    },
-    getUserAgent: function(){
+    }
+    
+    var getUserAgent = function(){
         return navigator.userAgent;
-    },
-    getViewportSize: function(){
+    }
+    
+    var getViewportSize = function(){
         return window.screen.availWidth+"x"+window.screen.availHeight;
-    },
+    }
 
     /*
      * Measurement Protocol
      * [https://developers.google.com/analytics/devguides/collection/protocol/v1/devguide]
      */
 
-    screenView: function(screename){
+    var screenView = function(screename){
         var data = {
 			't' : 'screenview',
 			'cd' : screename
 		}
-		this.sendRequest(data);
+		sendRequest(data);
         this.lastScreenName = screename;
-    },
-    event: function(category, action, label, value){
+    }
+    
+    var event = function(category, action, label, value){
         var data = {
 			't' : 'event',
 			'ec' : category,
@@ -115,17 +142,19 @@ var analytics = {
 			'ev' : value,
             'cd' : this.lastScreenName,
 		}
-		this.sendRequest(data);
-    },
-    exception: function(msg, fatal){
+		sendRequest(data);
+    }
+    
+    var exception = function(msg, fatal){
         var data = {
 			't' : 'exception',
 			'exd' : msg,
 			'exf' : fatal || 0
 		}
-		this.sendRequest(data);
-    },
-    timing: function(category, variable, time, label){
+		sendRequest(data);
+    }
+    
+    var timing = function(category, variable, time, label){
 
         var data = {
 			't' : 'timing',
@@ -134,9 +163,10 @@ var analytics = {
 			'utt' : time,
 			'utl' : label,
 		}
-		this.sendRequest(data);
-    },
-    ecommerce:{
+		sendRequest(data);
+    }
+    
+    var ecommerce = {
         transactionID: false,
         generateTransactionID: function()
         {
@@ -174,11 +204,17 @@ var analytics = {
                 this.sendRequest(data);
             })
         }
-    },
-    custom: function(data){
+    }
+    
+    var custom = function(data){
         this.sendRequest(data);
     }
-}
+    
+
+
+
+
+
 
 /*
  * Performance Tracking
@@ -186,13 +222,13 @@ var analytics = {
 
 window.addEventListener("load", function() {
 
-    if(analytics.performanceTracking)
+    if(this.performanceTracking)
     {
         setTimeout(function() {
             var timing = window.performance.timing;
             var userTime = timing.loadEventEnd - timing.navigationStart;
 
-            analytics.timing("performance", "pageload", userTime);
+            this.timing("performance", "pageload", userTime);
 
           }, 0);
     }
@@ -211,12 +247,23 @@ window.onerror = function (msg, url, lineNo, columnNo, error) {
         'Error object: ' + JSON.stringify(error)
     ].join(' - ');
 
-    if(analytics.errorTracking)
+    if(this.errorTracking)
     {
         setTimeout(function() {
-            analytics.exception(message.toString());
+            this.exception(message.toString());
         }, 0);
     }
 
     return false;
 };
+
+return {
+    sendRequest: sendRequest,
+    screenView: screenView,
+    event: event,
+    exception: exception,
+    timing: timing,
+    ecommerce: ecommerce
+}
+
+}]);
