@@ -151,34 +151,34 @@ jobStatusService.service('jobStatusService',['$log','$q','notifierService', 'dbS
 
 		                  $log.debug(job);
 											dbService.getSubmittedJobsDB().then(function(db) {
-			                  db.update(
-			                    { _id: job._id },
-			                    { $set:
-			                      {
-			                      "complete": true,
-														"idle": false,
-														"error": false,
-														"running": false,
-			                      "elapsed": job.Elapsed,
-			                      "reqMem": job.ReqMem,
-			                      "jobName": job.JobName,
-														"status": "COMPLETE"
-			                      }
-			                    },
-			                    { returnUpdatedDocs: true },
-			                    function (err, numReplaced, affectedDocuments) {
-			                      // update db with data so it doesn't have to be queried again
-			                      if (!err) {
-			                        notifierService.success('Your job, ' + affectedDocuments.jobName + ', has been completed', 'Job Completed!');
-			                        $log.debug("Completed job is: " + affectedDocuments);
+                        db.update(
+                          { _id: job._id },
+                          { $set:
+                            {
+                            "complete": true,
+                            "idle": false,
+                            "error": false,
+                            "running": false,
+                            "elapsed": job.Elapsed,
+                            "reqMem": job.ReqMem,
+                            "jobName": job.JobName,
+                            "status": "COMPLETE",
+                            "reportedStatus": job.State
+                            }
+                          },
+                          { returnUpdatedDocs: true },
+                          function (err, numReplaced, affectedDocuments) {
+                            // update db with data so it doesn't have to be queried again
+                            if (!err) {
+                              notifierService.success('Your job, ' + affectedDocuments.jobName + ', has been completed', 'Job Completed!');
+                              $log.debug("Completed job is: " + affectedDocuments);
 
-			                        recent_completed_jobs.push(affectedDocuments);
-			                        return each_callback(null);
+                              recent_completed_jobs.push(affectedDocuments);
+                              return each_callback(null);
 
-			                      }
-			                    }
-			                  );
-											});
+                            }
+                          }
+                        );
 		                }, function(err) {
 		                  // After the for loop, return all of the recently completed jobs.
 		                  return callback(null, recent_completed_jobs);

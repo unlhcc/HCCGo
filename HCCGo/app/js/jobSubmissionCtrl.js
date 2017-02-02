@@ -4,7 +4,12 @@ jobSubmissionModule = angular.module('HccGoApp.jobSubmissionCtrl', ['ngRoute' ])
 jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout','$rootScope', 'connectionService', '$routeParams', '$location', '$q', 'preferencesManager', 'notifierService', 'jobService', 'dbService', 'jobStatusService', function($scope, $log, $timeout, $rootScope, connectionService, $routeParams, $location, $q, preferencesManager, notifierService, jobService, dbService, jobStatusService) {
 
   $scope.params = $routeParams;
-  const DataStore = require('nedb');
+  //initialize editor
+  ace.config.set('basePath','lib/ace-builds/src-noconflict');
+  var editor = ace.edit("commands");
+  editor.setTheme("ace/theme/chrome");
+  editor.getSession().setMode("ace/mode/sh");
+  editor.setShowPrintMargin(false);
 
   //enable tooltips
   $('[data-toggle="tooltip"]').tooltip();
@@ -43,6 +48,7 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
       output: loadedJob.output,
       commands: loadedJob.commands
     };
+    editor.setValue($scope.job.commands);
   }
 
   $scope.cancel = function() {
@@ -131,7 +137,7 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
               jobFile += "\nmodule load " + job.modules[i];
           }
       }
-
+      job.commands = editor.getValue();
       jobFile += "\n" + job.commands + "\n";
 
     var now = Date.now();

@@ -7,10 +7,16 @@ welcomeModule.controller('welcomeCtrl', ['$scope', '$log', '$timeout', 'connecti
   angular.element('#betaModal').modal('show');
 
   $('#betaModal').on('shown.bs.modal', function () {
-  // get the locator for an input in your modal. Here I'm focusing on
-  // the element with the id of myInput
-  $('#focusOn').focus()
-});
+    // get the locator for an input in your modal. Here I'm focusing on
+    // the element with the id of myInput
+    $('#focusOn').focus()
+  });
+
+  $('#focusOn').on('click', function() {
+    $('#newFocus').focus()
+  });
+
+  $scope.loadingDescription = "Please enter your credentials.";
   var $selector = $('#clusterSelect').selectize({
 
     createOnBlur: true,
@@ -48,68 +54,74 @@ welcomeModule.controller('welcomeCtrl', ['$scope', '$log', '$timeout', 'connecti
     selection.refreshItems();
   });
 
-
-
   $scope.login = function() {
     // Get the input
     $('#loginSubmit').prop('disabled', true);
     $('#loginForm').fadeTo('fast', 0.3);
 
     var connectUrl = selection.getValue();
-    $scope.selectedCluster = $.grep($scope.clusters, function(e) {return e.url == connectUrl})[0];
+    var curValue = 25;
+    $scope.selectedCluster = $.grep($scope.clusters, function(e) {return e.url == connectUrl})[0]; 
+    
+    $('#submitprogress').css('width', curValue+'%').attr('aria-valuenow', curValue);
 
-    this.logger = new DebugLogger($('#LoginDebugWindow'))
+    $log.log("Got " + $scope.username + " for login");
 
-    this.logger.log("Got " + $scope.username + " for login");
-
-    this.logger.log("Starting login process", 'warning');
-    logger = this.logger;
-
-    connectionService.initiateConnection($scope.username, $scope.password, connectUrl, $scope.selectedCluster.label, this.logger, userPrompt,  function(err) {
-      $scope.$apply(function() {
-
+    curValue = 50;
+    $('#submitprogress').css('width', curValue+'%').attr('aria-valuenow', curValue);
+    
+    $scope.loadingDescription = "Attempting to login...";
+    $log.log("Starting login process", 'warning');
+    
+    connectionService.initiateConnection($scope.username, $scope.password, connectUrl, $scope.selectedCluster.label, userPrompt,  function(err) {
         if (err) {
-          logger.error("Got error from connection");
+          $log.error("Got error from connection");
           $('#loginSubmit').prop('disabled', false);
           $('#loginForm').fadeTo('fast', 1.0);
-        } else {
-
-          $location.path("/cluster/" + $scope.selectedCluster.label);
-        $log.debug("Cluster label: " + $scope.selectedCluster.label);
-
-        }
-      });
+          curValue = 0;
+          $('#submitprogress').css('width', curValue+'%').attr('aria-valuenow', curValue);
+          $scope.loadingDescription = "Login failed. Please try again.";
+        } 
+        else {
+          $scope.$apply(function() {
+            $location.path("/cluster/" + $scope.selectedCluster.label);
+            $log.debug("Cluster label: " + $scope.selectedCluster.label);
+          });
+        }      
     });
   };
 
-  $scope.transformCustom = function(customUrl) {
-
-    this.logger.log("Got custom attribute: " + customUrl);
+  $scope.transformCustom = function(customUrl) {   
+    
+    $log.log("Got custom attribute: " + customUrl);
     return { label: customUrl, url: customUrl, type: 'slurm'};
 
   };
 
 
   userPrompt = function(prompt, finishFunc) {
+    
     $scope.$apply(function() {
+      var curValue = 75;
+      $('#submitprogress').css('width', curValue+'%').attr('aria-valuenow', curValue);
+      $scope.loadingDescription = "Two-Factor Authentication Required";
       $scope.userPrompt = prompt;
-
       // Event registration must be before show command
       $('#promptModal').on('shown.bs.modal', function () {
         $('#userPromptInput').focus();
       });
       $("#promptModal").modal('show');
-
       $scope.finishFunc = finishFunc;
     });
 
   };
 
   $scope.promptComplete = function() {
-
     $("#promptModal").modal('hide');
     $scope.finishFunc($scope.userResponse);
-
+    var curValue = 90;
+    $('#submitprogress').css('width', curValue+'%').attr('aria-valuenow', curValue);
+    $scope.loadingDescription = "Waiting on authentication...";
   };
 
 }]);
