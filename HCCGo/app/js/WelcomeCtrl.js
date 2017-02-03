@@ -1,11 +1,11 @@
 
 welcomeModule = angular.module('HccGoApp.WelcomeCtrl', [ ]);
 
-welcomeModule.controller('welcomeCtrl', ['$scope', '$log', '$timeout', 'connectionService', 'notifierService', '$location', 'preferencesManager', 'updaterService', function($scope, $log, $timeout, connectionService, notifierService, $location, preferencesManager, updaterService) {
-
+welcomeModule.controller('welcomeCtrl', ['$scope', '$log', '$timeout', 'connectionService', 'notifierService', '$location', 'preferencesManager', 'updaterService', 'analyticsService', function($scope, $log, $timeout, connectionService, notifierService, $location, preferencesManager, updaterService, analyticsService) {
+ 
   updaterService.start();
   angular.element('#betaModal').modal('show');
-
+  
   $('#betaModal').on('shown.bs.modal', function () {
     // get the locator for an input in your modal. Here I'm focusing on
     // the element with the id of myInput
@@ -18,7 +18,7 @@ welcomeModule.controller('welcomeCtrl', ['$scope', '$log', '$timeout', 'connecti
 
   $scope.loadingDescription = "Please enter your credentials.";
   var $selector = $('#clusterSelect').selectize({
-
+    
     createOnBlur: true,
     labelField: 'label',
     searchField: 'label',
@@ -39,7 +39,7 @@ welcomeModule.controller('welcomeCtrl', ['$scope', '$log', '$timeout', 'connecti
        new_object.type = 'slurm';
        $scope.clusters.push(new_object);
        callback(new_object);
-
+      
      }
 
   });
@@ -81,9 +81,11 @@ welcomeModule.controller('welcomeCtrl', ['$scope', '$log', '$timeout', 'connecti
           curValue = 0;
           $('#submitprogress').css('width', curValue+'%').attr('aria-valuenow', curValue);
           $scope.loadingDescription = "Login failed. Please try again.";
+          analyticsService.event('login', 'fail');
         } 
         else {
           $scope.$apply(function() {
+            analyticsService.event('login', 'success');
             $location.path("/cluster/" + $scope.selectedCluster.label);
             $log.debug("Cluster label: " + $scope.selectedCluster.label);
           });
