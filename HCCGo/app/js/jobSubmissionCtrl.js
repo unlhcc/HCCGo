@@ -2,7 +2,7 @@
 jobSubmissionModule = angular.module('HccGoApp.jobSubmissionCtrl', ['ngRoute' ]);
 
 jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout','$rootScope', 'connectionService', '$routeParams', '$location', '$q', 'preferencesManager', 'notifierService', 'jobService', 'dbService', 'jobStatusService', function($scope, $log, $timeout, $rootScope, connectionService, $routeParams, $location, $q, preferencesManager, notifierService, jobService, dbService, jobStatusService) {
-
+  //connectionService.changeDir();
   $scope.params = $routeParams;
   const DataStore = require('nedb');
   var submittedJobsDB = dbService.getSubmittedJobsDB();
@@ -40,6 +40,10 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
       workPath = workPath + "/";
       $scope.job = {location: workPath, error: workPath, output: workPath};
     });
+<<<<<<< Updated upstream
+=======
+    // Put a placeholder into the commands editor
+>>>>>>> Stashed changes
     editor.setValue("#SBATCH --option=value\n\n# Commands\n\necho \"hello\"");
     editor.on("focus",function() {
       editor.setValue("");
@@ -136,9 +140,7 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
       if (line.includes("SBATCH")) {
         this.push(line);
         other.splice(index,1);
-
       }
-
     }, sbatch);
     sbatch = sbatch.join("\n");
     other = other.join("\n");
