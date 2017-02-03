@@ -178,7 +178,7 @@ jobStatusService.service('jobStatusService',['$log','$q','notifierService', 'dbS
 
                             }
                           }
-                        );
+                        )});
 		                }, function(err) {
 		                  // After the for loop, return all of the recently completed jobs.
 		                  return callback(null, recent_completed_jobs);
