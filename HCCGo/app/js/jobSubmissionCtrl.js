@@ -40,6 +40,10 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
       workPath = workPath + "/";
       $scope.job = {location: workPath, error: workPath, output: workPath};
     });
+    editor.setValue("#SBATCH --option=value\n\n# Commands\n\necho \"hello\"");
+    editor.on("focus",function() {
+      editor.setValue("");
+    });
   }
   else {
     $scope.job =
@@ -124,21 +128,40 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
 
     $("#submitbtn").prop('disabled', true);
 
+    // Separate SBATCH options from commands
+    job.commands = editor.getValue();
+    var other = editor.getValue().split("\n");
+    var sbatch = [];
+    var other = angular.forEach(other, function(line, index) {
+      if (line.includes("SBATCH")) {
+        this.push(line);
+        other.splice(index,1);
+
+      }
+
+    }, sbatch);
+    sbatch = sbatch.join("\n");
+    other = other.join("\n");
+    //console.log(other);
+    //console.log(sbatch);
+
     // Create string for file
+
     var jobFile =
       "#!/bin/sh\n" +
       "#SBATCH --time=\"" + job.runtime + "\"\n" +
       "#SBATCH --mem-per-cpu=\"" + job.memory + "\"\n" +
       "#SBATCH --job-name=\"" + job.jobname + "\"\n" +
       "#SBATCH --error=\"" + job.error + "\"\n" +
-      "#SBATCH --output=\"" + job.output + "\"\n";
+      "#SBATCH --output=\"" + job.output + "\"\n" +
+      sbatch;
       if(job.modules != null){
           for(var i = 0; i < job.modules.length; i++) {
               jobFile += "\nmodule load " + job.modules[i];
           }
       }
-      job.commands = editor.getValue();
-      jobFile += "\n" + job.commands + "\n";
+    
+      jobFile += "\n" + other + "\n";
 
     var now = Date.now();
     // updating job history
