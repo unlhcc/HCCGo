@@ -20,18 +20,10 @@ try {
     console.log("nslog.node doesn't exist\n");
 }
 
-const ref = spawn(path.join(__dirname, 'node_modules', '.bin', rebuilder),
+const disk = spawn(path.join(__dirname, 'node_modules', '.bin', rebuilder),
                   ['--version='+target,'--log'],
-		  { cwd: path.join(__dirname ,'node_modules' ,'ref'),
+		  { cwd: path.join(__dirname ,'node_modules' ,'diskusage'),
 		    env: process.env,
 			shell: true });
-console.log('ref output: ' + ref.output);
-console.log('ref error: ' + ref.error);
-
-const ffi = spawn(path.join(__dirname, 'node_modules', '.bin', rebuilder),
-                  ['--version='+target,'--log'],
-		  { cwd: path.join(__dirname, 'node_modules', 'ffi'),
-		    env: process.env,
-			shell: true });
-console.log('ffi output: ' + ffi.output);
-console.log('ffi error: ' + ffi.error);
+console.log('disk output: ' + disk.output);
+console.log('disk error: ' + disk.error);
