@@ -20,7 +20,7 @@ SlurmClusterInterface.prototype.getJobs = function() {
   // return a promise if the jobs info are found
   var deferred = this.$q.defer();
 
-  var promise = this.connectionService.runCommand("squeue -u `whoami` -o '%i,%P,%j,%u,%t,%M,%D,%S,%R'");
+  var promise = this.connectionService.runCommand("squeue -u `whoami` -o '%i,%P,%j,%u,%t,%M,%D,%S,%R,%C,%L'");
   promise.then(function(data) {
     console.log("Got data: " + data);
 
@@ -32,7 +32,7 @@ SlurmClusterInterface.prototype.getJobs = function() {
 
     csv_parse = require("csv-parse/lib/sync");
     records = csv_parse(data, {columns: true});
-    jobs = [];
+    jobs = {};
 
     records.forEach(function(entry) {
       curJob = {};
@@ -51,7 +51,7 @@ SlurmClusterInterface.prototype.getJobs = function() {
 
       curJob.runTime = entry.TIME;
       curJob.startTime = entry.START_TIME;
-      jobs.push(curJob);
+      jobs[curJob.jobId] = curJob;
     });
 
 
@@ -100,7 +100,7 @@ SlurmClusterInterface.prototype.getCompletedJobs = function(docs) {
               returnData[desiredFields[index]] = batchData[j] === undefined ? "" : batchData[j];
           }
         }
-        if(returnData.State == "COMPLETED") completedJobs.push(returnData);
+        completedJobs.push(returnData);
         if(i==docs.length) {
           if(completedJobs.length > 0) deferred.resolve(completedJobs);
           else deferred.reject("No running jobs have been completed.")

@@ -103,7 +103,7 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', '$lo
       // Get the sftp module
       function(callback) {
         var sftp_return = connectionList[getClusterContext()].sftp(function (err, sftp) {
-          logger.log("Got sftp now");
+          $log.log("Got sftp now");
           if (err){
             return callback(err);
           }
@@ -112,7 +112,7 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', '$lo
 
         if (!sftp_return) {
           callback("Unable to get sftp handle");
-          logger.log("Unable to get sftp handle");
+          $log.log("Unable to get sftp handle");
           return callback("Unable to get sftp handle");
         }
 
@@ -220,7 +220,7 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', '$lo
       runCommand('sbatch ' + location).then(function(data) {
         deferred.resolve(data);
       }, function(data) { // thrown on failure
-        logger.log("Error log: " + data)
+        $log.log("Error log: " + data)
         return deferred.reject("An error occurred when submitting the job.");
       });
       return deferred.promise;
@@ -495,12 +495,15 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', '$lo
      // Use stat from sftp
      connectionList[getClusterContext()].sftp(function (err, sftp) {
        if(err) {
+         sftp.end();
          return deferred.reject("Error getting SFTP object: " + err);
        }
        sftp.stat(filePath, function(err, stats) {
          if(err) {
+           sftp.end();
            return deferred.reject("Error getting stat: " + err);
          }
+         sftp.end();
          return deferred.resolve(stats.size);
        });
      });
@@ -522,7 +525,8 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', '$lo
       var readStream = sftp.createReadStream(filePath);
       var text = "";
       readStream.on('error', function (err) {
-        deferred.reject(err);
+        sftp.end();
+        return deferred.reject(err);
       });
 
       readStream.on('data', function(chunk) {
@@ -530,7 +534,8 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', '$lo
       });
 
       readStream.on('end', function() {
-        deferred.resolve(text);
+        sftp.end()
+        return deferred.resolve(text);
       });
     });
 
@@ -887,64 +892,78 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', '$lo
    checkWritable: checkWritable,
    getFileText: getFileText,
    getFileSize: getFileSize,
-   initiateConnection: function initiateConnection(username, password, hostname, cluster, logger, needInput, completed) {
+   initiateConnection: function initiateConnection(username, password, hostname, cluster, needInput, completed) {
 
      var Client = require('ssh2').Client;
      var conn = new Client();
-
+     try {
+     
+     if (username.length === 0 || password.length === 0)
+     {
+         completed("0 Length username or password given");
+     }
+     
      conn.on('ready', function() {
       completed(null);
-      logger.log('Client :: ready')
+      $log.log('Client :: ready');
       conn.exec('uptime', function (err, stream) {
         if (err) {
-         logger.error("Error Logging executing");
-         console.log(err)
+         $log.error("Error Logging executing");
          return;
         }
 
         stream.on('close', function(code, signal) {
-         logger.log('Stream :: close :: code: ' + code + ', signal: ' + signal)
-
+         
+         $log.info('Stream :: close :: code: ' + code + ', signal: ' + signal)
         }).on('data', function(data) {
-         logger.log('STDOUT' + data);
+         $log.log('STDOUT' + data);
         }).stderr.on('data', function(data) {
-         logger.log('STDERR' + data);
+         $log.log('STDERR' + data);
         });
       });
      }).on('error', function(err) {
-      logger.error(err);
+      $log.error(err);
       completed(err);
-     //}).on('close', function() {
 
+         
      }).on('keyboard-interactive', function(name, instructions,  instructionsLang, prompts, finishFunc) {
-      logger.log("Name: " + name + ", instructions: " + instructions + "prompts" + prompts);
-      console.log(prompts);
+      $log.log("Name: " + name + ", instructions: " + instructions + "prompts" + prompts);
+      
 
       if (prompts[0].prompt == "Password: ") {
         finishFunc([password]);
       } else {
-        logger.log(prompts[0].prompt);
+        $log.log(prompts[0].prompt);
         needInput(prompts[0].prompt, function(input) {
+            if (input < 1 || input > 3)
+            {
+                completed("Duo error");
+            }
          finishFunc([input]);
         });
       }
       }).on('close', function(hadError) {
-        logger.error("Connection closed");
-        if (hadError) logger.error("Error while closing connection");
+        $log.error("Connection closed");
+        if (hadError) $log.error("Error while closing connection");
         notifierService.error("Disconnected from cluster", "Disconnection");
         $location.path("/");
       }).on('end', function() {
-        logger.error("Connection ended");
+        $log.error("Connection ended");
+
      }).connect({
       host: hostname,
       username: username,
       tryKeyboard: true,
       readyTimeout: 99999999,
       debug: function(message) {
-        //logger.log(message);
+      //$log.log(message);
       }
 
     });
+     }
+     catch(err) {
+         completed(err);
+     }
 
       switch(cluster) {
       case "Crane":

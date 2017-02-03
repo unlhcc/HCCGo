@@ -135,7 +135,7 @@
       <div class="form-group">
         <label class="control-label col-sm-2" for="commands"> Commands: </label>
         <div class="col-sm-10">
-          <textarea class="form-control" rows="5" id="commands" ng-model="job.commands" required></textarea>
+          <div class="form-control" id="commands" required></div>
           <span class="text-danger" ng-show="jobscript.commands.$touched && jobscript.commands.$invalid">
               <span ng-show="jobscript.commands.$error.required"> Commands are required. </span>
           </span>

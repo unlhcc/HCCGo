@@ -74,39 +74,68 @@ jobStatusService.service('jobStatusService',['$log','$q','notifierService', func
 		        // results[0] is jobs from the DB that have not completed
 		        // results[1] is jobs completed in the DB
 		        // results[2] is jobs from the cluster
+						var db_jobs = results[0];
 		        var completed_jobs = results[1];
-		        var db_jobs = results[0];
 		        var cluster_jobs = results[2].jobs;
+						
+						// For each job in the db_jobs, match it and update the status from squeue
+						var recent_completed = [];
+						for (var i = 0; i < db_jobs.length; i++) {
+							if (!cluster_jobs.hasOwnProperty(db_jobs[i].jobId) ) {
+								// Recenty completed job (or disappeared from the squeue output)
+								db_jobs[i].status = 'COMPLETE';
+								recent_completed.push(db_jobs[i]);
+								db_jobs.splice(i, 1);
+								i--;
+							} else {
+								// Job showed up in the cluster jobs output, update it's status
+								cluster_job = cluster_jobs[db_jobs[i].jobId];
+								
+								if (cluster_job.running) {
+									db_jobs[i].status = 'RUNNING';
+								} else if (cluster_job.idle) {
+									db_jobs[i].status = 'IDLE';
+								}
+								
+								db_jobs[i] = Object.assign(db_jobs[i], cluster_job);
+								
+								// For some reason, I can't update the entire document
+								db.update(
+									{ _id: db_jobs[i]._id },
+									{ $set:
+										{
+										"running": cluster_job.running,
+										"idle": cluster_job.idle,
+										"error": cluster_job.error,
+										"status": db_jobs[i].status,
+										"elapsed": cluster_job.runTime
+										}
+									},
+									{},
+									function(err, numAffected, affectedDocuments, upsert) {
+										if (err) $log.error(err);
+									}
+								);
 
-		        // Find jobs that are in the DB but not reported (recently completed jobs)
-		        for (var index = 0; index < db_jobs.length; index++) {
-		          curJob = db_jobs[index];
-		          for (var indexa = 0; indexa < cluster_jobs.length; indexa++) {
-		            if (curJob.jobId == cluster_jobs[indexa].jobId) {
-		              // Remove the job from the list of jobs we care about
-		              db_jobs.splice(index, 1);
+							}
+						}
 
-		              // Break out of this inner for loop
-		              break;
-		            }
-		          }
-		        }
 
-		        // Now, db_jobs are jobs that are in the DB as running, but
+		        // Now, recent_completed are jobs that are in the DB as running, but
 		        // not in the list of running or idle jobs.  So they must
 		        // have completed
 
 		        // Update the DB
 		        async.series([
 		          function(callback) {
-		            if (db_jobs.length < 1) {
+		            if (recent_completed.length < 1) {
 		              return callback(null, null);
 		            }
-		            clusterInterface.getCompletedJobs(db_jobs).then(
+		            clusterInterface.getCompletedJobs(recent_completed).then(
 		              function(jobs) {
 
 		                $log.debug("Got " + jobs.length + " completed jobs");
-		                var recent_completed = [];
+		                var recent_completed_jobs = [];
 		                async.each(jobs, function(job, each_callback) {
 
 		                  $log.debug(job);
@@ -115,9 +144,14 @@ jobStatusService.service('jobStatusService',['$log','$q','notifierService', func
 		                    { $set:
 		                      {
 		                      "complete": true,
+													"idle": false,
+													"error": false,
+													"running": false,
 		                      "elapsed": job.Elapsed,
 		                      "reqMem": job.ReqMem,
-		                      "jobName": job.JobName
+		                      "jobName": job.JobName,
+													"status": "COMPLETE",
+													"reportedStatus": job.State
 		                      }
 		                    },
 		                    { returnUpdatedDocs: true },
@@ -127,7 +161,7 @@ jobStatusService.service('jobStatusService',['$log','$q','notifierService', func
 		                        notifierService.success('Your job, ' + affectedDocuments.jobName + ', has been completed', 'Job Completed!');
 		                        $log.debug("Completed job is: " + affectedDocuments);
 
-		                        recent_completed.push(affectedDocuments);
+		                        recent_completed_jobs.push(affectedDocuments);
 		                        return each_callback(null);
 
 		                      }
@@ -135,7 +169,7 @@ jobStatusService.service('jobStatusService',['$log','$q','notifierService', func
 		                  );
 		                }, function(err) {
 		                  // After the for loop, return all of the recently completed jobs.
-		                  return callback(null, recent_completed);
+		                  return callback(null, recent_completed_jobs);
 
 		                });
 
@@ -148,7 +182,7 @@ jobStatusService.service('jobStatusService',['$log','$q','notifierService', func
 
 		          }
 		        ],
-		        function(err, recent_completed) {
+		        function(err, recent_completed_jobs) {
 		          var updatedData = {
 		          	numRunning: results[2].numRunning,
 		          	numIdle: results[2].numIdle,
@@ -157,10 +191,10 @@ jobStatusService.service('jobStatusService',['$log','$q','notifierService', func
 		          };
 		          $log.debug("Concat all the things!");
 		          // Ok, now concat everything together.  Running jobs, completed jobs, and recently completed jobs.
-		          if (recent_completed[0] == null) {
-		            updatedData.jobs = completed_jobs.concat(cluster_jobs);
+		          if (recent_completed_jobs[0] == null) {
+		            updatedData.jobs = completed_jobs.concat(db_jobs);
 		          } else {
-		            updatedData.jobs = recent_completed[0].concat(completed_jobs, cluster_jobs);
+		            updatedData.jobs = recent_completed_jobs[0].concat(completed_jobs, db_jobs);
 		          }
 							
 		          lastPromise.resolve(updatedData);
