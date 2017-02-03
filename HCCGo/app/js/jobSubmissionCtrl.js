@@ -7,7 +7,7 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
   const DataStore = require('nedb');
   var submittedJobsDB = dbService.getSubmittedJobsDB();
   var jobHistoryDB = dbService.getJobHistoryDB();
-  
+
   //initialize editor
   ace.config.set('basePath','lib/ace-builds/src-noconflict');
   var editor = ace.edit("commands");
@@ -281,7 +281,7 @@ jobSubmissionModule.directive('remoteWritable', function($q, $log, connectionSer
 
         }, function(err) {
           if (err) {
-            $log.error("Got error from checking writability: " + err);
+            $log.debug("Got error from checking writability: " + err);
           }
           def.reject();
         });

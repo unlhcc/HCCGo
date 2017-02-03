@@ -11,7 +11,7 @@
         </label>
         <div class="col-sm-10">
           <input type="text" class="form-control" id="runtime" name="runtime" ng-model="job.runtime" ng-pattern="/^[0-9]{1,2}:[0-9]{1,2}:[0-9]{1,2}$/" placeholder="03:15:00 (hh:mm:ss)" autofocus required>
-          <span class="text-danger" ng-show="jobscript.runtime.$touched && jobscript.runtime.$invalid">
+          <span class="text-danger" ng-show="jobscript.runtime.$dirty && jobscript.runtime.$invalid">
             <span ng-show="jobscript.runtime.$error.required"> Runtime is required. </span>
             <span ng-show="jobscript.runtime.$error.pattern">Incorrect format. Must be hh:mm:ss </span>
           </span>
@@ -24,7 +24,7 @@
         </label>
         <div class="col-sm-10">
           <input type="text" class="form-control" id="memory" name="memory" ng-model="job.memory" ng-pattern="/^[0-9]{4,5}$/" placeholder="1024 (in megabytes)" required>
-          <span class="text-danger" ng-show="jobscript.memory.$touched && jobscript.memory.$invalid">
+          <span class="text-danger" ng-show="jobscript.memory.$dirty && jobscript.memory.$invalid">
               <span ng-show="jobscript.memory.$error.required"> Memory is required. </span>
               <span ng-show="jobscript.memory.$error.pattern"> Enter as a 4-5 digit number of megabytes. </span>
           </span>
@@ -34,7 +34,7 @@
         <label class="control-label col-sm-2" for="jobname"> Job Name: </label>
         <div class="col-sm-10">
           <input type="text" class="form-control" id="jobname" name="jobname" ng-model="job.jobname" placeholder="hello-world" required>
-          <span class="text-danger" ng-show="jobscript.jobname.$touched && jobscript.jobname.$invalid">
+          <span class="text-danger" ng-show="jobscript.jobname.$dirty && jobscript.jobname.$invalid">
               <span ng-show="jobscript.jobname.$error.required"> Job name is required. </span>
           </span>
         </div>
@@ -47,7 +47,7 @@
           <div class="col-sm-10">
             <!-- ng-pattern="/^.*\.slurm$/" -->
             <div class="right-inner-addon">
-              <input type="text" class="form-control" id="location" name="location" ng-model="job.location"  placeholder="loading work folder" required remote-writable />
+              <input type="text" class="form-control" id="location" name="location" ng-model="job.location"  ng-pattern="/^.*\.slurm$/" placeholder="loading work folder" required remote-writable />
               <div class="status-checkstatus">
                 <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" x="0px"     y="0px"
                 viewBox="0, 0, 100, 100" id="checkmark">
@@ -63,9 +63,10 @@
                 </svg>
               </div>
             </div>
-              <span class="text-danger" ng-show="jobscript.location.$touched && jobscript.location.$invalid">
+              <span class="text-danger" ng-show="jobscript.location.$dirty && jobscript.location.$invalid">
                   <span ng-show="jobscript.location.$error.required"> Location is required. </span>
                   <span ng-show="jobscript.location.$error.pattern"> Must end in .slurm </span>
+                  <span ng-show="jobscript.location.$error.remoteWritable"> The file is not writable or the directory does not exist. </span>
               </span>
           </div>
       </div>
@@ -92,9 +93,10 @@
               </svg>
             </div>
           </div>
-          <span class="text-danger" ng-show="jobscript.error.$touched && jobscript.error.$invalid">
+          <span class="text-danger" ng-show="jobscript.error.$dirty && jobscript.error.$invalid">
               <span ng-show="jobscript.error.$error.required"> Error is required. </span>
               <span ng-show="jobscript.error.$error.pattern"> Must end in .err </span>
+              <span ng-show="jobscript.error.$error.remoteWritable"> The file is not writable or the directory does not exist. </span>
           </span>
         </div>
       </div>
@@ -120,9 +122,10 @@
               </svg>
             </div>
           </div>
-          <span class="text-danger" ng-show="jobscript.output.$touched && jobscript.output.$invalid">
+          <span class="text-danger" ng-show="jobscript.output.$dirty && jobscript.output.$invalid">
               <span ng-show="jobscript.output.$error.required"> Output is required. </span>
               <span ng-show="jobscript.output.$error.pattern"> Must end in .out </span>
+              <span ng-show="jobscript.output.$error.remoteWritable"> The file is not writable or the directory does not exist. </span>
           </span>
         </div>
       </div>
@@ -137,7 +140,7 @@
         <label class="control-label col-sm-2" for="commands"> Commands: </label>
         <div class="col-sm-10">
           <div class="form-control" id="commands" required></div>
-          <span class="text-danger" ng-show="jobscript.commands.$touched && jobscript.commands.$invalid">
+          <span class="text-danger" ng-show="jobscript.commands.$dirty && jobscript.commands.$invalid">
               <span ng-show="jobscript.commands.$error.required"> Commands are required. </span>
           </span>
         </div>
