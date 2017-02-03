@@ -1,7 +1,7 @@
 
 welcomeModule = angular.module('HccGoApp.WelcomeCtrl', [ ]);
 
-welcomeModule.controller('welcomeCtrl', ['$scope', '$log', '$timeout', 'connectionService', 'notifierService', '$location', 'preferencesManager', 'updaterService', 'analyticsService', function($scope, $log, $timeout, connectionService, notifierService, $location, preferencesManager, updaterService, analyticsService) {
+welcomeModule.controller('welcomeCtrl', ['$scope', '$log', '$timeout', 'connectionService', 'notifierService', '$location', 'preferencesManager', 'updaterService', 'analyticsService', 'dbService', function($scope, $log, $timeout, connectionService, notifierService, $location, preferencesManager, updaterService, analyticsService, dbService) {
  
   updaterService.start();
   angular.element('#betaModal').modal('show');
