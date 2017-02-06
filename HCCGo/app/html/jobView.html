@@ -21,9 +21,11 @@
            <div class="panel-heading jobstatus-link" data-toggle="collapse" data-target="#collapse0">
              <div class="row">
                <div class="col-sm-12">
-                 <h4 class="panel-title jobhistory">Output<small class="jobdate"> {{job.outputPath}} </small></h4>
+                 <h4 class="panel-title jobhistory" style="display: inline-block">Output<small class="jobdate"> {{job.outputPath}}</small></h4>
+                 <button type="submit" class="btn btn-primary btn-xs save-buttons" ng-click="saveFile('Output')">Save</button>
                </div>
              </div>
+  
            </div>
            <div id="collapse0" class="panel-collapse collapse in">
              <div class="panel-body jobstatus-text">
@@ -35,7 +37,8 @@
            <div class="panel-heading jobstatus-link" data-toggle="collapse" data-target="#collapse1">
              <div class="row">
                <div class="col-sm-12">
-                 <h4 class="panel-title jobhistory">Error<small class="jobdate"> {{job.errorPath}} </small></h4>
+                 <h4 class="panel-title jobhistory" style="display: inline-block">Error<small class="jobdate"> {{job.errorPath}} </small></h4>
+                 <button type="submit" class="btn btn-primary btn-xs save-buttons" ng-click="saveFile('Error')">Save</button>                 
                </div>
              </div>
             </div>

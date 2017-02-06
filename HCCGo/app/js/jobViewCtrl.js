@@ -75,4 +75,26 @@ jobViewModule.controller('jobViewCtrl', ['$scope', '$log', '$timeout', 'connecti
     });
   });
 
+  $scope.saveFile = function(fileType) {
+    const {dialog} = require('electron').remote;
+    const fs = require('fs');
+    const path = require('path');
+
+    var options = {
+      filters: [
+        { name: 'text', extensions: ['txt']}
+      ]
+    };
+
+    dialog.showSaveDialog(options, function(fileName) {
+      switch(fileType){
+        case 'Output':
+          fs.writeFile(fileName, $scope.job.outText, function(err) {});
+          break;
+        case 'Error':
+          fs.writeFile(fileName, $scope.job.errText, function(err) {});
+          break;
+      }
+    });
+  };
 }]);
