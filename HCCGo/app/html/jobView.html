@@ -22,7 +22,7 @@
              <div class="row">
                <div class="col-sm-12">
                  <h4 class="panel-title jobhistory" style="display: inline-block">Output<small class="jobdate"> {{job.outputPath}}</small></h4>
-                 <button type="submit" class="btn btn-primary btn-xs save-buttons" ng-click="saveFile('Output')">Save</button>
+                 <button type="submit" class="btn btn-primary btn-xs save-buttons" ng-click="saveFile('Output', $event)">Save...</button>
                </div>
              </div>
   
@@ -38,7 +38,7 @@
              <div class="row">
                <div class="col-sm-12">
                  <h4 class="panel-title jobhistory" style="display: inline-block">Error<small class="jobdate"> {{job.errorPath}} </small></h4>
-                 <button type="submit" class="btn btn-primary btn-xs save-buttons" ng-click="saveFile('Error')">Save</button>                 
+                 <button type="submit" class="btn btn-primary btn-xs save-buttons" ng-click="saveFile('Error', $event)">Save...</button>                 
                </div>
              </div>
             </div>
