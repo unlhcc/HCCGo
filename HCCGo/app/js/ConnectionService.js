@@ -872,14 +872,23 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', '$lo
                 }
        });
 
-   }
+   };
 
+   var quickDownload = function(remotePath, localPath) {
+       const sftp = require('ssh2').SFTPStream;
+       sftp.fastGet(remotePath, localPath, function(err) {
+           if (err) {
+               $log.error("Error while downloading file!");
+           }
+       });
+   };
    return {
    getConnection: getConnection,
    runCommand: runCommand,
    getUsername: getUsername,
    uploadFile: uploadFile,
    downloadFile: downloadFile,
+   quickDownload: quickDownload,
    submitJob: submitJob,
    closeStream: closeStream,
    readDir: readDir,

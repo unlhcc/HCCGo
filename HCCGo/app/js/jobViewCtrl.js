@@ -78,27 +78,37 @@ jobViewModule.controller('jobViewCtrl', ['$scope', '$log', '$timeout', 'connecti
   $scope.saveFile = function(fileType, $event) {
     const {dialog} = require('electron').remote;
     const fs = require('fs');
-    const path = require('path');
-
     var options = {
       filters: [
         { name: 'text', extensions: ['txt']}
       ]
     };
 
-    dialog.showSaveDialog(options, function(fileName) {
-      // If the user clicks cancel, fileName will be undefined
-      if (!fileName) return;
+    dialog.showSaveDialog(options, function(localFile) {
+      // If the user clicks cancel, localFile will be undefined
+      if (!localFile) return;
       switch(fileType){
         case 'Output':
-          fs.writeFile(fileName, $scope.job.outText, function(err) {});
+          if (!downloadRemoteFile($scope.job.outputPath, localFile))
+            fs.writeFile(localFile, $scope.job.outText, function(err) {});
           break;
         case 'Error':
-          fs.writeFile(fileName, $scope.job.errText, function(err) {});
+          if (!downloadRemoteFile($scope.job.errorPath, localFile))
+            fs.writeFile(localFile, $scope.job.errText, function(err) {});
           break;
       }
     });
     // Stop the propagation of the click
     $event.stopPropagation();
   };
+
+  function downloadRemoteFile(remotePath, localPath) {
+    connectionService.getFileSize(remotePath).then(function(size) {
+      if (size > 5*1025*1024) {
+        connectionService.quickDownload(remotePath, localPath);
+        return true;
+      }
+      return false;
+    });
+  }
 }]);
