@@ -41,13 +41,13 @@
       </div>
       <div class="form-group" ng-class="{'has-error': jobscript.location.$error.remoteWritable}">
           <label class="control-label col-sm-2" for="location">
-            Locaton:
+            Location:
             <span class="glyphicon glyphicon-info-sign infoBubble" data-toggle="tooltip" data-container="body" data-placement="top" title="Must end in .slurm"></span>
           </label>
           <div class="col-sm-10">
             <!-- ng-pattern="/^.*\.slurm$/" -->
             <div class="right-inner-addon">
-              <input type="text" class="form-control" id="location" name="location" ng-model="job.location"  placeholder="loading work folder" required remote-writable />
+              <input type="text" class="form-control" id="location" name="location" ng-model="job.location"  placeholder="loading work folder" required remote-writable location-path ng-pattern="/^.*\.slurm$/"/>
               <div class="status-checkstatus">
                 <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" x="0px"     y="0px"
                 viewBox="0, 0, 100, 100" id="checkmark">
@@ -67,6 +67,7 @@
                   <span ng-show="jobscript.location.$error.required"> Location is required. </span>
                   <span ng-show="jobscript.location.$error.pattern"> Must end in .slurm </span>
               </span>
+              <span ng-show="jobscript.location.$error.locationPath"> * Job file will be placed in your $WORK folder </span>
           </div>
       </div>
       <div class="form-group" ng-class="{'has-error': jobscript.error.$error.remoteWritable}">
@@ -76,7 +77,7 @@
         </label>
         <div class="col-sm-10">
           <div class="right-inner-addon">
-            <input type="text" class="form-control" id="error" name="error" ng-model="job.error" ng-pattern="/^.*\.err$/" placeholder="loading work folder" required remote-writable>
+            <input type="text" class="form-control" id="error" name="error" ng-model="job.error" ng-pattern="/^.*\.err$/" placeholder="loading work folder" required remote-writable location-path>
             <div class="status-checkstatus">
               <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" x="0px"     y="0px"
               viewBox="0, 0, 100, 100" id="checkmark">
@@ -96,6 +97,7 @@
               <span ng-show="jobscript.error.$error.required"> Error is required. </span>
               <span ng-show="jobscript.error.$error.pattern"> Must end in .err </span>
           </span>
+          <span ng-show="jobscript.location.$error.locationPath"> * Error file will be placed in your $WORK folder </span>
         </div>
       </div>
       <div class="form-group" ng-class="{'has-error': jobscript.output.$error.remoteWritable}">
@@ -104,7 +106,7 @@
         </label>
         <div class="col-sm-10">
           <div class="right-inner-addon">
-            <input type="text" class="form-control" id="output" name="output" ng-model="job.output" ng-pattern="/^.*\.out$/" placeholder="loading work folder" required remote-writable>
+            <input type="text" class="form-control" id="output" name="output" ng-model="job.output" ng-pattern="/^.*\.out$/" placeholder="loading work folder" required remote-writable locationPath>
             <div class="status-checkstatus">
               <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" x="0px"     y="0px"
               viewBox="0, 0, 100, 100" id="checkmark">
@@ -124,6 +126,7 @@
               <span ng-show="jobscript.output.$error.required"> Output is required. </span>
               <span ng-show="jobscript.output.$error.pattern"> Must end in .out </span>
           </span>
+          <span ng-show="jobscript.location.$error.locationPath"> * Output file will be placed in your $WORK folder </span>
         </div>
       </div>
       <div class="form-group">

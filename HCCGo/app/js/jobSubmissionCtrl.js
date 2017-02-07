@@ -2,7 +2,7 @@
 jobSubmissionModule = angular.module('HccGoApp.jobSubmissionCtrl', ['ngRoute' ]);
 
 jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout','$rootScope', 'connectionService', '$routeParams', '$location', '$q', 'preferencesManager', 'notifierService', 'jobService', 'dbService', 'jobStatusService', function($scope, $log, $timeout, $rootScope, connectionService, $routeParams, $location, $q, preferencesManager, notifierService, jobService, dbService, jobStatusService) {
-  //connectionService.changeDir();
+  connectionService.runCommand('echo $WORK').then(function(cwd) { console.log(cwd); });
   $scope.params = $routeParams;
   const DataStore = require('nedb');
   var submittedJobsDB = dbService.getSubmittedJobsDB();
@@ -40,14 +40,12 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
       workPath = workPath + "/";
       $scope.job = {location: workPath, error: workPath, output: workPath};
     });
-<<<<<<< Updated upstream
-=======
+//<<<<<<< Updated upstream
     // Put a placeholder into the commands editor
->>>>>>> Stashed changes
+//>>>>>>> Stashed changes
     editor.setValue("#SBATCH --option=value\n\n# Commands\n\necho \"hello\"");
-    editor.on("focus",function() {
-      editor.setValue("");
-    });
+    
+  
   }
   else {
     $scope.job =
@@ -136,12 +134,12 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
     job.commands = editor.getValue();
     var other = editor.getValue().split("\n");
     var sbatch = [];
-    var other = angular.forEach(other, function(line, index) {
-      if (line.includes("SBATCH")) {
-        this.push(line);
-        other.splice(index,1);
+    for(var x = 0; x < other.length; x++) {
+      if (other[x].includes("SBATCH")) {
+        sbatch.push(other[x]);
+        other.splice(x,1);
       }
-    }, sbatch);
+    }
     sbatch = sbatch.join("\n");
     other = other.join("\n");
     //console.log(other);
@@ -314,4 +312,26 @@ jobSubmissionModule.directive('remoteWritable', function($q, $log, connectionSer
       };
     }
   };
+});
+
+jobSubmissionModule.directive('locationPath', function() {
+  return {
+    require: 'ngModel',
+    restrict: 'A',
+    link: function(scope, elm, attrs) {
+      
+      scope.$watch(attrs.ngModel, function(value) {
+        if (value.search('^[a-zA-Z0-9]*\.slurm$')!=-1) {
+          scope.jobscript.location.$error.locationPath=true;
+        }
+        else if (value.search('^[a-zA-Z0-9]*\.err$')!=-1) {
+          scope.jobscript.location.$error.locationPath=true;
+        
+        }
+        else if (value.search('^[a-zA-Z0-9]*\.out$')!=-1) {
+          scope.jobscript.location.$error.locationPath=true;
+        }
+      })
+    }
+  }
 });
