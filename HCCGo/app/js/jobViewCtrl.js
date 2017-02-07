@@ -75,7 +75,7 @@ jobViewModule.controller('jobViewCtrl', ['$scope', '$log', '$timeout', 'connecti
     });
   });
 
-  $scope.saveFile = function(fileType) {
+  $scope.saveFile = function(fileType, $event) {
     const {dialog} = require('electron').remote;
     const fs = require('fs');
     const path = require('path');
@@ -87,6 +87,8 @@ jobViewModule.controller('jobViewCtrl', ['$scope', '$log', '$timeout', 'connecti
     };
 
     dialog.showSaveDialog(options, function(fileName) {
+      // If the user clicks cancel, fileName will be undefined
+      if (!fileName) return;
       switch(fileType){
         case 'Output':
           fs.writeFile(fileName, $scope.job.outText, function(err) {});
@@ -96,5 +98,7 @@ jobViewModule.controller('jobViewCtrl', ['$scope', '$log', '$timeout', 'connecti
           break;
       }
     });
+    // Stop the propagation of the click
+    $event.stopPropagation();
   };
 }]);
