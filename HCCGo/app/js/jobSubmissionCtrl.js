@@ -2,7 +2,7 @@
 jobSubmissionModule = angular.module('HccGoApp.jobSubmissionCtrl', ['ngRoute' ]);
 
 jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout','$rootScope', 'connectionService', '$routeParams', '$location', '$q', 'preferencesManager', 'notifierService', 'jobService', 'dbService', 'jobStatusService', function($scope, $log, $timeout, $rootScope, connectionService, $routeParams, $location, $q, preferencesManager, notifierService, jobService, dbService, jobStatusService) {
-  connectionService.runCommand('echo $WORK').then(function(cwd) { console.log(cwd); });
+
   $scope.params = $routeParams;
   const DataStore = require('nedb');
   var submittedJobsDB = dbService.getSubmittedJobsDB();
@@ -40,9 +40,8 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
       workPath = workPath + "/";
       $scope.job = {location: workPath, error: workPath, output: workPath};
     });
-//<<<<<<< Updated upstream
+
     // Put a placeholder into the commands editor
-//>>>>>>> Stashed changes
     editor.setValue("#SBATCH --option=value\n\n# Commands\n\necho \"hello\"");
     
   
