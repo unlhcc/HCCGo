@@ -4,6 +4,9 @@ env:
   - GIT_EMAIL: djw8605@gmail.com
   - GH_REF: git@github.com:unlhcc/hccgo-dev.git
 language: node_js
+node_js:
+  - "node"
+  - "6"
 before_script:
 - npm install
 script:
