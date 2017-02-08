@@ -112,8 +112,9 @@ jobViewModule.controller('jobViewCtrl', ['$scope', '$log', '$timeout', 'connecti
     });
   }
 
-  $scope.copyToClipboard = function(fileType) {
+  $scope.copyToClipboard = function(fileType, $event) {
     const {clipboard} = require('electron');
     clipboard.writeText($scope.job[fileType]);
+    $event.stopPropagation();
   }
 }]);

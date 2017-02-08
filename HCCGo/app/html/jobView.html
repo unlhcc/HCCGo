@@ -23,7 +23,7 @@
                <div class="col-sm-12">
                  <h4 class="panel-title jobhistory" style="display: inline-block">Output<small class="jobdate"> {{job.outputPath}}</small></h4>
                  <button type="submit" class="btn btn-primary btn-xs save-buttons" ng-click="saveFile('Output', $event)"> <i class="glyphicon glyphicon-floppy-disk" aria-hidden="True"></i> Save</button>
-                 <button type="submit" class="btn btn-primary btn-xs save-buttons" ng-click="copyToClipboard('outText')"> <i class="glyphicon glyphicon-copy" aria-hidden="true"></i> Copy</button>  
+                 <button type="submit" class="btn btn-primary btn-xs save-buttons" ng-click="copyToClipboard('outText', $event)"> <i class="glyphicon glyphicon-copy" aria-hidden="true"></i> Copy</button>  
                </div>
              </div>
   
@@ -40,7 +40,7 @@
                <div class="col-sm-12">
                  <h4 class="panel-title jobhistory" style="display: inline-block">Error<small class="jobdate"> {{job.errorPath}} </small></h4>
                  <button type="submit" class="btn btn-primary btn-xs save-buttons" ng-click="saveFile('Error', $event)"> <i class="glyphicon glyphicon-floppy-disk" aria-hidden="True"></i> Save</button>
-                 <button type="submit" class="btn btn-primary btn-xs save-buttons" ng-click="copyToClipboard('errText')"><i class="glyphicon glyphicon-copy" aria-hidden="true"></i> Copy</button>       
+                 <button type="submit" class="btn btn-primary btn-xs save-buttons" ng-click="copyToClipboard('errText', $event)"><i class="glyphicon glyphicon-copy" aria-hidden="true"></i> Copy</button>       
                </div>
              </div>
             </div>
