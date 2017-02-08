@@ -60,6 +60,14 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
     editor.setValue($scope.job.commands);
   }
 
+  $scope.locationPath = function() {
+    if($scope.job.location.search(/^\w*(\.slurm|\.err|\.out)$/)!=-1 |
+     $scope.job.error.search(/^\w*(\.slurm|\.err|\.out)$/)!=-1 | 
+     $scope.job.output.search(/^\w*(\.slurm|\.err|\.out)$/)!=-1){
+     $scope.jobscript.changePath = true;
+    }
+
+  }
   $scope.cancel = function() {
     $location.path("cluster/" + $scope.params.clusterId + "/jobHistory");
   }
@@ -134,18 +142,28 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
     var other = editor.getValue().split("\n");
     var sbatch = [];
     for(var x = 0; x < other.length; x++) {
-      if (other[x].includes("SBATCH")) {
+      if (other[x].startsWith("#SBATCH")) {
         sbatch.push(other[x]);
         other.splice(x,1);
       }
     }
     sbatch = sbatch.join("\n");
     other = other.join("\n");
-    //console.log(other);
-    //console.log(sbatch);
 
+    var getWorkProm = getWork();
+    if ($scope.jobscript.changePath) {
+
+      getWorkProm.then(function(wp) {
+        job.location = wp + '\/' +  job.location.match(/\w*\.\w*/);
+        job.error = wp + '\/' + job.error.match(/\w*\.\w*/);
+        job.output = wp + '\/' +  job.output.match(/\w*\.\w*/);
+      })
+    }
+    else {
+      getWorkProm.when();
+    }
     // Create string for file
-
+    getWorkProm.then(function() {
     var jobFile =
       "#!/bin/sh\n" +
       "#SBATCH --time=\"" + job.runtime + "\"\n" +
@@ -269,7 +287,7 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
         $location.path("cluster/" + $scope.params.clusterId);
       }
     });
-
+  });
 
   }
 
@@ -313,24 +331,21 @@ jobSubmissionModule.directive('remoteWritable', function($q, $log, connectionSer
   };
 });
 
-jobSubmissionModule.directive('locationPath', function() {
+/*jobSubmissionModule.directive('locationPath', function($q) {
   return {
     require: 'ngModel',
     restrict: 'A',
-    link: function(scope, elm, attrs) {
-      
-      scope.$watch(attrs.ngModel, function(value) {
-        if (value.search('^[a-zA-Z0-9]*\.slurm$')!=-1) {
-          scope.jobscript.location.$error.locationPath=true;
+    link: function(scope, elm, attrs, ctrl) {
+      ctrl.$validators.locationPath = function(modelValue, viewValue) {
+        if(modelValue) {
+          if (modelValue.search(/^\w*(\.slurm|\.err|\.out)$/)!=-1) {
+            if(!scope.jobscript.location.$error.locationPath) {
+              return false;
+            }
+            
+          }
         }
-        else if (value.search('^[a-zA-Z0-9]*\.err$')!=-1) {
-          scope.jobscript.location.$error.locationPath=true;
-        
-        }
-        else if (value.search('^[a-zA-Z0-9]*\.out$')!=-1) {
-          scope.jobscript.location.$error.locationPath=true;
-        }
-      })
+      }
     }
   }
-});
+});*/

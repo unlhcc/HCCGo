@@ -358,23 +358,6 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', '$lo
       return deferred.promise;
    }
 
-   // Sets the current working directory on server
-   /*var changeDir = function(path) {
-     if(!path) {
-       runCommand("cd /work/swanson/cjkeilig").then(runCommand("pwd").then(function(cwd) {console.log(cwd)}));
-          
-
-     }
-     else {
-       runCommand("cd " + path).then(function(cwd) {
-          return cwd;
-         },
-         function(err) {
-           $log.error(err);
-         });
-     }
-   }*/
-
    // Creates directory on server
    // Publicly available
    var makeDir = function(dirList, root, dest, callback) {
@@ -908,7 +891,6 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', '$lo
    checkWritable: checkWritable,
    getFileText: getFileText,
    getFileSize: getFileSize,
-   //changeDir: changeDir,
    initiateConnection: function initiateConnection(username, password, hostname, cluster, needInput, completed) {
 
      var Client = require('ssh2').Client;
