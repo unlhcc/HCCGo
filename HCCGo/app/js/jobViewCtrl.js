@@ -1,5 +1,25 @@
 jobViewModule = angular.module('HccGoApp.jobViewCtrl', ['ngRoute' ]);
 
+/**
+ * This controller is responsible for displaying the input, output, and error of a specific job.
+ * The user is able to copy the output and error of a job up to 5MB.
+ * They are also able to save the entire file to their local machines.
+ * 
+ * @ngdoc controller
+ * @memberof HCCGo
+ * @class jobViewCtrl
+ * @requires $scope
+ * @requires $log
+ * @requires $timeout
+ * @requires connectionService
+ * @requires $routeParams
+ * @requires $location
+ * @requires $q
+ * @requires preferencesManager
+ * @requires notifierService
+ * @requires jobService
+ * @requires dbService
+ */
 jobViewModule.controller('jobViewCtrl', ['$scope', '$log', '$timeout', 'connectionService', '$routeParams', '$location', '$q', 'preferencesManager', 'notifierService', 'jobService', 'dbService', function($scope, $log, $timeout, connectionService, $routeParams, $location, $q, preferencesManager, notifierService, jobService, dbService) {
 
   $scope.params = $routeParams;
@@ -75,9 +95,18 @@ jobViewModule.controller('jobViewCtrl', ['$scope', '$log', '$timeout', 'connecti
     });
   });
 
+  /**
+   * Saves the output or error to a file
+   * @method saveFile
+   * @memberof HCCGo.jobViewCtrl
+   * @param {String} fileType - Denotes either the output or error to be Saved
+   * @param {Event} $event - Used to stop the save event from moving up the DOM
+   */
   $scope.saveFile = function(fileType, $event) {
     const {dialog} = require('electron').remote;
     const fs = require('fs');
+    const path = require('path');
+
     var options = {
       filters: [
         { name: 'text', extensions: ['txt']}
@@ -87,34 +116,50 @@ jobViewModule.controller('jobViewCtrl', ['$scope', '$log', '$timeout', 'connecti
     dialog.showSaveDialog(options, function(localFile) {
       // If the user clicks cancel, localFile will be undefined
       if (!localFile) return;
-      switch(fileType){
-        case 'Output':
-          if (!downloadRemoteFile($scope.job.outputPath, localFile))
-            fs.writeFile(localFile, $scope.job.outText, function(err) {});
-          break;
-        case 'Error':
-          if (!downloadRemoteFile($scope.job.errorPath, localFile))
-            fs.writeFile(localFile, $scope.job.errText, function(err) {});
-          break;
+
+      if (!downloadRemoteFile($scope.job[fileType], localFile)) {
+        fs.writeFile(localFile, $scope.job[fileType], function(err) {});
       }
+      notifierService.success(path.basename(localFile).trim() + " Was Successfully Saved!", "Save Successful!");
     });
     // Stop the propagation of the click
     $event.stopPropagation();
   };
 
+  /**
+   * Used to download the file requested from the server, since only 5MB worth of data is displayed to the user.
+   * @method downloadRemoteFile
+   * @memberof HCCGo.jobViewCtrl
+   * @param {String} remotePath - Denotes the path on the server to download the file from
+   * @param {String} localPath - Denotes the path where the user wants the file saved
+   * @returns {Boolean} A flag that denotes whether the file needed to be downloaded from the server or not
+   */
   function downloadRemoteFile(remotePath, localPath) {
     connectionService.getFileSize(remotePath).then(function(size) {
       if (size > 5*1025*1024) {
-        connectionService.quickDownload(remotePath, localPath);
+        connectionService.quickDownload(remotePath, localPath).then(function(msg) {
+          if (msg !== null){
+            notifierService.error(msg);
+            return false;
+          }
+        });
         return true;
       }
       return false;
     });
   }
 
+  /**
+   * Copies the contents of the displayed output or error to the system clipboard
+   * @method copyToClipboard
+   * @memberof HCCGo.jobViewCtrl
+   * @param {String} fileType - Used to grab either output or error from the textarea
+   * @param {Object} $event - Stops the copy event from traversing up the DOM
+   */
   $scope.copyToClipboard = function(fileType, $event) {
     const {clipboard} = require('electron');
     clipboard.writeText($scope.job[fileType]);
     $event.stopPropagation();
+    notifierService.success("Copied to Clipboard!", "Copied!");
   }
 }]);

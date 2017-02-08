@@ -1,6 +1,23 @@
 
 connectionModule = angular.module('ConnectionServiceModule', [])
 
+/**
+ * The connectionService is used throughout the entire app, from filetransfer to login authentication.
+ * Uses a mixture of protocols to accomplish these tasks.
+ * 
+ * @ngdoc service
+ * @memberof HCCGo
+ * @class connectionService
+ * @requires $log
+ * @requires $q
+ * @requires $routeParams
+ * @requires $location
+ * @requires nriotifierService
+ * @requires async
+ * @requires path
+ * @requires fs
+ * @requires ssh2
+ */
 connectionModule.factory('connectionService',['$log', '$q', '$routeParams', '$location', 'notifierService', function($log, $q, $routeParams, $location, notifierService) {
    var connectionList = {crane: null,
                      tusker: null,
@@ -874,14 +891,25 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', '$lo
 
    };
 
+   /**
+    * Allows a user to quickly download a file from the server
+    * @method quickDownload
+    * @memberof HCCgo.connectionService
+    * @param {String} remotePath - Where the file resides on the server
+    * @param {String} localPath - Location where the file will be sent
+    * @returns {Promise} A promise denoting whether the process was successful or not
+    */
    var quickDownload = function(remotePath, localPath) {
+       var deferred = $q.defer();
        connectionList[getClusterContext()].sftp(function (err, sftp) {
            if (err) {
-               return;
+               deferred.reject(err);
            }
            sftp.fastGet(remotePath, localPath);
            sftp.end();
+           deferred.resolve(null);
        });
+       return deferred.promise;
    };
    return {
    getConnection: getConnection,
