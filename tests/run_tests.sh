@@ -22,7 +22,9 @@ if [ "${TRAVIS_PULL_REQUEST}" = "false" ]; then
     git remote add gh-token "${GH_REF}"
     chmod 600 ../deploy-key
     eval `ssh-agent -s`
-    ssh-add ../deploy-key 
+    ssh-add ../deploy-key
+    git add .
+    git commit -m "${GIT_NAME}"
     git push gh-token master
     popd 
   fi
