@@ -3,9 +3,17 @@ env:
   - GIT_NAME: "'Markdown autodeploy'"
   - GIT_EMAIL: djw8605@gmail.com
   - GH_REF: git@github.com:unlhcc/hccgo-dev.git
+  - CXX=g++-4.8
 language: node_js
 node_js:
   - "node"
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      - g++-4.8
+
 before_script:
 - npm install
 script:
