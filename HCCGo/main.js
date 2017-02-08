@@ -97,10 +97,6 @@ app.on('ready', function() {
             label: 'View',
             submenu: [
           {
-            label: "Reload",
-            role: 'reload'
-          },
-          {
             label: "Open Dev Tools",
             role: 'toggledevtools',
             click: function() {
