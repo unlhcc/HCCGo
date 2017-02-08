@@ -1,4 +1,4 @@
-#!/bin/sh -x -e
+#!/bin/sh -xe
 
 
 
@@ -24,6 +24,7 @@ if [ "${TRAVIS_PULL_REQUEST}" = "false" ]; then
     eval `ssh-agent -s`
     ssh-add ../deploy-key 
     git push gh-token master
+    popd 
   fi
 fi
-popd 
+
