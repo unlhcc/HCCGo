@@ -16,14 +16,14 @@ addons:
 
 script:
 - openssl aes-256-cbc -K $encrypted_c3ed45c29343_key -iv $encrypted_c3ed45c29343_iv -in deploy-key.enc -out deploy-key -d
-- chmod 600 deploy-key
-- eval `ssh-agent -s`
-- ssh-add deploy-key
 - grunt docs
 - cp -r docs/* hccgo-dev/
+- chmod 600 deploy-key
+- eval `ssh-agent -s`
 - pushd hccgo-dev
 - git config user.name "Automatic Publish"
 - git config user.email "djw8605@gmail.com"
 - git clone "${GH_REF}" hccgo-dev
-- if [ "${TRAVIS_PULL_REQUEST}" = "false" ]; then echo "Pushing to github"; git push hccgo-dev master; fi
+- if [ "${TRAVIS_PULL_REQUEST}" = "false" ]; then echo "Pushing to github"; ssh-add ../deploy-key; git push hccgo-dev master; fi
 - popd 
+
