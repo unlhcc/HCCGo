@@ -111,4 +111,9 @@ jobViewModule.controller('jobViewCtrl', ['$scope', '$log', '$timeout', 'connecti
       return false;
     });
   }
+
+  $scope.copyToClipboard = function(fileType) {
+    const {clipboard} = require('electron');
+    clipboard.writeText($scope.job[fileType]);
+  }
 }]);

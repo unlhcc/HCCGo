@@ -22,13 +22,14 @@
              <div class="row">
                <div class="col-sm-12">
                  <h4 class="panel-title jobhistory" style="display: inline-block">Output<small class="jobdate"> {{job.outputPath}}</small></h4>
-                 <button type="submit" class="btn btn-primary btn-xs save-buttons" ng-click="saveFile('Output', $event)">Save...</button>
+                 <button type="submit" class="btn btn-primary btn-xs save-buttons" ng-click="saveFile('Output', $event)"> <i class="glyphicon glyphicon-floppy-disk" aria-hidden="True"></i> Save</button>
+                 <button type="submit" class="btn btn-primary btn-xs save-buttons" ng-click="copyToClipboard('outText')"> <i class="glyphicon glyphicon-copy" aria-hidden="true"></i> Copy</button>  
                </div>
              </div>
   
            </div>
            <div id="collapse0" class="panel-collapse collapse in">
-             <div class="panel-body jobstatus-text">
+             <div class="panel-body jobstatus-text copy-Output">
                <pre>{{job.outText}}</pre>
              </div>
            </div>
@@ -38,12 +39,13 @@
              <div class="row">
                <div class="col-sm-12">
                  <h4 class="panel-title jobhistory" style="display: inline-block">Error<small class="jobdate"> {{job.errorPath}} </small></h4>
-                 <button type="submit" class="btn btn-primary btn-xs save-buttons" ng-click="saveFile('Error', $event)">Save...</button>                 
+                 <button type="submit" class="btn btn-primary btn-xs save-buttons" ng-click="saveFile('Error', $event)"> <i class="glyphicon glyphicon-floppy-disk" aria-hidden="True"></i> Save</button>
+                 <button type="submit" class="btn btn-primary btn-xs save-buttons" ng-click="copyToClipboard('errText')"><i class="glyphicon glyphicon-copy" aria-hidden="true"></i> Copy</button>       
                </div>
              </div>
             </div>
             <div id="collapse1" class="panel-collapse collapse in">
-              <div class="panel-body jobstatus-text">
+              <div class="panel-body jobstatus-text copy-Error">
                 <pre>{{job.errText}}</pre>
               </div>
             </div>

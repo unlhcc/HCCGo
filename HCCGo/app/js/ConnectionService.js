@@ -875,11 +875,12 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', '$lo
    };
 
    var quickDownload = function(remotePath, localPath) {
-       const sftp = require('ssh2').SFTPStream;
-       sftp.fastGet(remotePath, localPath, function(err) {
+       connectionList[getClusterContext()].sftp(function (err, sftp) {
            if (err) {
-               $log.error("Error while downloading file!");
+               return;
            }
+           sftp.fastGet(remotePath, localPath);
+           sftp.end();
        });
    };
    return {
