@@ -3,6 +3,7 @@ env:
   - GIT_NAME: "'Markdown autodeploy'"
   - GIT_EMAIL: djw8605@gmail.com
   - GH_REF: git@github.com:unlhcc/hccgo-dev.git
+  - GH_HTTP: https://github.com/unlhcc/hccgo-dev.git
   - CXX=g++-4.8
 language: node_js
 node_js:
@@ -20,10 +21,11 @@ script:
 - chmod 600 deploy-key
 - git config user.name "Automatic Publish"
 - git config user.email "djw8605@gmail.com"
-- git clone "${GH_REF}" hccgo-dev
+- git clone "${GH_HTTP}" hccgo-dev
 - eval `ssh-agent -s`
-- pushd hccgo-dev
 - cp -r docs/* hccgo-dev/
-- if [ "${TRAVIS_PULL_REQUEST}" = "false" ]; then echo "Pushing to github"; ssh-add ../deploy-key; git push hccgo-dev master; fi
+- pushd hccgo-dev
+- git remote add gh-token "${GH_REF}"
+- if [ "${TRAVIS_PULL_REQUEST}" = "false" ]; then echo "Pushing to github"; ssh-add ../deploy-key; git push gh-token master; fi
 - popd 
 
