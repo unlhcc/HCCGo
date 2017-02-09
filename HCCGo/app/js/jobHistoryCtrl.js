@@ -37,14 +37,13 @@ jobHistoryModule.service('jobService', function() {
 
   }
 
-  // query db
-  const DataStore = require('nedb');
-  var jobHistoryDB = dbService.getJobHistoryDB();
   // Get completed jobs from db file
-  jobHistoryDB.find({}, function (err, docs) {
-    // if data already loaded, just add them to the list
-    $scope.jobs = docs;
-    if(err) console.log("Error fetching completed jobs: " + err);
+  dbService.getJobHistoryDB().then(function(jobHistoryDB) {
+    jobHistoryDB.find({}, function (err, docs) {
+      // if data already loaded, just add them to the list
+      $scope.jobs = docs;
+      if(err) console.log("Error fetching completed jobs: " + err);
+    });
   });
 
   $scope.deleteJob = function(job) {
@@ -53,13 +52,19 @@ jobHistoryModule.service('jobService', function() {
       callback: function(result) {
         if(result) {
           // remove panel
-          $("#panel"+job.id).fadeOut(500, function() {
+          $("#panel"+job._id).fadeOut(500, function() {
             $(this).css({"visibility":"hidden",display:'block'}).slideUp();
           });
           // remove from angular binding
-          $scope.jobs.splice(index,1);
-          db.remove({ _id: job._id }, { multi: true }, function (err, numRemoved) {
-            if(err) console.log("Error deleting document " + err);
+          for(var i=0; i<$scope.jobs.length; i++) {
+            if($scope.jobs[i]._id == job._id) {
+              $scope.jobs.splice(i,1);
+            }
+          }
+          dbService.getJobHistoryDB().then(function(db) {
+            db.remove({ _id: job._id }, { multi: true }, function (err, numRemoved) {
+              if(err) $log.error("Error deleting document " + err);
+            });
           });
         }
       }

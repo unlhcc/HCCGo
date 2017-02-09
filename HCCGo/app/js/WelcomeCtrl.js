@@ -1,7 +1,7 @@
 
 welcomeModule = angular.module('HccGoApp.WelcomeCtrl', [ ]);
 
-welcomeModule.controller('welcomeCtrl', ['$scope', '$log', '$timeout', 'connectionService', 'notifierService', '$location', 'preferencesManager', 'updaterService', function($scope, $log, $timeout, connectionService, notifierService, $location, preferencesManager, updaterService) {
+welcomeModule.controller('welcomeCtrl', ['$scope', '$log', '$timeout', 'connectionService', 'notifierService', '$location', 'preferencesManager', 'updaterService', 'analyticsService', 'dbService', function($scope, $log, $timeout, connectionService, notifierService, $location, preferencesManager, updaterService, analyticsService, dbService) {
  
   updaterService.start();
   angular.element('#betaModal').modal('show');
@@ -41,11 +41,11 @@ welcomeModule.controller('welcomeCtrl', ['$scope', '$log', '$timeout', 'connecti
        callback(new_object);
       
      }
-    
+
   });
-  
+
   var selection = $selector[0].selectize;
-  
+
   preferencesManager.getClusters().then(function(clusters) {
     $scope.clusters = clusters;
     selection.addOption(clusters);
@@ -53,17 +53,15 @@ welcomeModule.controller('welcomeCtrl', ['$scope', '$log', '$timeout', 'connecti
     selection.refreshOptions(false);
     selection.refreshItems();
   });
-  
 
   $scope.login = function() {
     // Get the input
     $('#loginSubmit').prop('disabled', true);
     $('#loginForm').fadeTo('fast', 0.3);
-    
+
     var connectUrl = selection.getValue();
     var curValue = 25;
-    $scope.selectedCluster = $.grep($scope.clusters, function(e) {return e.url == connectUrl})[0];
-    
+    $scope.selectedCluster = $.grep($scope.clusters, function(e) {return e.url == connectUrl})[0]; 
     
     $('#submitprogress').css('width', curValue+'%').attr('aria-valuenow', curValue);
 
@@ -76,7 +74,6 @@ welcomeModule.controller('welcomeCtrl', ['$scope', '$log', '$timeout', 'connecti
     $log.log("Starting login process", 'warning');
     
     connectionService.initiateConnection($scope.username, $scope.password, connectUrl, $scope.selectedCluster.label, userPrompt,  function(err) {
-        
         if (err) {
           $log.error("Got error from connection");
           $('#loginSubmit').prop('disabled', false);
@@ -84,24 +81,26 @@ welcomeModule.controller('welcomeCtrl', ['$scope', '$log', '$timeout', 'connecti
           curValue = 0;
           $('#submitprogress').css('width', curValue+'%').attr('aria-valuenow', curValue);
           $scope.loadingDescription = "Login failed. Please try again.";
+          analyticsService.event('login', 'fail');
         } 
         else {
           $scope.$apply(function() {
+            analyticsService.event('login', 'success');
             $location.path("/cluster/" + $scope.selectedCluster.label);
             $log.debug("Cluster label: " + $scope.selectedCluster.label);
           });
         }      
     });
   };
-  
-  $scope.transformCustom = function(customUrl) {
+
+  $scope.transformCustom = function(customUrl) {   
     
     $log.log("Got custom attribute: " + customUrl);
     return { label: customUrl, url: customUrl, type: 'slurm'};
-    
+
   };
-  
-  
+
+
   userPrompt = function(prompt, finishFunc) {
     
     $scope.$apply(function() {
@@ -116,9 +115,9 @@ welcomeModule.controller('welcomeCtrl', ['$scope', '$log', '$timeout', 'connecti
       $("#promptModal").modal('show');
       $scope.finishFunc = finishFunc;
     });
-    
+
   };
-  
+
   $scope.promptComplete = function() {
     $("#promptModal").modal('hide');
     $scope.finishFunc($scope.userResponse);
@@ -126,5 +125,5 @@ welcomeModule.controller('welcomeCtrl', ['$scope', '$log', '$timeout', 'connecti
     $('#submitprogress').css('width', curValue+'%').attr('aria-valuenow', curValue);
     $scope.loadingDescription = "Waiting on authentication...";
   };
-  
+
 }]);

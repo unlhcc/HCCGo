@@ -6,48 +6,6 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
   $scope.params = $routeParams;
   $scope.jobs = [];
   var clusterInterface = null;
-  var path = require('path');
-  var jobHistory = path.join(__dirname, 'data/jobHistory.json');
-
-  // Check if app data folder is there, if not, create one with default json file
-  var jobHistoryPath = filePathService.getJobHistory();
-  var dataPath = filePathService.getDataPath();
-  var submittedJobsPath = filePathService.getSubmittedJobs();
-  var db;
-  var fs = require('fs');
-  fs.exists(dataPath, function(exists) {
-    if(!exists) {
-        fs.mkdir(dataPath, function() {
-            // create default files
-            fs.createWriteStream(jobHistoryPath);
-            var jobHistoryDB = dbService.getJobHistoryDB();
-            $.getJSON(jobHistory, function(json) {
-              jobHistoryDB.insert(json.jobs[0], function(err, newDoc) {
-                if(err) console.log(err);
-              });
-            });
-            fs.createWriteStream(submittedJobsPath);
-        });
-    }
-    else {
-      fs.exists(jobHistoryPath, function(fileExists) {
-        if(!fileExists) {
-          fs.createWriteStream(jobHistoryPath);
-          var jobHistoryDB = dbService.getJobHistoryDB();
-          $.getJSON(jobHistory, function(json) {
-            jobHistoryDB.insert(json.jobs[0], function(err, newDoc) {
-              if(err) console.log(err);
-            });
-          });
-        }
-      });
-      fs.exists(submittedJobsPath, function(fileExists) {
-        if(!fileExists)
-          fs.createWriteStream(submittedJobsPath);
-      });
-    }
-  });
-  db = dbService.getSubmittedJobsDB();
 
   // Generate empty graphs
   var homeUsageGauge = c3.generate({
@@ -128,9 +86,10 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
         break;
       }
     }
-    
-    db.remove({ _id: id }, { multi: true }, function (err, numRemoved) {
-      if(err) console.log("Error deleting document " + err);
+    dbService.getSubmittedJobsDB().then(function(db) {
+      db.remove({ _id: id }, { multi: true }, function (err, numRemoved) {
+        if(err) console.log("Error deleting document " + err);
+      });
     });
     $event.stopPropagation();
   }
@@ -145,8 +104,7 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
     // Begin spinning the refresh image
     $("#jobrefresh").addClass("spinning-image");
 
-
-    jobStatusService.refreshDatabase(db, clusterInterface, clusterId, force).then(function(data) {
+    jobStatusService.refreshDatabase(clusterInterface, clusterId, force).then(function(data) {
       $scope.numRunning = data.numRunning;
       $scope.numIdle = data.numIdle;
       $scope.numError = data.numError;
@@ -154,7 +112,7 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
 
       // Stop spinning image
       $("#jobrefresh").removeClass("spinning-image");
-    })
+    });
   }
 
   function updateGraphs(force) {

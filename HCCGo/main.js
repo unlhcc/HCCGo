@@ -12,9 +12,11 @@ require('electron-debug')({showDevTools: true});
 app.on('ready', function() {
 
     mainWindow = new BrowserWindow({
-        width: 1000,
+        width: 1200,
         height: 800,
-        show: false
+        show: false,
+        minWidth: 1200,
+        minHeight: 800
     });
 
 	ipcMain.on('focus-check-reply', (event, arg) => {
@@ -94,10 +96,6 @@ app.on('ready', function() {
         ]}, {
             label: 'View',
             submenu: [
-          {
-            label: "Reload",
-            role: 'reload'
-          },
           {
             label: "Open Dev Tools",
             role: 'toggledevtools',

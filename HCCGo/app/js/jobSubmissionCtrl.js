@@ -4,9 +4,6 @@ jobSubmissionModule = angular.module('HccGoApp.jobSubmissionCtrl', ['ngRoute' ])
 jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout','$rootScope', 'connectionService', '$routeParams', '$location', '$q', 'preferencesManager', 'notifierService', 'jobService', 'dbService', 'jobStatusService', function($scope, $log, $timeout, $rootScope, connectionService, $routeParams, $location, $q, preferencesManager, notifierService, jobService, dbService, jobStatusService) {
 
   $scope.params = $routeParams;
-  const DataStore = require('nedb');
-  var submittedJobsDB = dbService.getSubmittedJobsDB();
-  var jobHistoryDB = dbService.getJobHistoryDB();
 
   //initialize editor
   ace.config.set('basePath','lib/ace-builds/src-noconflict');
@@ -59,8 +56,12 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
     $location.path("cluster/" + $scope.params.clusterId + "/jobHistory");
   }
 
+  /**
+   * Force a refresh of the job statuses.
+   *
+   */
   $scope.refreshCluster = function() {
-    jobStatusService.refreshDatabase(dbService.getSubmittedJobsDB(), $rootScope.clusterInterface, $rootScope.clusterId, true)
+    jobStatusService.refreshDatabase($rootScope.clusterInterface, $rootScope.clusterId, true);
   }
   // Get available modules
   function getModules() {
@@ -143,27 +144,29 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
     var now = Date.now();
     // updating job history
     if(loadedJob != null) {
-      jobHistoryDB.update(
-        { _id: loadedJob._id },
-        { $set:
-          {
-            timestamp: now,
-            runtime: job.runtime,
-            memory: job.memory,
-            jobname: job.jobname,
-            location: job.location,
-            error: job.error,
-            output: job.output,
-            modules: ((job.modules != null) ? job.modules : []),
-            commands: job.commands,
-            cluster: $scope.params.clusterId
+      dbService.getJobHistoryDB().then(function(jobHistoryDB) {
+        jobHistoryDB.update(
+          { _id: loadedJob._id },
+          { $set:
+            {
+              timestamp: now,
+              runtime: job.runtime,
+              memory: job.memory,
+              jobname: job.jobname,
+              location: job.location,
+              error: job.error,
+              output: job.output,
+              modules: ((job.modules != null) ? job.modules : []),
+              commands: job.commands,
+              cluster: $scope.params.clusterId
+            }
+          },
+          {},
+          function (err, numReplaced) {
+            if(err) console.log("Error updating job history db: " + err);
           }
-        },
-        {},
-        function (err, numReplaced) {
-          if(err) console.log("Error updating job history db: " + err);
-        }
-      );
+        );
+      });
     }
     else {
       var newJob = {
@@ -178,8 +181,10 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
         "timestamp": now,
         "cluster": $scope.params.clusterId
       }
-      jobHistoryDB.insert(newJob, function(err, newDoc) {
-        if(err) console.log(err);
+      dbService.getJobHistoryDB().then(function(jobHistoryDB) {
+        jobHistoryDB.insert(newJob, function(err, newDoc) {
+          if(err) $log.error(err);
+        });
       });
     }
 
@@ -222,9 +227,11 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
             "status": "SUBMITTED",
             "jobName": job.jobname
           }
-          submittedJobsDB.insert(doc, function(err, newDoc) {
-            if(err) console.log(err);
-            callback(null);
+          dbService.getSubmittedJobsDB().then(function(submittedJobsDB) {
+            submittedJobsDB.insert(doc, function(err, newDoc) {
+              if(err) $log.error(err);
+              callback(null);
+            });
           });
 
         }, function(err) {
