@@ -164,7 +164,7 @@ jobStatusService.service('jobStatusService',['$log','$q','notifierService', 'dbS
                             "jobName": job.JobName,
                             "status": "COMPLETE",
                             "reportedStatus": job.State,
-														"maxMemory": job.MaxRSS
+                            "maxMemory": job.MaxRSS
                             }
                           },
                           { returnUpdatedDocs: true },
