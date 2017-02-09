@@ -37,6 +37,11 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
       workPath = workPath + "/";
       $scope.job = {location: workPath, error: workPath, output: workPath};
     });
+
+    // Put a placeholder into the commands editor
+    editor.setValue("#SBATCH --option=\"value\"\n\n# Commands\n\necho \"Hello\"");
+    
+  
   }
   else {
     $scope.job =
@@ -50,6 +55,20 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
       commands: loadedJob.commands
     };
     editor.setValue($scope.job.commands);
+  }
+
+  $scope.chkDir = function(path, identifier) {
+    if (!$scope.job.change) {
+      $scope.job.change = [];
+    }
+    if(path) {
+      if(path.search(/^\w*\.\w*$/)!=-1) {
+        $scope.job.change[identifier] = true;
+      }
+      else {
+        $scope.job.change[identifier] = false;
+      }
+    }
   }
 
   $scope.cancel = function() {
@@ -125,6 +144,28 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
 
     $("#submitbtn").prop('disabled', true);
 
+    // Separate SBATCH options from commands
+    job.commands = editor.getValue();
+    var other = editor.getValue().split("\n");
+    var sbatch = [];
+    sbatch = other.filter(function(value, index, array) {
+      return (value.startsWith("#SBATCH"));
+    });
+    other = other.filter(function(value, index, array) {
+      return (!value.startsWith("#SBATCH"));
+    });
+
+    sbatch = sbatch.join("\n");
+    other = other.join("\n");
+
+    var getWorkProm = getWork();
+    getWorkProm.then(function(wp) { 
+      for(path in $scope.job.change) {
+        if ($scope.job.change[path]) {
+          job[path] = wp + '\/' +  $scope.job[path].match(/\w*\.\w*/);
+        }
+      }
+
     // Create string for file
     var jobFile =
       "#!/bin/sh\n" +
@@ -132,14 +173,15 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
       "#SBATCH --mem-per-cpu=\"" + job.memory + "\"\n" +
       "#SBATCH --job-name=\"" + job.jobname + "\"\n" +
       "#SBATCH --error=\"" + job.error + "\"\n" +
-      "#SBATCH --output=\"" + job.output + "\"\n";
+      "#SBATCH --output=\"" + job.output + "\"\n" +
+      sbatch;
       if(job.modules != null){
           for(var i = 0; i < job.modules.length; i++) {
               jobFile += "\nmodule load " + job.modules[i];
           }
       }
-      job.commands = editor.getValue();
-      jobFile += "\n" + job.commands + "\n";
+    
+      jobFile += "\n" + other + "\n";
 
     var now = Date.now();
     // updating job history
@@ -254,7 +296,7 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
         $location.path("cluster/" + $scope.params.clusterId);
       }
     });
-
+  });
 
   }
 
