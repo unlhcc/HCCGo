@@ -41,12 +41,12 @@
       </div>
       <div class="form-group" ng-class="{'has-error': jobscript.location.$error.remoteWritable}">
           <label class="control-label col-sm-2" for="location">
-            Locaton:
+            Location:
             <span class="glyphicon glyphicon-info-sign infoBubble" data-toggle="tooltip" data-container="body" data-placement="top" title="Must end in .slurm"></span>
           </label>
           <div class="col-sm-10">
             <div class="right-inner-addon">
-              <input type="text" class="form-control" id="location" name="location" ng-model="job.location"  ng-pattern="/^.*\.slurm$/" placeholder="loading work folder" required remote-writable />
+              <input type="text" class="form-control" id="location" name="location" ng-model="job.location" ng-pattern="/^.*\.slurm$/" placeholder="loading work folder" required remote-writable ng-change="chkDir(job.location, 'location')" />
               <div class="status-checkstatus">
                 <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" x="0px"     y="0px"
                 viewBox="0, 0, 100, 100" id="checkmark">
@@ -67,6 +67,7 @@
                   <span ng-show="jobscript.location.$error.pattern"> Must end in .slurm </span>
                   <span ng-show="jobscript.location.$error.remoteWritable"> The file is not writable or the directory does not exist. </span>
               </span>
+              <span ng-show="job.change.location && job.location"> * Job file will be placed in your $WORK folder </span>
           </div>
       </div>
       <div class="form-group" ng-class="{'has-error': jobscript.error.$error.remoteWritable}">
@@ -76,7 +77,7 @@
         </label>
         <div class="col-sm-10">
           <div class="right-inner-addon">
-            <input type="text" class="form-control" id="error" name="error" ng-model="job.error" ng-pattern="/^.*\.err$/" placeholder="loading work folder" required remote-writable>
+            <input type="text" class="form-control" id="error" name="error" ng-model="job.error" ng-pattern="/^.*\.err$/" placeholder="loading work folder" required remote-writable ng-change="chkDir(job.error, 'error')">
             <div class="status-checkstatus">
               <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" x="0px"     y="0px"
               viewBox="0, 0, 100, 100" id="checkmark">
@@ -97,6 +98,7 @@
               <span ng-show="jobscript.error.$error.pattern"> Must end in .err </span>
               <span ng-show="jobscript.error.$error.remoteWritable"> The file is not writable or the directory does not exist. </span>
           </span>
+          <span ng-show="job.change.error && job.error"> * Error file will be placed in your $WORK folder </span>
         </div>
       </div>
       <div class="form-group" ng-class="{'has-error': jobscript.output.$error.remoteWritable}">
@@ -105,7 +107,7 @@
         </label>
         <div class="col-sm-10">
           <div class="right-inner-addon">
-            <input type="text" class="form-control" id="output" name="output" ng-model="job.output" ng-pattern="/^.*\.out$/" placeholder="loading work folder" required remote-writable>
+            <input type="text" class="form-control" id="output" name="output" ng-model="job.output" ng-pattern="/^.*\.out$/" placeholder="loading work folder" required remote-writable ng-change="chkDir(job.output, 'output')">
             <div class="status-checkstatus">
               <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" x="0px"     y="0px"
               viewBox="0, 0, 100, 100" id="checkmark">
@@ -126,6 +128,7 @@
               <span ng-show="jobscript.output.$error.pattern"> Must end in .out </span>
               <span ng-show="jobscript.output.$error.remoteWritable"> The file is not writable or the directory does not exist. </span>
           </span>
+          <span ng-show="job.change.output && job.output"> * Output file will be placed in your $WORK folder </span>
         </div>
       </div>
       <div class="form-group">
