@@ -43,7 +43,7 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
     {
       runtime: loadedJob.runtime,
       memory: loadedJob.memory,
-      jobname: loadedJob.jobname,
+      jobname: loadedJob.clone ? "Clone of " + loadedJob.jobname : loadedJob.jobname,
       location: loadedJob.location,
       error: loadedJob.error,
       output: loadedJob.output,
@@ -143,7 +143,7 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
 
     var now = Date.now();
     // updating job history
-    if(loadedJob != null) {
+    if(loadedJob != null && !loadedJob.clone) {
       dbService.getJobHistoryDB().then(function(jobHistoryDB) {
         jobHistoryDB.update(
           { _id: loadedJob._id },

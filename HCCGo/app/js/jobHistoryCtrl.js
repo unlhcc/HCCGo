@@ -31,9 +31,16 @@ jobHistoryModule.service('jobService', function() {
   }
 
   $scope.loadJob = function(job) {
-
+    job.clone = false;
     jobService.setJob(job);
     $location.path("cluster/" + $scope.params.clusterId + "/jobSubmission");
+
+  }
+
+  $scope.cloneJob = function(job) {
+    job.clone = true;
+    jobService.setJob(job);
+    $location.path("cluster/" + $scope.params.clusterId + "/jobSubmission")
 
   }
 
