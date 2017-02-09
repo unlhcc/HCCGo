@@ -9,7 +9,8 @@
         <p><strong>Status:</strong> {{job.status}}</p>
         <p ng-if="job.reportedStatus"><strong>Completed State:</strong> {{ job.reportedStatus }}</p>
         <p><strong>Time:</strong> {{job.elapsed}}</p>
-        <p><strong>Required Memory:</strong> {{job.reqMem}}</p>
+        <p><strong>Requested Memory:</strong> {{job.reqMem}}</p>
+        <p><strong>Maximum Memory Used:</strong> {{job.maxMemory}}</p>
       </div>
     </div>
     <div class="col-md-8">

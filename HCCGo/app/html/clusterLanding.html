@@ -77,7 +77,6 @@
                 <span class="jobid">ID: {{job.jobId}}</span>
                 <span class="runTime" ng-if="job.running">Runtime: {{job.runTime}}</span>
                 <span class="runTime" ng-if="job.complete">Runtime: {{job.elapsed}}</span>
-                <span class="runTime" ng-if="job.complete">Required Memory: {{job.reqMem}}</span>
                 <span class="startTime" ng-if="!job.running && !job.complete">Estimated Start: {{job.startTime}}</span>
               </p>
             </div>
