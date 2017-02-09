@@ -412,15 +412,16 @@ div.historyinfo {
   padding-left: 0px;
 }
 
-.jobstatus-link {
-  cursor: pointer;
-  transition: background-color 0.3s ease-in-out;
 
+.list-group-item.jobstatus-link {
+  cursor: pointer;
+  /* border-width: 0 0 0 3px; */
+  border-left: 3px solid transparent;
+  
   &:hover {
-    background-color: #EEEEEE;
-  }
-  &:active{
-    background-color: #F5F5F5;
+    /* background-color: #EEEEEE; */
+    border-left-style: solid;
+    border-left-color: #26A69A;
   }
 }
 
@@ -433,4 +434,12 @@ div.historyinfo {
 	height:13em;
 	font-size:1em;
 }
+
+/* Placeholder for job submission */
+.list-group-item.empty-placeholder {
+  border-style: dashed;
+  border-width: 3px;
+  text-align: center;
+}
+
 
