@@ -42,7 +42,7 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
     });
 
     // Put a placeholder into the commands editor
-    editor.setValue("#SBATCH --option=value\n\n# Commands\n\necho \"hello\"");
+    editor.setValue("#SBATCH --option=\"value\"\n\n# Commands\n\necho \"Hello\"");
     
   
   }
@@ -147,12 +147,13 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
     job.commands = editor.getValue();
     var other = editor.getValue().split("\n");
     var sbatch = [];
-    for(var x = 0; x < other.length; x++) {
-      if (other[x].startsWith("#SBATCH")) {
-        sbatch.push(other[x]);
-        other.splice(x,1);
-      }
-    }
+    sbatch = other.filter(function(value, index, array) {
+      return (value.startsWith("#SBATCH"));
+    });
+    other = other.filter(function(value, index, array) {
+      return (!value.startsWith("#SBATCH"));
+    });
+
     sbatch = sbatch.join("\n");
     other = other.join("\n");
 
