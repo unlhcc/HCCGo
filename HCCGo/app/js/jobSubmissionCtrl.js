@@ -4,6 +4,7 @@ jobSubmissionModule = angular.module('HccGoApp.jobSubmissionCtrl', ['ngRoute' ])
 jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout','$rootScope', 'connectionService', '$routeParams', '$location', '$q', 'preferencesManager', 'notifierService', 'jobService', 'dbService', 'jobStatusService', function($scope, $log, $timeout, $rootScope, connectionService, $routeParams, $location, $q, preferencesManager, notifierService, jobService, dbService, jobStatusService) {
 
   $scope.params = $routeParams;
+
   //initialize editor
   ace.config.set('basePath','lib/ace-builds/src-noconflict');
   var editor = ace.edit("commands");
@@ -287,7 +288,7 @@ jobSubmissionModule.directive('remoteWritable', function($q, $log, connectionSer
 
         }, function(err) {
           if (err) {
-            $log.error("Got error from checking writability: " + err);
+            $log.debug("Got error from checking writability: " + err);
           }
           def.reject();
         });
