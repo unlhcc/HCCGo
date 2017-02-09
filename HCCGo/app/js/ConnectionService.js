@@ -12,7 +12,7 @@ connectionModule = angular.module('ConnectionServiceModule', [])
  * @requires $q
  * @requires $routeParams
  * @requires $location
- * @requires nriotifierService
+ * @requires notifierService
  * @requires async
  * @requires path
  * @requires fs

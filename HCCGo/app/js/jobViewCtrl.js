@@ -117,10 +117,13 @@ jobViewModule.controller('jobViewCtrl', ['$scope', '$log', '$timeout', 'connecti
       // If the user clicks cancel, localFile will be undefined
       if (!localFile) return;
 
-      if (!downloadRemoteFile($scope.job[fileType], localFile)) {
-        fs.writeFile(localFile, $scope.job[fileType], function(err) {});
-      }
-      notifierService.success(path.basename(localFile).trim() + " Was Successfully Saved!", "Save Successful!");
+      downloadRemoteFile($scope.job[fileType], localFile).then(function(flag) {
+        if (flag) {
+          fs.writeFile(localFile, $scope.job[fileType], function(err) {});
+        }
+      });
+      
+      notifierService.success(path.basename(localFile).trim() + " was Successfully Saved!", "Save Successful!");
     });
     // Stop the propagation of the click
     $event.stopPropagation();
@@ -132,20 +135,25 @@ jobViewModule.controller('jobViewCtrl', ['$scope', '$log', '$timeout', 'connecti
    * @memberof HCCGo.jobViewCtrl
    * @param {String} remotePath - Denotes the path on the server to download the file from
    * @param {String} localPath - Denotes the path where the user wants the file saved
-   * @returns {Boolean} A flag that denotes whether the file needed to be downloaded from the server or not
+   * @returns {Promise} A promise denoting whether the file was downloaded from the server or not.
    */
   function downloadRemoteFile(remotePath, localPath) {
+    var deferred = $q.defer();
+
     connectionService.getFileSize(remotePath).then(function(size) {
       if (size > 5*1025*1024) {
         connectionService.quickDownload(remotePath, localPath).then(function(msg) {
           if (msg !== null){
             notifierService.error(msg);
-            return false;
+            deferred.resolve(false);
           }
         });
-        return true;
+        deferred.resolve(true);
       }
-      return false;
+      else {
+        deferred.resolve(false);
+      }
+      return deferred.promise;
     });
   }
 
