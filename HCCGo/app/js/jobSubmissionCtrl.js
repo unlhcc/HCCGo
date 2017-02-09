@@ -60,37 +60,18 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
     editor.setValue($scope.job.commands);
   }
 
-  $scope.chkLocation = function() {
-    //$timeout(function() {
-      if($scope.job.location) {
-        if($scope.job.location.search(/^\w*\.\w*$/)!=-1) {
-          $scope.job.changeLocation = true;
-        }
-        else {
-          $scope.job.changeLocation = false;
-        }
+  $scope.chkDir = function(path, identifier) {
+    if (!$scope.job.change) {
+      $scope.job.change = [];
+    }
+    if(path) {
+      if(path.search(/^\w*\.\w*$/)!=-1) {
+        $scope.job.change[identifier] = true;
       }
-    //},1000)
-  }
-  $scope.chkError = function() {
-      if($scope.job.error) {
-        if ($scope.job.error.search(/^\w*\.\w*$/)!=-1) {
-          $scope.job.changeError = true;
-        }
-        else {
-          $scope.job.changeError = false;
-        }
+      else {
+        $scope.job.change[identifier] = false;
       }
-  }
-  $scope.chkOutput = function() {
-      if($scope.job.output) {
-        if ($scope.job.output.search(/^\w*\.\w*$/)!=-1) {
-          $scope.job.changeOutput = true;
-        }
-        else {
-          $scope.job.changeOutput = false;
-        }
-      }
+    }
   }
 
   $scope.cancel = function() {
@@ -177,15 +158,12 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
 
     var getWorkProm = getWork();
     getWorkProm.then(function(wp) { 
-      if ($scope.job.changeLocation) {
-        job.location = wp + '\/' +  job.location.match(/\w*\.\w*/);
+      for(path in $scope.job.change) {
+        if ($scope.job.change[path]) {
+          job[path] = wp + '\/' +  $scope.job[path].match(/\w*\.\w*/);
+        }
       }
-      if ($scope.job.changeError) {
-        job.error = wp + '\/' +  job.error.match(/\w*\.\w*/);
-      }
-      if ($scope.job.changeOutput) {
-        job.output = wp + '\/' +  job.output.match(/\w*\.\w*/);
-      }
+
     // Create string for file
     var jobFile =
       "#!/bin/sh\n" +
