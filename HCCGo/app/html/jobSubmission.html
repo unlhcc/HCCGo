@@ -47,7 +47,7 @@
           <div class="col-sm-10">
             <!-- ng-pattern="/^.*\.slurm$/" -->
             <div class="right-inner-addon">
-              <input type="text" class="form-control" id="location" name="location" ng-model="job.location"  placeholder="loading work folder" required remote-writable ng-change="locationPath()" ng-pattern="/^.*\.slurm$/"/>
+              <input type="text" class="form-control" id="location" name="location" ng-model="job.location"  placeholder="loading work folder" required remote-writable ng-change="chkLocation()" ng-pattern="/^.*\.slurm$/"/>
               <div class="status-checkstatus">
                 <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" x="0px"     y="0px"
                 viewBox="0, 0, 100, 100" id="checkmark">
@@ -67,7 +67,7 @@
                   <span ng-show="jobscript.location.$error.required"> Location is required. </span>
                   <span ng-show="jobscript.location.$error.pattern"> Must end in .slurm </span>
               </span>
-              <span ng-show="jobscript.changePath"> * Job file will be placed in your $WORK folder </span>
+              <span ng-show="job.changeLocation && job.location"> * Job file will be placed in your $WORK folder </span>
           </div>
       </div>
       <div class="form-group" ng-class="{'has-error': jobscript.error.$error.remoteWritable}">
@@ -77,7 +77,7 @@
         </label>
         <div class="col-sm-10">
           <div class="right-inner-addon">
-            <input type="text" class="form-control" id="error" name="error" ng-model="job.error" ng-pattern="/^.*\.err$/" placeholder="loading work folder" required remote-writable ng-change="locationPath()">
+            <input type="text" class="form-control" id="error" name="error" ng-model="job.error" ng-pattern="/^.*\.err$/" placeholder="loading work folder" required remote-writable ng-change="chkError()">
             <div class="status-checkstatus">
               <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" x="0px"     y="0px"
               viewBox="0, 0, 100, 100" id="checkmark">
@@ -97,7 +97,7 @@
               <span ng-show="jobscript.error.$error.required"> Error is required. </span>
               <span ng-show="jobscript.error.$error.pattern"> Must end in .err </span>
           </span>
-          <span ng-show="jobscript.changePath"> * Error file will be placed in your $WORK folder </span>
+          <span ng-show="job.changeError && job.error"> * Error file will be placed in your $WORK folder </span>
         </div>
       </div>
       <div class="form-group" ng-class="{'has-error': jobscript.output.$error.remoteWritable}">
@@ -106,7 +106,7 @@
         </label>
         <div class="col-sm-10">
           <div class="right-inner-addon">
-            <input type="text" class="form-control" id="output" name="output" ng-model="job.output" ng-pattern="/^.*\.out$/" placeholder="loading work folder" required remote-writable ng-change="locationPath()">
+            <input type="text" class="form-control" id="output" name="output" ng-model="job.output" ng-pattern="/^.*\.out$/" placeholder="loading work folder" required remote-writable ng-change="chkOutput()">
             <div class="status-checkstatus">
               <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" x="0px"     y="0px"
               viewBox="0, 0, 100, 100" id="checkmark">
@@ -126,7 +126,7 @@
               <span ng-show="jobscript.output.$error.required"> Output is required. </span>
               <span ng-show="jobscript.output.$error.pattern"> Must end in .out </span>
           </span>
-          <span ng-show="jobscript.changePath"> * Output file will be placed in your $WORK folder </span>
+          <span ng-show="job.changeOutput && job.output"> * Output file will be placed in your $WORK folder </span>
         </div>
       </div>
       <div class="form-group">

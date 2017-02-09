@@ -60,14 +60,39 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
     editor.setValue($scope.job.commands);
   }
 
-  $scope.locationPath = function() {
-    if($scope.job.location.search(/^\w*(\.slurm|\.err|\.out)$/)!=-1 |
-     $scope.job.error.search(/^\w*(\.slurm|\.err|\.out)$/)!=-1 | 
-     $scope.job.output.search(/^\w*(\.slurm|\.err|\.out)$/)!=-1){
-     $scope.jobscript.changePath = true;
-    }
-
+  $scope.chkLocation = function() {
+    //$timeout(function() {
+      if($scope.job.location) {
+        if($scope.job.location.search(/^\w*\.\w*$/)!=-1) {
+          $scope.job.changeLocation = true;
+        }
+        else {
+          $scope.job.changeLocation = false;
+        }
+      }
+    //},1000)
   }
+  $scope.chkError = function() {
+      if($scope.job.error) {
+        if ($scope.job.error.search(/^\w*\.\w*$/)!=-1) {
+          $scope.job.changeError = true;
+        }
+        else {
+          $scope.job.changeError = false;
+        }
+      }
+  }
+  $scope.chkOutput = function() {
+      if($scope.job.output) {
+        if ($scope.job.output.search(/^\w*\.\w*$/)!=-1) {
+          $scope.job.changeOutput = true;
+        }
+        else {
+          $scope.job.changeOutput = false;
+        }
+      }
+  }
+
   $scope.cancel = function() {
     $location.path("cluster/" + $scope.params.clusterId + "/jobHistory");
   }
@@ -151,19 +176,17 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
     other = other.join("\n");
 
     var getWorkProm = getWork();
-    if ($scope.jobscript.changePath) {
-
-      getWorkProm.then(function(wp) {
+    getWorkProm.then(function(wp) { 
+      if ($scope.job.changeLocation) {
         job.location = wp + '\/' +  job.location.match(/\w*\.\w*/);
-        job.error = wp + '\/' + job.error.match(/\w*\.\w*/);
+      }
+      if ($scope.job.changeError) {
+        job.error = wp + '\/' +  job.error.match(/\w*\.\w*/);
+      }
+      if ($scope.job.changeOutput) {
         job.output = wp + '\/' +  job.output.match(/\w*\.\w*/);
-      })
-    }
-    else {
-      getWorkProm.when();
-    }
+      }
     // Create string for file
-    getWorkProm.then(function() {
     var jobFile =
       "#!/bin/sh\n" +
       "#SBATCH --time=\"" + job.runtime + "\"\n" +
@@ -330,22 +353,3 @@ jobSubmissionModule.directive('remoteWritable', function($q, $log, connectionSer
     }
   };
 });
-
-/*jobSubmissionModule.directive('locationPath', function($q) {
-  return {
-    require: 'ngModel',
-    restrict: 'A',
-    link: function(scope, elm, attrs, ctrl) {
-      ctrl.$validators.locationPath = function(modelValue, viewValue) {
-        if(modelValue) {
-          if (modelValue.search(/^\w*(\.slurm|\.err|\.out)$/)!=-1) {
-            if(!scope.jobscript.location.$error.locationPath) {
-              return false;
-            }
-            
-          }
-        }
-      }
-    }
-  }
-});*/
