@@ -25,9 +25,12 @@ if [ "${TRAVIS_PULL_REQUEST}" = "false" ]; then
     ssh-add ../deploy-key
     git config user.name "Automatic Publish"
     git config user.email "djw8605@gmail.com"
-    git add .
-    git commit -m "${GIT_NAME}"
-    git push gh-token master
+    git diff --exit-code
+    if [ "$?" -ne "0" ]; then
+      git add .
+      git commit -m "${GIT_NAME}"
+      git push gh-token master
+    fi
     popd 
   fi
 fi
