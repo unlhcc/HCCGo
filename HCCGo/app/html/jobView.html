@@ -4,8 +4,9 @@
   <div class="row">
     <div class="col-md-4">
       <div class="well">
-        <h3 class="text-center">Job Stats</h3>
+        <h3 class="text-center">{{job.jobName}}</h3>
         <hr />
+        <p><strong>Job ID:</strong> {{job.jobId}}</p>
         <p><strong>Status:</strong> {{job.status}}</p>
         <p ng-if="job.reportedStatus"><strong>Completed State:</strong> {{ job.reportedStatus }}</p>
         <p><strong>Time:</strong> {{job.elapsed}}</p>
@@ -15,8 +16,6 @@
     </div>
     <div class="col-md-8">
       <div class="well">
-        <h3 class="text-center">{{job.jobName}} - {{job.jobId}}</h3>
-        <hr />
         <div class="panel-group">
           <div class="panel panel-default">
            <div class="panel-heading jobstatus-link" data-toggle="collapse" data-target="#collapse0">

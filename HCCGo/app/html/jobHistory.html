@@ -35,7 +35,7 @@
                <p> Error: {{ job.error }} </p>
                <p> Output: {{ job.output }} </p>
                <p> Modules: <span ng-repeat="module in job.modules"> {{module}} </span></p>
-               <p> Commands: {{ job.commands }} </p>
+               <p> Commands: <br /><pre>{{ job.commands }}</pre> </p>
              </div>
            </div>
          </div>
