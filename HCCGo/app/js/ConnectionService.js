@@ -1,7 +1,7 @@
 
 connectionModule = angular.module('ConnectionServiceModule', [])
 
-connectionModule.factory('connectionService',['$log', '$q', '$routeParams', '$location', 'notifierService', function($log, $q, $routeParams, $location, notifierService) {
+connectionModule.factory('connectionService',['$log', '$q', '$routeParams', '$location', 'notifierService', 'analyticsService', function($log, $q, $routeParams, $location, notifierService, analyticsService) {
    var connectionList = {crane: null,
                      tusker: null,
                      sandhills: null,
@@ -613,6 +613,7 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', '$lo
                          }
                      });
                 }, function(err) {
+                    analyticsService.event('file upload', 'fail');
                     bfs(err);
                 });
             });
@@ -672,18 +673,20 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', '$lo
                       });
 
                }, function(err) {
+                 analyticsService.event('file upload', 'fail');
                   water(err);
                });
             }],
             function(err) {
                 if(err) {
+                  analyticsService.event('file upload', 'fail');
                     $log.debug(err);
                     error(err);
                 } else {
                     finished();
                 }
        });
-
+       analyticsService.event('file upload', 'success', '', sizeTotal);
     }
 
    var remoteStatQueue = async.cargo(function (task, callback) {
@@ -804,6 +807,7 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', '$lo
                         });
                     }
                 }, function(err) {
+                    analyticsService.event('file download', 'fail');
                     bfs(err);
                 });
             });
@@ -860,18 +864,20 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', '$lo
                       });
                }, function(err) {
                   //sftp.end();
+                  analyticsService.event('file upload', 'fail');
                   water(err);
                });
             }],
             function(err) {
                 if(err) {
+                    analyticsService.event('file upload', 'fail');
                     $log.debug(err);
                     error(err);
                 } else {
                     finished();
                 }
        });
-
+       analyticsService.event('file upload', 'success', '', sizeTotal);
    }
 
    return {
@@ -896,12 +902,12 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', '$lo
      var Client = require('ssh2').Client;
      var conn = new Client();
      try {
-     
+
      if (username.length === 0 || password.length === 0)
      {
          completed("0 Length username or password given");
      }
-     
+
      conn.on('ready', function() {
       completed(null);
       $log.log('Client :: ready');
@@ -912,7 +918,7 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', '$lo
         }
 
         stream.on('close', function(code, signal) {
-         
+
          $log.info('Stream :: close :: code: ' + code + ', signal: ' + signal)
         }).on('data', function(data) {
          $log.log('STDOUT' + data);
@@ -924,10 +930,10 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', '$lo
       $log.error(err);
       completed(err);
 
-         
+
      }).on('keyboard-interactive', function(name, instructions,  instructionsLang, prompts, finishFunc) {
       $log.log("Name: " + name + ", instructions: " + instructions + "prompts" + prompts);
-      
+
 
       if (prompts[0].prompt == "Password: ") {
         finishFunc([password]);
