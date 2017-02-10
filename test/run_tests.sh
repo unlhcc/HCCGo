@@ -3,6 +3,7 @@
 
 
 grunt docs
+npm test
 
 git config user.name "Automatic Publish"
 git config user.email "djw8605@gmail.com"
