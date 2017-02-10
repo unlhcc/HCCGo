@@ -54,11 +54,12 @@
 
     <div class="col-md-8 jobdisplay">
       <div class="card">
-        <div class="col-xs-6">
-          <input type="search" class="form-control" placeholder="filter jobs..." />
+        <div class="form-control">
+          <input type="search" class="form-control" style="width:150px" placeholder="Filter Jobs..." />
           <span class="help-block">Please enter a job</span>
         <a class="pull-right" href="javascript:void(0)" ng-click="refreshCluster(true)"><i id="jobrefresh" class="mdi-action-autorenew"></i></a>
         <hr />
+        </div>
         <div class="list-group">
           <div class="list-group-item jobstatus-link" ng-repeat-start="job in jobs | filter:q | orderBy:'timestamp':true" ng-class="{running: job.running, idle: job.idle, error: job.error, complete: job.complete}" ng-click="viewOutErr(job._id)">
             <div class="row-action-primary">
@@ -86,7 +87,6 @@
           </div>
           <div class="list-group-separator" ng-repeat-end ng-if="!$last"></div>
         </div>
-      </div>
       </div>
     </div>
 
