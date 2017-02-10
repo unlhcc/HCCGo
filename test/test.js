@@ -6,7 +6,7 @@ describe('application launch', function () {
 
   beforeEach(function () {
     this.app = new Application({
-      path: './HCCGo/node_modules/electron//dist/Electron.app/Contents/MacOS/Electron',
+      path: './node_modules/.bin/electron',
       args: ['HCCGo/main.js']
     })
     return this.app.start()
