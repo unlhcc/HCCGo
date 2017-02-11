@@ -29,7 +29,7 @@ module.exports = function(config) {
       './HCCGo/app/js/PreferencesManager.js',
       './HCCGo/app/js/updaterService.js',
       './HCCGo/app/js/ConnectionService.js',
-      './HCCGo/app/js/notifierService.js',
+      './HCCGo/app/js/NotifierService.js',
       './HCCGo/app/js/navbar.js',
       './HCCGo/app/js/app.js',
       
