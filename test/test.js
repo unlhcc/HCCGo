@@ -2,7 +2,7 @@ var Application = require('spectron').Application
 var assert = require('assert')
 
 describe('application launch', function () {
-  this.timeout(30000);
+  this.timeout(60000);
 
   beforeEach(function () {
     this.app = new Application({
