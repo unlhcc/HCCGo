@@ -43,6 +43,14 @@ describe('File Path Service', function() {
     expect(filePathService.getDataPath()).toBe(path.join(process.env.HOME, 'Library/', 'HCCGo'));
   });
   
+  it('Return Submitted Jobs', function() {
+    expect(filePathService.getSubmittedJobs()).toBe(path.join(process.env.HOME, 'Library/', 'HCCGo', 'submittedJobs.db'));
+  });
+  
+  it('Return Prefrence Path', function() {
+    expect(filePathService.getPreferencePath()).toBe(path.join(process.env.HOME, 'Library/', 'HCCGo', 'preferences.json'));
+  });
+  
   
   
 });
