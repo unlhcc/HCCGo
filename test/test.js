@@ -9,7 +9,7 @@ if (process.platform === 'win32') {
     electronPath += '.cmd';
 }
 
-var appPath = path.join(__dirname, '..');
+var appPath = path.join(__dirname, '..', 'HCCGo');
 
 var app = new Application({
             path: electronPath,
@@ -22,6 +22,8 @@ global.before(function () {
 });
 
 describe('Test Example', function () {
+  this.timeout(60000);
+  
   beforeEach(function () {
       return app.start();
   });
