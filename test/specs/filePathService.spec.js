@@ -1,26 +1,6 @@
 
 describe('File Path Service', function() {
   var filePathService;
-  process = {}
-  process.env = {}
-  process.platform = 'darwin';
-  process.env.HOME = "/home/derek"
-  path = {}
-  path.join = function() {
-    new_array = [];
-    for (var i = 0; i < arguments.length; i++) {
-      new_array.push(arguments[i]);
-    }
-    return new_array.join('/');
-    
-  }
-  require = function(packageName) {
-    switch(packageName) {
-      case "path":
-        return path;
-        break;
-    }
-  }
   
   // Before each test load our api.users module
   beforeEach(angular.mock.module('filePathService'));

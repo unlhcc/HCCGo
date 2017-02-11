@@ -18,14 +18,24 @@ module.exports = function(config) {
       './node_modules/angular/angular.js',                             // angular
       './node_modules/angular-route/angular-route.js', // ui-router
       './node_modules/angular-mocks/angular-mocks.js',                 // loads our modules for tests
+      './HCCGo/app/lib/angular-toastr/angular-toastr.tpls.js',
+      './HCCGo/node_modules/async/dist/async.js',
+      
+      // Mocks
+      './test/mocks/*.js',
+      
+      // Application files
       './HCCGo/app/js/filePathService.js',
-      './HCCGo/app/js/filePathService.spec.js',
       './HCCGo/app/js/PreferencesManager.js',
       './HCCGo/app/js/updaterService.js',
+      './HCCGo/app/js/ConnectionService.js',
+      './HCCGo/app/js/notifierService.js',
       './HCCGo/app/js/navbar.js',
-      './HCCGo/app/js/navbar.spec.js',
       './HCCGo/app/js/app.js',
-      './test/*.js'
+      
+      // Specs
+      './test/specs/*.js'
+
     ],
 
 
