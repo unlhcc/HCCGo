@@ -9,7 +9,7 @@ if (process.platform === 'win32') {
     electronPath += '.cmd';
 }
 
-var appPath = path.join(__dirname, '..', 'HCCGo');
+var appPath = path.join(__dirname, '..', 'HCCGo/main.js');
 
 var app = new Application({
             path: electronPath,
