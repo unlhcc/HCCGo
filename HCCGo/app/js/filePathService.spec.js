@@ -14,8 +14,8 @@ describe('File Path Service', function() {
     return new_array.join('/');
     
   }
-  require = function(package) {
-    switch(package) {
+  require = function(packageName) {
+    switch(packageName) {
       case "path":
         return path;
         break;
