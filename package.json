@@ -14,6 +14,8 @@
     "angular-jsdoc": "^1.5.0",
     "angular-mocks": "^1.6.2",
     "angular-route": "^1.6.2",
+    "chai": "^3.5.0",
+    "chai-as-promised": "^6.0.0",
     "electron": "^1.4.15",
     "grunt-jsdoc": "^2.1.0",
     "grunt-marked": "^0.1.3",
