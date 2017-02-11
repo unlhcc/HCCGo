@@ -1,26 +1,42 @@
-var Application = require('spectron').Application
-var assert = require('assert')
+const Application = require('spectron').Application;
+const path = require('path');
+const chai = require('chai');
+const chaiAsPromised = require('chai-as-promised');
 
-describe('application launch', function () {
-  this.timeout(60000);
+var electronPath = path.join(__dirname, '..', 'node_modules', '.bin', 'electron');
 
+if (process.platform === 'win32') {
+    electronPath += '.cmd';
+}
+
+var appPath = path.join(__dirname, '..');
+
+var app = new Application({
+            path: electronPath,
+            args: [appPath]
+        });
+
+global.before(function () {
+    chai.should();
+    chai.use(chaiAsPromised);
+});
+
+describe('Test Example', function () {
   beforeEach(function () {
-    this.app = new Application({
-      path: './node_modules/.bin/electron',
-      args: ['HCCGo/main.js']
-    })
-    return this.app.start()
-  })
+      return app.start();
+  });
 
   afterEach(function () {
-    if (this.app && this.app.isRunning()) {
-      return this.app.stop()
-    }
-  })
+      return app.stop();
+  });
 
-  it('shows an initial window', function () {
-    return this.app.client.getWindowCount().then(function (count) {
-      assert.equal(count, 2)
-    })
-  })
-})
+  it('opens a window', function () {
+    return app.client.waitUntilWindowLoaded()
+      .getWindowCount().should.eventually.equal(2);
+  });
+
+  it('tests the title', function () {
+    return app.client.waitUntilWindowLoaded()
+      .getTitle().should.eventually.equal('Hello World!');
+  });
+});
