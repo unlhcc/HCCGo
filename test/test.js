@@ -2,6 +2,7 @@ const Application = require('spectron').Application;
 const path = require('path');
 const chai = require('chai');
 const chaiAsPromised = require('chai-as-promised');
+var electron = require('electron');
 
 var electronPath = path.join(__dirname, '..', 'node_modules', '.bin', 'electron');
 
@@ -9,10 +10,10 @@ if (process.platform === 'win32') {
     electronPath += '.cmd';
 }
 
-var appPath = path.join(__dirname, '..', 'HCCGo/main.js');
+var appPath = path.join(__dirname, '..', 'HCCGo');
 
 var app = new Application({
-            path: electronPath,
+            path: electron,
             args: [appPath]
         });
 
