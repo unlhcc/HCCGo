@@ -4,10 +4,7 @@ jobSubmissionModule = angular.module('HccGoApp.jobSubmissionCtrl', ['ngRoute' ])
 jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout','$rootScope', 'connectionService', '$routeParams', '$location', '$q', 'preferencesManager', 'notifierService', 'jobService', 'dbService', 'jobStatusService', function($scope, $log, $timeout, $rootScope, connectionService, $routeParams, $location, $q, preferencesManager, notifierService, jobService, dbService, jobStatusService) {
 
   $scope.params = $routeParams;
-  const DataStore = require('nedb');
-  var submittedJobsDB = dbService.getSubmittedJobsDB();
-  var jobHistoryDB = dbService.getJobHistoryDB();
-  
+
   //initialize editor
   ace.config.set('basePath','lib/ace-builds/src-noconflict');
   var editor = ace.edit("commands");
@@ -40,6 +37,11 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
       workPath = workPath + "/";
       $scope.job = {location: workPath, error: workPath, output: workPath};
     });
+
+    // Put a placeholder into the commands editor
+    editor.setValue("#SBATCH --option=\"value\"\n\n# Commands\n\necho \"Hello\"");
+    
+  
   }
   else {
     $scope.job =
@@ -55,12 +57,30 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
     editor.setValue($scope.job.commands);
   }
 
+  $scope.chkDir = function(path, identifier) {
+    if (!$scope.job.change) {
+      $scope.job.change = [];
+    }
+    if(path) {
+      if(path.search(/^\w*\.\w*$/)!=-1) {
+        $scope.job.change[identifier] = true;
+      }
+      else {
+        $scope.job.change[identifier] = false;
+      }
+    }
+  }
+
   $scope.cancel = function() {
     $location.path("cluster/" + $scope.params.clusterId + "/jobHistory");
   }
 
+  /**
+   * Force a refresh of the job statuses.
+   *
+   */
   $scope.refreshCluster = function() {
-    jobStatusService.refreshDatabase(dbService.getSubmittedJobsDB(), $rootScope.clusterInterface, $rootScope.clusterId, true)
+    jobStatusService.refreshDatabase($rootScope.clusterInterface, $rootScope.clusterId, true);
   }
   // Get available modules
   function getModules() {
@@ -124,6 +144,28 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
 
     $("#submitbtn").prop('disabled', true);
 
+    // Separate SBATCH options from commands
+    job.commands = editor.getValue();
+    var other = editor.getValue().split(/\r?\n/);
+    var sbatch = [];
+    sbatch = other.filter(function(value, index, array) {
+      return (value.startsWith("#SBATCH"));
+    });
+    other = other.filter(function(value, index, array) {
+      return (!value.startsWith("#SBATCH"));
+    });
+
+    sbatch = sbatch.join("\n");
+    other = other.join("\n");
+
+    var getWorkProm = getWork();
+    getWorkProm.then(function(wp) { 
+      for(path in $scope.job.change) {
+        if ($scope.job.change[path]) {
+          job[path] = wp + '\/' +  $scope.job[path].match(/\w*\.\w*/);
+        }
+      }
+
     // Create string for file
     var jobFile =
       "#!/bin/sh\n" +
@@ -131,39 +173,42 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
       "#SBATCH --mem-per-cpu=\"" + job.memory + "\"\n" +
       "#SBATCH --job-name=\"" + job.jobname + "\"\n" +
       "#SBATCH --error=\"" + job.error + "\"\n" +
-      "#SBATCH --output=\"" + job.output + "\"\n";
+      "#SBATCH --output=\"" + job.output + "\"\n" +
+      sbatch;
       if(job.modules != null){
           for(var i = 0; i < job.modules.length; i++) {
               jobFile += "\nmodule load " + job.modules[i];
           }
       }
-      job.commands = editor.getValue();
-      jobFile += "\n" + job.commands + "\n";
+    
+      jobFile += "\n" + other + "\n";
 
     var now = Date.now();
     // updating job history
     if(loadedJob != null) {
-      jobHistoryDB.update(
-        { _id: loadedJob._id },
-        { $set:
-          {
-            timestamp: now,
-            runtime: job.runtime,
-            memory: job.memory,
-            jobname: job.jobname,
-            location: job.location,
-            error: job.error,
-            output: job.output,
-            modules: ((job.modules != null) ? job.modules : []),
-            commands: job.commands,
-            cluster: $scope.params.clusterId
+      dbService.getJobHistoryDB().then(function(jobHistoryDB) {
+        jobHistoryDB.update(
+          { _id: loadedJob._id },
+          { $set:
+            {
+              timestamp: now,
+              runtime: job.runtime,
+              memory: job.memory,
+              jobname: job.jobname,
+              location: job.location,
+              error: job.error,
+              output: job.output,
+              modules: ((job.modules != null) ? job.modules : []),
+              commands: job.commands,
+              cluster: $scope.params.clusterId
+            }
+          },
+          {},
+          function (err, numReplaced) {
+            if(err) console.log("Error updating job history db: " + err);
           }
-        },
-        {},
-        function (err, numReplaced) {
-          if(err) console.log("Error updating job history db: " + err);
-        }
-      );
+        );
+      });
     }
     else {
       var newJob = {
@@ -178,8 +223,10 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
         "timestamp": now,
         "cluster": $scope.params.clusterId
       }
-      jobHistoryDB.insert(newJob, function(err, newDoc) {
-        if(err) console.log(err);
+      dbService.getJobHistoryDB().then(function(jobHistoryDB) {
+        jobHistoryDB.insert(newJob, function(err, newDoc) {
+          if(err) $log.error(err);
+        });
       });
     }
 
@@ -222,9 +269,11 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
             "status": "SUBMITTED",
             "jobName": job.jobname
           }
-          submittedJobsDB.insert(doc, function(err, newDoc) {
-            if(err) console.log(err);
-            callback(null);
+          dbService.getSubmittedJobsDB().then(function(submittedJobsDB) {
+            submittedJobsDB.insert(doc, function(err, newDoc) {
+              if(err) $log.error(err);
+              callback(null);
+            });
           });
 
         }, function(err) {
@@ -247,7 +296,7 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
         $location.path("cluster/" + $scope.params.clusterId);
       }
     });
-
+  });
 
   }
 
@@ -281,7 +330,7 @@ jobSubmissionModule.directive('remoteWritable', function($q, $log, connectionSer
 
         }, function(err) {
           if (err) {
-            $log.error("Got error from checking writability: " + err);
+            $log.debug("Got error from checking writability: " + err);
           }
           def.reject();
         });

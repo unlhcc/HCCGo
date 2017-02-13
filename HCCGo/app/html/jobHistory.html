@@ -4,7 +4,7 @@
     <div class="well clearfix col-sm-12">
       <h2 class="text-center"> Job History </h2>
         <div class="panel-group" id="accordion">
-         <div class="panel panel-default" ng-attr-id="{{ 'panel' + job.id }}" ng-repeat="job in jobs | orderBy:'-timestamp'">
+         <div class="panel panel-default" ng-attr-id="{{ 'panel' + job._id }}" ng-repeat="job in jobs | orderBy:'-timestamp'">
            <div class="panel-heading jobhistory">
              <div class="row">
                <div class="col-sm-4">
@@ -34,7 +34,7 @@
                <p> Error: {{ job.error }} </p>
                <p> Output: {{ job.output }} </p>
                <p> Modules: <span ng-repeat="module in job.modules"> {{module}} </span></p>
-               <p> Commands: {{ job.commands }} </p>
+               <p> Commands: <br /><pre>{{ job.commands }}</pre> </p>
              </div>
            </div>
          </div>

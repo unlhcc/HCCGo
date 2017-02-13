@@ -20,8 +20,8 @@ try {
     console.log("nslog.node doesn't exist\n");
 }
 
-const disk = spawn("\"" + path.join(__dirname, 'node_modules', '.bin', rebuilder) + "\"",
-                  ['--version='+target,' --log'],
+const disk = spawn(path.join(__dirname, 'node_modules', '.bin', rebuilder),
+                  ['--version='+target,'--log'],
 		  { cwd: path.join(__dirname ,'node_modules' ,'diskusage'),
 		    env: process.env,
 			shell: true });

@@ -88,7 +88,8 @@ SlurmClusterInterface.prototype.getCompletedJobs = function(docs) {
           "Elapsed",
           "ReqMem",
           "State",
-          "JobName"
+          "JobName",
+          "MaxRSS"
         ]
         // loop through headers to get the indices of the desired fields
         for(var j = 0; j < headers.length; j++) {
