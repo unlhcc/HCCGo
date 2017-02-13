@@ -39,8 +39,10 @@ jobViewModule.controller('jobViewCtrl', ['$scope', '$log', '$timeout', 'connecti
         connectionService.getFileSize(result.outputPath).then(function(size) {
           // If the file is larger than 5MB
           if(size > 5*1025*1024) {
-            result.outText = "The Output file is too large to be displayed here."
+            result.outText = "The Output file is too large to be displayed here.";
+            $scope.outDownloaded = false;
           } else {
+            $scope.outDownloaded = true;
             connectionService.getFileText(result.outputPath).then(function(data) {
               var text = data.length>0 ? data : "(none)";
               result.outText = text;
@@ -65,9 +67,13 @@ jobViewModule.controller('jobViewCtrl', ['$scope', '$log', '$timeout', 'connecti
 
         connectionService.getFileSize(result.errorPath).then(function(size) {
           if(size > 5*1025*1024) {
-            result.errText = "The Error file is too large to be displayed here."
+            result.errText = "The Error file is too large to be displayed here.";
+            $scope.errDownloaded = false;
           }
-          connectionService.getFileText(result.errorPath).then(function(data) {
+          else
+          {
+            $scope.errDownloaded = true;
+            connectionService.getFileText(result.errorPath).then(function(data) {
             var text = data.length>0 ? data : "(none)";
             result.errText = text;
             // Only save the output if the job is marked complete
@@ -86,9 +92,10 @@ jobViewModule.controller('jobViewCtrl', ['$scope', '$log', '$timeout', 'connecti
                     $log.debug("Something went wrong updating the db.");
                   }
                 }
-              );
-            }
-          });
+                );
+              }
+            });
+          }
         });
       }
       $scope.job = result;
@@ -121,9 +128,12 @@ jobViewModule.controller('jobViewCtrl', ['$scope', '$log', '$timeout', 'connecti
         if (flag) {
           fs.writeFile(localFile, $scope.job[fileType], function(err) {});
         }
+        notifierService.success(path.basename(localFile).trim() + " was Successfully Saved!", "Save Successful!");
+      },
+      function(err) {
+        notifierService.error(msg);
       });
       
-      notifierService.success(path.basename(localFile).trim() + " was Successfully Saved!", "Save Successful!");
     });
     // Stop the propagation of the click
     $event.stopPropagation();
@@ -142,17 +152,17 @@ jobViewModule.controller('jobViewCtrl', ['$scope', '$log', '$timeout', 'connecti
 
     connectionService.getFileSize(remotePath).then(function(size) {
       if (size > 5*1025*1024) {
-        connectionService.quickDownload(remotePath, localPath).then(function(msg) {
-          if (msg !== null){
-            notifierService.error(msg);
-            deferred.resolve(false);
-          }
+        connectionService.quickDownload(remotePath, localPath).then(function(flag) {
+          deferred.resolve(true);
+        }, 
+        function(err) {
+            deferred.reject("Error downloading file!");  
         });
-        deferred.resolve(true);
       }
       else {
         deferred.resolve(false);
       }
+      $log.log(deferred);
       return deferred.promise;
     });
   }

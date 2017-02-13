@@ -905,9 +905,12 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', '$lo
            if (err) {
                deferred.reject(err);
            }
-           sftp.fastGet(remotePath, localPath);
-           sftp.end();
-           deferred.resolve(null);
+           else
+           {
+               sftp.fastGet(remotePath, localPath);
+               sftp.end();
+               deferred.resolve(true);
+           }
        });
        return deferred.promise;
    };
