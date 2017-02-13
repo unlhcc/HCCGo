@@ -1,8 +1,8 @@
 
 fileManageService = angular.module('fileManageService', [])
 
-fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'connectionService', 'notifierService', 
-   function($log, $q, $routeParams, connectionService, notifierService) {
+fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'connectionService', 'notifierService', '$timeout',
+   function($log, $q, $routeParams, connectionService, notifierService, $timeout) {
   
    const async = require('async');
    const path = require('path');
@@ -111,7 +111,9 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
              if(err) {
                  $log.debug(err);
              } else {
-                 service.localFiles = _tempFiles;
+                 $timeout(function() {
+				     service.localFiles = _tempFiles;
+				 }, 100);
              }
          }); 
       });
@@ -132,6 +134,8 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
        }
 
        remoteRead(service.remoteWD);
+	   
+	   return 0;
    }
 
    service.cdSSH = function(data) {
@@ -146,6 +150,8 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
        angular.element('#tranContent').text('');
 	   
        remoteRead(service.remoteWD);
+	   
+	   return 0;
    }
 
    service.cdLocal = function(data) {
