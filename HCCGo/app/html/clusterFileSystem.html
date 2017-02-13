@@ -46,6 +46,8 @@
                               </button>
                               <br/>
                               <div id="tranContent"></div>
+                              <span class="text-danger" ng-show="remoteOverwrite">Uploading file will overwrite the current file on the cluster</span>
+                              <span class="text-danger" ng-show="localOverwrite">Downloading file will overwrite the current file on your system</span>
                            </div>
                         </div>
                        <div class="panel panel-default width-control">

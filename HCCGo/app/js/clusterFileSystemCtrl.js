@@ -255,6 +255,8 @@ clusterUploadModule.controller('clusterFileSystemCtrl', ['$scope', '$log', '$tim
    var remoteFocus = new String("");    // Stores id of highlight object of remote origin
    var localFocus = new String("");     // Stores id of highlight object of local origin
    $scope.remoteHighlight = function(id) {
+      $scope.localOverwrite = false;
+
       angular.element("#btnDownload").removeAttr('disabled');       // Shows download button
       angular.element("#btnUpload").attr('disabled', '');           // Hides upload button
       angular.element("#l" +  localFocus.replace(/\./g, "\\.")).removeClass('highlight');
@@ -266,6 +268,13 @@ clusterUploadModule.controller('clusterFileSystemCtrl', ['$scope', '$log', '$tim
       // Change button context
       angular.element("#tranContent").text("Download: " + remoteFocus);
 
+      // Alert if same file on local system
+      for(let dirObj of $scope.localFiles) {
+        if(id.name === dirObj.name) {
+          $scope.localOverwrite = true; 
+        }
+      }
+
       // Sets all 'processing' displays to be hidden
       $scope.processStatus = false;
       $scope.uploadStatus = false;
@@ -274,6 +283,9 @@ clusterUploadModule.controller('clusterFileSystemCtrl', ['$scope', '$log', '$tim
       $scope.userDownAuth = false;
    }
    $scope.localHighlight = function(id) {
+      $scope.remoteOverwrite = false;
+
+      angular.element("#clusterWarning").attr('display', 'none');
       angular.element("#btnDownload").attr('disabled', '');         // Hides download button
       angular.element("#btnUpload").removeAttr('disabled');         // Shows upload button
       angular.element("#r" + remoteFocus.replace(/\./g, "\\.")).removeClass('highlight');
@@ -284,6 +296,13 @@ clusterUploadModule.controller('clusterFileSystemCtrl', ['$scope', '$log', '$tim
 
       // Change button context
       angular.element("#tranContent").text("Upload: " + localFocus);
+
+      // Alert if local file is on the cluster
+      for(let dirObj of $scope.remoteFiles) {
+        if(id.name === dirObj.name) {
+          $scope.remoteOverwrite = true; 
+        }
+      }
 
       // Sets all 'processing' displays to be hidden
       $scope.processStatus = false;
