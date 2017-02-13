@@ -125,7 +125,7 @@ jobViewModule.controller('jobViewCtrl', ['$scope', '$log', '$timeout', 'connecti
       if (!localFile) return;
 
       downloadRemoteFile($scope.job[fileType], localFile).then(function(flag) {
-        if (flag) {
+        if (!flag) {
           fs.writeFile(localFile, $scope.job[fileType], function(err) {});
         }
         notifierService.success(path.basename(localFile).trim() + " was Successfully Saved!", "Save Successful!");
@@ -163,8 +163,8 @@ jobViewModule.controller('jobViewCtrl', ['$scope', '$log', '$timeout', 'connecti
         deferred.resolve(false);
       }
       $log.log(deferred);
-      return deferred.promise;
     });
+    return deferred.promise;
   }
 
   /**

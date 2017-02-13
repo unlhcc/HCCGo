@@ -907,9 +907,11 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', '$lo
            }
            else
            {
-               sftp.fastGet(remotePath, localPath);
-               sftp.end();
-               deferred.resolve(true);
+               sftp.fastGet(remotePath, localPath, function(err) {
+                   console.log("File transfer successful!");
+                   sftp.end();
+                   deferred.resolve(true);
+               });
            }
        });
        return deferred.promise;
