@@ -2,11 +2,18 @@
 <div class="container"> 
       <div class="card">
             <table class="table table-striped table-hover">
+			   <thead>
+			      <tr>
+				      <th>Local</th>
+					  <th></th>
+					  <th>Remote: <span id="lblRemote">Home</span></th>
+				  </tr>
+			   </thead>
                <tbody>
                   <tr>
                      <td>
                         <div class="panel panel-default width-control">
-                           <div class="panel-heading">Local Working Directory:
+                           <div class="panel-heading">Working directory:
                                <div id="divlocalDir">{{fileManage.localWD}}</div>
                                <nav>
                                    <ul class="pager">
@@ -106,7 +113,7 @@
                      </td>
                      <td>
                         <div class="panel panel-default width-control">
-                          <div class="panel-heading">Remote <b><span id="lblRemote">Home</span></b> Working Directory: 
+                          <div class="panel-heading">Working Directory: 
                                <div id="divremoteDir">{{fileManage.remoteWD}}</div>
                                <nav>
                                    <ul id="remote-directories" class="pager">
