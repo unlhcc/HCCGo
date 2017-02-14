@@ -241,10 +241,11 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
 			 service.filesTotal = filesTotal;
 			 boolStarter = false;
 		 }         
+         $timeout(function() {
+             service.counter = counter;       
 
-         service.counter = counter;       
-
-         service.totalProgress = Math.floor(((total_transferred + currentTotal)/sizeTotal)*100);
+             service.totalProgress = Math.floor(((total_transferred + currentTotal)/sizeTotal)*100);
+	     }, 15);
 
        }, function() {
          // update view
@@ -275,11 +276,13 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
              boolStarter = false;
          }
 
-         // Callback function for progress bar
-         service.counter = counter;
+		 $timeout(function() {
+             // Callback function for progress bar
+             service.counter = counter;
          
-         // Work on progress bar
-         service.totalProgress = Math.floor(((total_transferred + currentTotal)/sizeTotal)*100);
+             // Work on progress bar
+             service.totalProgress = Math.floor(((total_transferred + currentTotal)/sizeTotal)*100);
+	     }, 15);
        }, function() {
          // update view
          localRead(service.localWD);
