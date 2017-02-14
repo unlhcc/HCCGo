@@ -33,6 +33,8 @@ jobViewModule.controller('jobViewCtrl', ['$scope', '$log', '$timeout', 'connecti
       }
       else if (result.hasOwnProperty("outText") && result.hasOwnProperty("errText")) {
         $scope.job = result;
+        $scope.outDownload = true;
+        console.log($scope.outDownload);
       }
       else {
         // In parallel, get the size of the output and error
@@ -40,10 +42,15 @@ jobViewModule.controller('jobViewCtrl', ['$scope', '$log', '$timeout', 'connecti
           // If the file is larger than 5MB
           if(size > 5*1025*1024) {
             result.outText = "The Output file is too large to be displayed here.";
+            $scope.outDownload = false;
+            console.log($scope.outDownload);
           } else {
+
             connectionService.getFileText(result.outputPath).then(function(data) {
               var text = data.length>0 ? data : "(none)";
               result.outText = text;
+              $scope.outDownload = true;
+              console.log($scope.outDownload);
               db.update(
                 { _id: $routeParams.jobId },
                 { $set:
@@ -67,12 +74,14 @@ jobViewModule.controller('jobViewCtrl', ['$scope', '$log', '$timeout', 'connecti
         connectionService.getFileSize(result.errorPath).then(function(size) {
           if(size > 5*1025*1024) {
             result.errText = "The Error file is too large to be displayed here.";
+            $scope.errDownload = false;
           }
           else
           {
             connectionService.getFileText(result.errorPath).then(function(data) {
             var text = data.length>0 ? data : "(none)";
             result.errText = text;
+            $scope.errDownload = true;
             // Only save the output if the job is marked complete
             if (result.complete) {
               db.update(
@@ -98,34 +107,7 @@ jobViewModule.controller('jobViewCtrl', ['$scope', '$log', '$timeout', 'connecti
       $scope.job = result;
     });
   });
-
-  /**
-   * Determines if the clipboard button should be shown based on the output file
-   * @method outputCheck
-   * @memberof HCCGo.jobViewCtrl
-   * @returns {Boolean} flag that determines if the button is shown with ng-show
-   */
-  $scope.outputCheck = function() {
-    if ($scope.hasOwnProperty("job"))
-    {
-      return $scope.job.outText != "The Output file is too large to be displayed here.";
-    }
-    return true;
-  }
-
-  /**
-   * Determines if the clipboard button should be shown based on the error file
-   * @method errorCheck
-   * @memberof HCCGo.jobViewCtrl
-   * @returns {Boolean} flag that determines if the button is shown with ng-show
-   */
-  $scope.errorCheck = function() {
-    if ($scope.hasOwnProperty("job"))
-    {
-      return $scope.job.errText != "The Error file is too large to be displayed here.";
-    }
-    return true;
-  }
+  
   /**
    * Saves the output or error to a file
    * @method saveFile
