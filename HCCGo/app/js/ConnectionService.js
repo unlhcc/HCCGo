@@ -8,7 +8,7 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', '$lo
                          sandhills: null,
                          glidein: null};
    const async = require('async');
-   const path = require('path');
+   const path = require('path').posix;
    const fs = require('fs');
    $log.debug(connectionList);
 
