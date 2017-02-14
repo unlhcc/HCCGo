@@ -119,7 +119,6 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', '$lo
       }, function(sftp, callback){
 
         // Check for writeable directory
-        path = require('path');
         // Try to write to a test file
         var dirname_path = path.dirname(file);
         var test_path = path.join(dirname_path, ".hccgo-test" + makeid());
@@ -173,7 +172,6 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', '$lo
 
     // using the 'fs' library for this, temporary until how to pass
     // process progression data is figured out
-    var fs = require('fs');
 
     // Starts the connection
     connectionList[getClusterContext()].sftp(function (err, sftp) {

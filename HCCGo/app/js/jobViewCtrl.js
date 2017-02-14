@@ -12,7 +12,9 @@ jobViewModule.controller('jobViewCtrl', ['$scope', '$log', '$timeout', 'connecti
         $log.error("Error querying the DB for job states");
       }
       else if (result.hasOwnProperty("outText") && result.hasOwnProperty("errText")) {
-        $scope.job = result;
+        $scope.$apply(function() {
+          $scope.job = result;
+        });
       }
       else {
         // In parallel, get the size of the output and error
@@ -71,7 +73,9 @@ jobViewModule.controller('jobViewCtrl', ['$scope', '$log', '$timeout', 'connecti
           });
         });
       }
-      $scope.job = result;
+      $scope.$apply(function() {
+        $scope.job = result;
+      });
     });
   });
 
