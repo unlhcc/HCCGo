@@ -54,7 +54,12 @@
 
     <div class="col-md-8 jobdisplay">
       <div class="card">
-        <input type="search" ng-model="q" placeholder="filter jobs..." />
+        <div class="form-control">
+          <div class="col-md-4">
+          <input type="search" class="form-control" ng-model="q" placeholder="Filter Jobs..." />
+          <span class="help-block">Please enter a job</span>
+          </div>
+        </div>
         <a class="pull-right" href="javascript:void(0)" ng-click="refreshCluster(true)"><i id="jobrefresh" class="mdi-action-autorenew"></i></a>
         <hr />
         <div class="list-group">
