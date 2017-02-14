@@ -146,7 +146,7 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
 
     // Separate SBATCH options from commands
     job.commands = editor.getValue();
-    var other = editor.getValue().split("\n");
+    var other = editor.getValue().split(/\r?\n/);
     var sbatch = [];
     sbatch = other.filter(function(value, index, array) {
       return (value.startsWith("#SBATCH"));
