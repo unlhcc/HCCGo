@@ -77,12 +77,19 @@
                 <span class="jobid">ID: {{job.jobId}}</span>
                 <span class="runTime" ng-if="job.running">Runtime: {{job.runTime}}</span>
                 <span class="runTime" ng-if="job.complete">Runtime: {{job.elapsed}}</span>
-                <span class="runTime" ng-if="job.complete">Required Memory: {{job.reqMem}}</span>
                 <span class="startTime" ng-if="!job.running && !job.complete">Estimated Start: {{job.startTime}}</span>
               </p>
             </div>
           </div>
           <div class="list-group-separator" ng-repeat-end ng-if="!$last"></div>
+          <div class="list-group-item empty-placeholder" ng-show="!jobs.length">
+            <div>
+              <h3 ng-hide="loading">Looks like you don't have any jobs here yet!</h3>
+              <h3 ng-show="loading">Loading Job Information...</h3>
+              <br/>
+              <a href="javascript:void(0)" class="btn btn-raised btn-primary" ng-click="jobHistory()">Submit A Job</a>
+            </div>
+          </div>
         </div>
       </div>
     </div>
