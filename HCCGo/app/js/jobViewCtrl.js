@@ -43,14 +43,12 @@ jobViewModule.controller('jobViewCtrl', ['$scope', '$log', '$timeout', 'connecti
           if(size > 5*1025*1024) {
             result.outText = "The Output file is too large to be displayed here.";
             $scope.outDownload = false;
-            console.log($scope.outDownload);
           } else {
 
             connectionService.getFileText(result.outputPath).then(function(data) {
               var text = data.length>0 ? data : "(none)";
               result.outText = text;
               $scope.outDownload = true;
-              console.log($scope.outDownload);
               db.update(
                 { _id: $routeParams.jobId },
                 { $set:
@@ -107,7 +105,7 @@ jobViewModule.controller('jobViewCtrl', ['$scope', '$log', '$timeout', 'connecti
       $scope.job = result;
     });
   });
-  
+
   /**
    * Saves the output or error to a file
    * @method saveFile
