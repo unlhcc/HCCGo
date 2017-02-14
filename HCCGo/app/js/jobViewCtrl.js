@@ -40,9 +40,7 @@ jobViewModule.controller('jobViewCtrl', ['$scope', '$log', '$timeout', 'connecti
           // If the file is larger than 5MB
           if(size > 5*1025*1024) {
             result.outText = "The Output file is too large to be displayed here.";
-            $scope.outDownloaded = false;
           } else {
-            $scope.outDownloaded = true;
             connectionService.getFileText(result.outputPath).then(function(data) {
               var text = data.length>0 ? data : "(none)";
               result.outText = text;
@@ -65,14 +63,13 @@ jobViewModule.controller('jobViewCtrl', ['$scope', '$log', '$timeout', 'connecti
           }
         });
 
+
         connectionService.getFileSize(result.errorPath).then(function(size) {
           if(size > 5*1025*1024) {
             result.errText = "The Error file is too large to be displayed here.";
-            $scope.errDownloaded = false;
           }
           else
           {
-            $scope.errDownloaded = true;
             connectionService.getFileText(result.errorPath).then(function(data) {
             var text = data.length>0 ? data : "(none)";
             result.errText = text;
@@ -102,6 +99,33 @@ jobViewModule.controller('jobViewCtrl', ['$scope', '$log', '$timeout', 'connecti
     });
   });
 
+  /**
+   * Determines if the clipboard button should be shown based on the output file
+   * @method outputCheck
+   * @memberof HCCGo.jobViewCtrl
+   * @returns {Boolean} flag that determines if the button is shown with ng-show
+   */
+  $scope.outputCheck = function() {
+    if ($scope.hasOwnProperty("job"))
+    {
+      return $scope.job.outText != "The Output file is too large to be displayed here.";
+    }
+    return true;
+  }
+
+  /**
+   * Determines if the clipboard button should be shown based on the error file
+   * @method errorCheck
+   * @memberof HCCGo.jobViewCtrl
+   * @returns {Boolean} flag that determines if the button is shown with ng-show
+   */
+  $scope.errorCheck = function() {
+    if ($scope.hasOwnProperty("job"))
+    {
+      return $scope.job.errText != "The Error file is too large to be displayed here.";
+    }
+    return true;
+  }
   /**
    * Saves the output or error to a file
    * @method saveFile
