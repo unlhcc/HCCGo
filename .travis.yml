@@ -9,6 +9,7 @@ language: node_js
 node_js:
   - "node"
 addons:
+  firefox: latest
   apt:
     sources:
       - ubuntu-toolchain-r-test
