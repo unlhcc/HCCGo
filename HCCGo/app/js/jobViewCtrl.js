@@ -105,9 +105,9 @@ jobViewModule.controller('jobViewCtrl', ['$scope', '$log', '$timeout', 'connecti
           }
         });
       }
-      $scope.job = result;
-      console.log($scope.job);
-      console.log($scope.job.errDownload);
+      $scope.$apply(function() {
+        $scope.job = result;
+      });
     });
   });
 
