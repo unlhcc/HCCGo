@@ -30,7 +30,7 @@ module.exports = function(config) {
       './HCCGo/app/js/updaterService.js',
       './HCCGo/app/js/ConnectionService.js',
       './HCCGo/app/js/NotifierService.js',
-      './HCCGo/app/js/navbar.js',
+      './HCCGo/app/js/navService.js',
       './HCCGo/app/js/app.js',
       
       // Specs

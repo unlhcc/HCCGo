@@ -34,7 +34,7 @@ fileManageService.factory('navService',['$log', '$q', '$location', '$routeParams
    
    // Nav to jobHistory
    service.jobHistory = function() {
-      $location.path("cluster/" + $routeParams.clusterId + "/jobHistory");
+      $location.path("/cluster/" + $routeParams.clusterId + "/jobHistory");
    }
    
    //if($templateCache.get('username') == null){
