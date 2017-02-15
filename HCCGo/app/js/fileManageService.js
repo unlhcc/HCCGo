@@ -76,7 +76,7 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
               if (file.longname.charAt(0) == 'd') {
                   _tempFiles.unshift({Class: "directory", name: file.filename});
               } else {
-                  _tempFiles.push({Class: "ext_txt", name: file.filename, location: data + "/" + file.filename, size: (file.attrs.size / 1000).toFixed(2) + " KB",mtime: file.attrs.mtime});
+                  _tempFiles.push({Class: "ext_txt", name: file.filename, location: data + "/" + file.filename, size: (file.attrs.size / 1000).toFixed(2) + " KB",mtime: new Date(1e3 * file.attrs.mtime)});
               }
 
               // Indicates iteree is over
