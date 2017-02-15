@@ -77,7 +77,6 @@ jobViewModule.controller('jobViewCtrl', ['$scope', '$log', '$timeout', 'connecti
             result.errDownload = false;
           }
           else {
-            console.log("In else of error");
             connectionService.getFileText(result.errorPath).then(function(data) {
             var text = data.length>0 ? data : "(none)";
             result.errText = text;
@@ -106,8 +105,6 @@ jobViewModule.controller('jobViewCtrl', ['$scope', '$log', '$timeout', 'connecti
         });
       }
       $scope.job = result;
-      console.log($scope.job);
-      console.log($scope.job.errDownload);
     });
   });
 
