@@ -864,20 +864,20 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', '$lo
                       });
                }, function(err) {
                   //sftp.end();
-                  analyticsService.event('file upload', 'fail');
+                  analyticsService.event('file download', 'fail');
                   water(err);
                });
             }],
             function(err) {
                 if(err) {
-                    analyticsService.event('file upload', 'fail');
+                    analyticsService.event('file download', 'fail');
                     $log.debug(err);
                     error(err);
                 } else {
                     finished();
                 }
        });
-       analyticsService.event('file upload', 'success', '', sizeTotal);
+       analyticsService.event('file download', 'success', '', sizeTotal);
    }
 
    return {
