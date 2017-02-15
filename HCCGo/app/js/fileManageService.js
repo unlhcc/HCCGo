@@ -249,7 +249,6 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
    
    // Upload entire directory
    service.uploadCall = function() {
-
       let boolStarter = true;
 	  service.processStatus = true;
 	  service.userUpAuth = false;
@@ -355,25 +354,23 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
    }
    
    service.localHighlight = function(id) {
-        service.localOverwrite = false;
-        service.remoteOverwrite = false;
-        if(id.Class==="ext_txt") {
+      service.localOverwrite = false;
+      service.remoteOverwrite = false;
+      if(id.Class==="ext_txt") {
         angular.element("#fileStats").show();
         angular.element("#flocation").text(id.location);
         angular.element("#fsize").text(id.size);
         angular.element("#fmtime").text(id.mtime);
+      }
+      else {
+        angular.element("#fileStats").hide();
+      }
+      for(let dirObj of service.remoteFiles) {
+        if(id.name === dirObj.name) {
+          service.remoteOverwrite = true; 
         }
-        else {
-          angular.element("#fileStats").hide();
-        }
-        for(let dirObj of service.remoteFiles) {
-          console.log(dirObj.name);
-          console.log(id.name);
-          if(id.name === dirObj.name) {
-            service.remoteOverwrite = true; 
-          }
-        }
-        angular.element("#btnDownload").attr('disabled', '');         // Hides download button
+      }
+      angular.element("#btnDownload").attr('disabled', '');         // Hides download button
       angular.element("#btnUpload").removeAttr('disabled');         // Shows upload button
       angular.element("#r" + service.remoteFocus.replace(/\./g, "\\.")).removeClass('highlight');
       service.remoteFocus = "";
