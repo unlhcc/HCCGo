@@ -1,7 +1,7 @@
 
 clusterLandingModule = angular.module('HccGoApp.clusterLandingCtrl', ['ngRoute' ]);
 
-clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeout','$rootScope', 'connectionService', '$routeParams', '$location', '$q', 'preferencesManager', 'filePathService', 'notifierService', 'dbService', 'dataUsageService','jobStatusService', function($scope, $log, $timeout, $rootScope, connectionService, $routeParams, $location, $q, preferencesManager, filePathService, notifierService, dbService, dataUsageService, jobStatusService) {
+clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeout','$rootScope', 'connectionService', '$routeParams', '$location', '$q', 'preferencesManager', 'filePathService', 'notifierService', 'dbService', 'dataUsageService','jobStatusService', 'fileManageService', function($scope, $log, $timeout, $rootScope, connectionService, $routeParams, $location, $q, preferencesManager, filePathService, notifierService, dbService, dataUsageService, jobStatusService, fileManageService) {
 
   $scope.params = $routeParams;
   $scope.jobs = [];
@@ -69,6 +69,11 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
   });
 
 
+  // Nav to jobHistory
+  $scope.jobHistory = function() {
+     $location.path("cluster/" + $scope.params.clusterId + "/jobHistory");
+  }
+
   $scope.refreshCluster = function(force=false) {
     getClusterStats($scope.params.clusterId, force);
 
@@ -103,6 +108,7 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
 
     // Begin spinning the refresh image
     $("#jobrefresh").addClass("spinning-image");
+    $scope.loading = true;
 
     jobStatusService.refreshDatabase(clusterInterface, clusterId, force).then(function(data) {
       $scope.numRunning = data.numRunning;
@@ -112,6 +118,7 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
 
       // Stop spinning image
       $("#jobrefresh").removeClass("spinning-image");
+      $scope.loading = false;
     });
   }
 
