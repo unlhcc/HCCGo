@@ -2,13 +2,14 @@
 connectionModule = angular.module('ConnectionServiceModule', [])
 
 connectionModule.factory('connectionService',['$log', '$q', '$routeParams', '$location', 'notifierService', function($log, $q, $routeParams, $location, notifierService) {
+
    var connectionList = {crane: null,
-                     tusker: null,
-                     sandhills: null,
-                     glidein: null};
-   var async = require('async');
-   var path = require('path');
-   var fs = require('fs');
+                         tusker: null,
+                         sandhills: null,
+                         glidein: null};
+   const async = require('async');
+   const path = require('path').posix;
+   const fs = require('fs');
    $log.debug(connectionList);
 
    /**
@@ -37,7 +38,7 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', '$lo
    }
 
    // Checks if connection for a cluster exists
-   var getConnection = function(host) {
+   var getConnection = function() {
       // Check if the host exists in the connection list
       switch($routeParams.clusterId) {
          case "Crane":
@@ -118,7 +119,6 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', '$lo
       }, function(sftp, callback){
 
         // Check for writeable directory
-        path = require('path');
         // Try to write to a test file
         var dirname_path = path.dirname(file);
         var test_path = path.join(dirname_path, ".hccgo-test" + makeid());
@@ -172,7 +172,6 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', '$lo
 
     // using the 'fs' library for this, temporary until how to pass
     // process progression data is figured out
-    var fs = require('fs');
 
     // Starts the connection
     connectionList[getClusterContext()].sftp(function (err, sftp) {
@@ -957,11 +956,13 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', '$lo
       debug: function(message) {
       //$log.log(message);
       }
+
     });
      }
      catch(err) {
          completed(err);
      }
+
       switch(cluster) {
       case "Crane":
          connectionList['crane'] = conn;

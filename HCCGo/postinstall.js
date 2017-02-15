@@ -4,7 +4,7 @@ const fs = require('fs');
 const target = "1.4.3";
 const path = require('path');
 
-var rebuilder = "";
+let rebuilder = "";
 
 if (process.platform == 'win32') {
     rebuilder = "electron-rebuild.cmd";
@@ -20,7 +20,7 @@ try {
     console.log("nslog.node doesn't exist\n");
 }
 
-const disk = spawn(path.join(__dirname, 'node_modules', '.bin', rebuilder),
+const disk = spawn("\"" + path.join(__dirname, 'node_modules', '.bin', rebuilder) + "\"",
                   ['--version='+target,'--log'],
 		  { cwd: path.join(__dirname ,'node_modules' ,'diskusage'),
 		    env: process.env,

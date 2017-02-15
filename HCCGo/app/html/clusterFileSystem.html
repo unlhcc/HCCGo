@@ -1,125 +1,16 @@
 <div ng-include="'html/navbar.html'"></div>
-
 <div class="container"> 
       <div class="card">
-            <table class="table table-striped table-hover">
-               <tbody>
-                  <tr>
-                     <td>
+            <div class="row">
+                     <div class="col-xs-6 col-sm-4">
                         <div class="panel panel-default width-control">
-                          <div class="panel-heading">Remote <b><span id="lblRemote">Home</span></b> Working Directory: 
-                               <div id="divremoteDir">{{remoteWD}}</div>
-                               <nav>
-                                   <ul id="remote-directories" class="pager">
-                                       <li class="previous">
-                                           <a id="remoteBack" ng-click="cdSSH(sourceDir)">
-                                               <span aria-hidden="true">&larr;</span>Go Up
-                                           </a>
-                                       </li>
-                                       <li class="previous">
-                                           <a id="remoteSwitch" ng-click="wdSwitcher(remoteWD)">
-                                               <span aria-hidden="true">&#8646;</span>Switch to <span id="lblSwitch">Work</span>
-                                           </a>
-                                       </li>
-                                   </ul>
-                               </nav>
-                          </div>
-                           <div class="panel-body scroll">Available Folders:
-                              <ul class="jqueryFileTree" 
-                                 ng-repeat="folder in remoteFiles">
-                                 <li ng-switch on="folder.Class" class="{{folder.Class}}">
-                                     <a id="r{{folder.name}}" ng-switch-when="directory" ng-click="remoteHighlight(folder)" ng-dblclick="cdSSH(folder)">{{folder.name}}</a>
-                                     <a id="r{{folder.name}}" ng-switch-default ng-click="remoteHighlight(folder)" ng-dblclick="">{{folder.name}}</a>
-                                 </li>
-                              </ul>
-                           </div>
-                        </div>
-                     </td>
-                     <td>
-                        <div class="panel panel-default width-control">
-                           <div class="panel-body">
-                              <button id="btnDownload" disabled ng-click="verifyDownload()" type="button" class="btn btn-primary btn-block">
-                                  <span class="glyphicon glyphicon-arrow-right" aria-hidden="true">Download</span>
-                              </button>
-                              <button id="btnUpload" disabled ng-click="verifyUpload()" type="button" class="btn btn-primary btn-block">
-                                  <span class="glyphicon glyphicon-arrow-left" aria-hidden="true">Upload</span>
-                              </button>
-                              <br/>
-                              <div id="tranContent"></div>
-                              <span class="text-danger" ng-show="remoteOverwrite">Uploading file will overwrite the current file on the cluster</span>
-                              <span class="text-danger" ng-show="localOverwrite">Downloading file will overwrite the current file on your system</span>
-                           </div>
-                        </div>
-                       <div class="panel panel-default width-control">
-                         <div class="panel-body" ng-show="processStatus">
-                             <span class="glyphicon glyphicon-refresh glyphicon-animate">
-                             </span>
-                             Processing...
-                         </div>
-                         <div class="panel-body" ng-show="uploadStatus">
-                             <div class="progress progress-striped active" style="height: 20px">
-                                <div class="progress-bar" style="width: {{totalProgress}}%">
-                                </div>
-                             </div>
-                             <br />
-                             Total progress: {{totalProgress}}% ({{counter}}/{{filesTotal}})
-                         </div>
-                         <div class="panel-body" ng-show="processFinished">
-                             Done!
-                         </div>
-                         <div class="panel-body" ng-show="userUpAuth">
-                          <table style="width: 100%">
-                              <tr>
-                                <div>Upload location: {{remoteWD}}</div>
-                                <div>Upload size: <span ng-if="accuSize > 1024*1024*1024">{{accuSize / 1024 / 1024 / 1024 | number:2}} GB</span><span ng-if="accuSize < 1024*1024*1024 && accuSize > 1024*1024">{{accuSize / 1024 / 1024 | number:2}} MB</span><span ng-if="accuSize < 1024*1024">{{accuSize / 1024 | number:2}} KB</span></div>
-                                <div>Available space on remote disk: {{diskAvail}}%</div>
-                                <div>Percent of space to be taken: {{diskQuota}}%</div>
-                                <td>
-                                   <button id="upDeny" ng-click="verifyUploadCancel()" type="button" class="btn btn-primary btn-block" style="background-color: #FF0000;">
-                                    <span aria-hidden="true">Cancel</span>
-                                   </button>
-                                </td>
-                                <td style="width: 20%"></td>
-                                <td>
-                                   <button id="upConfirm" ng-click="uploadCall()" type="button" class="btn btn-primary btn-block">
-                                    <span aria-hidden="true">Confirm</span>
-                                   </button>
-                                </td>
-                             </tr>
-                          </table>
-                         </div>
-                         <div class="panel-body" ng-show="userDownAuth">
-                          <table style="width: 100%">
-                             <tr>
-                                <div>Download location: {{localWD}}</div>
-                                <div>Download size: <span ng-if="accuSize > 1024*1024*1024">{{accuSize / 1024 / 1024 / 1024 | number:2}} GB</span><span ng-if="accuSize < 1024*1024*1024 && accuSize > 1024*1024">{{accuSize / 1024 / 1024 | number:2}} MB</span><span ng-if="accuSize < 1024*1024">{{accuSize / 1024 | number:2}} KB</span>
-                                </div>
-                                <div>Available space on disk: {{diskAvail}}%</div>
-                                <div>Percent of space to be taken: {{diskQuota}}%</div>
-                                <td>
-                                <button id="downConfirm" ng-click="downloadCall()" type="button" class="btn btn-primary btn-block" style="">
-                                    <span aria-hidden="true">Confirm</span>
-                                </button>
-                                </td>
-                                <td style="width: 20%"></td>
-                                <td>
-                                <button id="downDeny" ng-click="verifyDownloadCancel()" type="button" class="btn btn-primary btn-block" style="background-color: #FF0000;">
-                                    <span aria-hidden="true">Cancel</span>
-                                </button>
-                                </td>
-                             </tr>
-                          </table>
-                         </div>
-                       </div>
-                     </td>
-                     <td>
-                        <div class="panel panel-default width-control">
-                           <div class="panel-heading">Local Working Directory:
-                               <div id="divlocalDir">{{localWD}}</div>
+
+                           <div class="panel-heading"><h2>Local</h2>
+                               <div id="divlocalDir">{{fileManage.localWD}}</div>
                                <nav>
                                    <ul class="pager">
                                        <li class="previous">
-                                           <a id="localBack" ng-click="cdLocal(sourceDir)">
+                                           <a id="localBack" ng-click="fileManage.cdLocal(fileManage.sourceDir)">
                                                <span aria-hidden="true">&larr;</span>Go Up
                                            </a>
                                        </li>
@@ -128,18 +19,131 @@
                            </div>
                            <div class="panel-body scroll" >Available Folders:
                               <ul class="jqueryFileTree"
-                                 ng-repeat="folder in localFiles">
+                                 ng-repeat="folder in fileManage.localFiles">
                                  <li ng-switch on="folder.Class" class="{{folder.Class}}">
-                                     <a id="l{{folder.name}}" ng-switch-when="directory" ng-click="localHighlight(folder)" ng-dblclick="cdLocal(folder)">{{folder.name}}</a>
-                                     <a id="l{{folder.name}}" ng-switch-default ng-click="localHighlight(folder)" ng-dblclick="">{{folder.name}}</a>
+                                     <a id="l{{folder.name}}" ng-switch-when="directory" ng-click="fileManage.localHighlight(folder)" ng-dblclick="fileManage.cdLocal(folder)">{{folder.name}}</a>
+                                     <a id="l{{folder.name}}" ng-switch-default ng-click="fileManage.localHighlight(folder)" ng-dblclick="">{{folder.name}}</a>
                                  </li>
                               </ul>
                            </div>
                         </div>
-                     </td>
-                  </tr>
-               </tbody>
-            </table>
+                     </div>
+                   <div class="col-xs-6 col-sm-4">
+                      <div class="panel panel-default width-control">
+                         <div class="panel-body">
+                            <button id="btnDownload" disabled ng-click="fileManage.verifyDownload()" type="button" class="btn btn-primary btn-block">
+                                <span class="glyphicon glyphicon-arrow-left" aria-hidden="true">Download</span>
+                            </button>
+                            <button id="btnUpload" disabled ng-click="fileManage.verifyUpload()" type="button" class="btn btn-primary btn-block">
+                                <span class="glyphicon glyphicon-arrow-right" aria-hidden="true">Upload</span>
+                            </button>
+                            <br/>
+                            <div id="tranContent"></div>
+                            <div id="fileStats" style="display:none">
+                              <h5>Path to file</h5>
+                              <p id="flocation"></p>
+                              <h5>Size</h5>
+                              <p id="fsize"></p>
+                              <h5>Last Modified</h5>
+                              <p id="fmtime"></p>
+                            </div>
+                         </div>
+                      </div>
+                     <div class="panel panel-default width-control">
+                       <div class="panel-body" ng-show="fileManage.processStatus">
+                           <span class="glyphicon glyphicon-refresh glyphicon-animate">
+                           </span>
+                           Processing...
+                       </div>
+                       <div class="panel-body" ng-show="fileManage.uploadStatus">
+                           <div class="progress progress-striped active" style="height: 20px">
+                              <div class="progress-bar" style="width: {{fileManage.totalProgress}}%">
+                              </div>
+                           </div>
+                           <br />
+                           Total progress: {{fileManage.totalProgress}}% ({{fileManage.counter}}/{{fileManage.filesTotal}})
+                       </div>
+                       <div class="panel-body" ng-show="fileManage.processFinished">
+                           Done!
+                       </div>
+                       <div class="panel-body" ng-show="fileManage.userUpAuth">
+                        <table style="width: 100%">
+                            <tr>
+                              <div>Upload location: {{fileManage.remoteWD}}</div>
+                              <div>Upload size: <span ng-if="fileManage.accuSize > 1024*1024*1024">{{fileManage.accuSize / 1024 / 1024 / 1024 | number:2}} GB</span><span ng-if="fileManage.accuSize < 1024*1024*1024 && fileManage.accuSize > 1024*1024">{{fileManage.accuSize / 1024 / 1024 | number:2}} MB</span><span ng-if="fileManage.accuSize < 1024*1024">{{fileManage.accuSize / 1024 | number:2}} KB</span></div>
+                              <div>Available space on remote disk: {{fileManage.diskAvail}}%</div>
+                              <div>Percent of space to be taken: {{fileManage.diskQuota}}%</div>
+                              <span class="text-danger" id="remoteOverwrite" style="display:none">This upload will overwrite the file on the cluster</span>
+                              <td>
+                              <button id="upDeny" ng-click="fileManage.verifyUploadCancel()" type="button" class="btn btn-primary btn-block" style="background-color: #FF0000;">
+                               <span aria-hidden="true">Cancel</span>
+                              </button>
+                           </td>
+                           <td style="width: 20%"></td>
+                           <td>
+                              <button id="upConfirm" ng-click="fileManage.uploadCall()" type="button" class="btn btn-primary btn-block">
+                               <span aria-hidden="true">Confirm</span>
+                              </button>
+                           </td>
+                        </tr>
+                    </table>
+                    </div>
+                    <div class="panel-body" ng-show="fileManage.userDownAuth">
+                      <table style="width: 100%">
+                         <tr>
+                            <div>Download location: {{fileManage.localWD}}</div>
+                            <div>Download size: <span ng-if="fileManage.accuSize > 1024*1024*1024">{{fileManage.accuSize / 1024 / 1024 / 1024 | number:2}} GB</span><span ng-if="fileManage.accuSize < 1024*1024*1024 && fileManage.accuSize > 1024*1024">{{fileManage.accuSize / 1024 / 1024 | number:2}} MB</span><span ng-if="fileManage.accuSize < 1024*1024">{{fileManage.accuSize / 1024 | number:2}} KB</span>
+                            </div>
+                            <div>Available space on disk: {{fileManage.diskAvail}}%</div>
+                            <div>Percent of space to be taken: {{fileManage.diskQuota}}%</div>
+                            <span class="text-danger" id="localOverwrite" style="display:none">This download will overwrite the file on your computer</span>
+                            <td>
+                            <button id="downConfirm" ng-click="fileManage.downloadCall()" type="button" class="btn btn-primary btn-block" style="">
+                                <span aria-hidden="true">Confirm</span>
+                            </button>
+                            </td>
+                            <td style="width: 20%"></td>
+                            <td>
+                            <button id="downDeny" ng-click="fileManage.verifyDownloadCancel()" type="button" class="btn btn-primary btn-block" style="background-color: #FF0000;">
+                                <span aria-hidden="true">Cancel</span>
+                            </button>
+                            </td>
+                         </tr>
+                      </table>
+                     </div>
+                   </div>
+             </div>
+             <div class="col-xs-6 col-sm-4">
+                    <div class="panel panel-default width-control">
+                    <div class="panel-heading"><h2>Remote</h2> <b><span id="lblRemote">Home</span></b> 
+                    <div id="divremoteDir">{{fileManage.remoteWD}}</div>
+                       <nav>
+                            <ul id="remote-directories" class="pager">
+                                <li class="previous">
+                                    <a id="remoteBack" ng-click="fileManage.cdSSH(fileManage.sourceDir)">
+                                        <span aria-hidden="true">&larr;</span>Go Up
+                                    </a>
+                                </li>
+                                <li class="previous">
+                                    <a id="remoteSwitch" ng-click="fileManage.wdSwitcher()">
+                                        <span aria-hidden="true">&#8646;</span>Switch to <span id="lblSwitch">Work</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </nav>
+                   </div>
+                   <div class="panel-body scroll">Available Folders:
+                      <ul class="jqueryFileTree" 
+                         ng-repeat="folder in fileManage.remoteFiles">
+                         <li ng-switch on="folder.Class" class="{{folder.Class}}">
+                             <a id="r{{folder.name}}" ng-switch-when="directory" ng-click="fileManage.remoteHighlight(folder)" ng-dblclick="fileManage.cdSSH(folder)">{{folder.name}}</a>
+                             <a id="r{{folder.name}}" ng-switch-default ng-click="fileManage.remoteHighlight(folder)" ng-dblclick="">{{folder.name}}</a>
+                         </li>
+                     </ul>
+                   </div>
+               </div>
+            </div>
+         </div>
       </div>
     </div>
 </div>
