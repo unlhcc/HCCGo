@@ -13,34 +13,34 @@
     var trackID = 'UA-90202403-1';
     var clientID = null;
     var userID = null;
-	var appName = 'HCCGo';
-	var appVersion = '0.2.0';
-	var debug = false;
-	var performanceTracking = true;
-	var errorTracking = true;
-	var userLanguage = "en";
+  	var appName = 'HCCGo';
+  	var appVersion = '0.2.0';
+  	var debug = false;
+  	var performanceTracking = true;
+  	var errorTracking = true;
+  	var userLanguage = "en";
     var currency = "USD";
     var lastScreenName = '';
-    
+
     clientDefer = $q.defer();
-    
+
     preferencesManager.getPreferences().then(function(pref) {
       clientDefer.resolve(pref.uuid);
       this.clientID = pref.uuid;
     });
-    
-    
-    
+
+
+
     var sendRequest = function(data, callback) {
         clientDefer.promise.then(function(clientId) {
             clientID = clientId;
             _sendRequest(data, callback);
         })
     }
-        
-        
+
+
     var _sendRequest = function(data, callback) {
-        
+
         if(!this.clientID || this.clientID == null)
             this.clientID = generateClientID();
 
@@ -93,7 +93,7 @@
         }
         http.send(postData);
     }
-    
+
     var generateClientID = function()
     {
         var id = "";
@@ -102,19 +102,19 @@
             id += possibilities.charAt(Math.floor(Math.random() * possibilities.length));
         return id;
     }
-    
+
     var getScreenResolution = function(){
         return screen.width+"x"+screen.height;
     }
-    
+
     var getColorDept = function(){
         return screen.colorDepth+"-bits";
     }
-    
+
     var getUserAgent = function(){
         return navigator.userAgent;
     }
-    
+
     var getViewportSize = function(){
         return window.screen.availWidth+"x"+window.screen.availHeight;
     }
@@ -132,7 +132,7 @@
 		sendRequest(data);
         this.lastScreenName = screename;
     }
-    
+
     var event = function(category, action, label, value){
         var data = {
 			't' : 'event',
@@ -144,7 +144,7 @@
 		}
 		sendRequest(data);
     }
-    
+
     var exception = function(msg, fatal){
         var data = {
 			't' : 'exception',
@@ -153,7 +153,7 @@
 		}
 		sendRequest(data);
     }
-    
+
     var timing = function(category, variable, time, label){
 
         var data = {
@@ -165,7 +165,7 @@
 		}
 		sendRequest(data);
     }
-    
+
     var ecommerce = {
         transactionID: false,
         generateTransactionID: function()
@@ -205,11 +205,11 @@
             })
         }
     }
-    
+
     var custom = function(data){
         this.sendRequest(data);
     }
-    
+
 
 
 
