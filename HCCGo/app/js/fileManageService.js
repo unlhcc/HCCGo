@@ -45,6 +45,10 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
 
    service.processStatus = false;
 
+   service.remoteOverwrite = false;
+
+   service.localOverwrite = false;
+
    service.localFiles = [];
 
    service.remoteFiles = [];
@@ -72,7 +76,7 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
               if (file.longname.charAt(0) == 'd') {
                   _tempFiles.unshift({Class: "directory", name: file.filename});
               } else {
-                  _tempFiles.push({Class: "ext_txt", name: file.filename});
+                  _tempFiles.push({Class: "ext_txt", name: file.filename, location: data + "/" + file.filename, size: (file.attrs.size / 1000).toFixed(2) + " KB",mtime: file.attrs.mtime});
               }
 
               // Indicates iteree is over
@@ -101,7 +105,7 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
                  } else if (stats.isDirectory()) {
                      _tempFiles.unshift({Class: "directory", name: file});
                  } else if (stats.isFile()) {
-                     _tempFiles.push({Class: "ext_txt", name: file});
+                     _tempFiles.push({Class: "ext_txt", name: file, location: data + "/" + file, size: (stats.size/1000).toFixed(2) + " KB", mtime: stats.mtime});
                  }
              });
 
@@ -172,6 +176,15 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
 	  angular.element('#btnUpload').attr('disabled', '');
 	  service.userUpAuth = true;
 	  service.processStatus = true;
+
+    angular.element("#localOverwrite").hide();
+    console.log(service.localOverwrite);
+    if(service.remoteOverwrite) {
+      angular.element("#remoteOverwrite").show();
+    }
+    else {
+     angular.element("#remoteOverwrite").hide();
+    }
 	  
       connectionService.localSize(String(service.localWD + "/" + service.localFocus)).then( function(ldata) {
           if (service.remoteWD.indexOf(service.workWD) > -1) {
@@ -210,6 +223,14 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
 	  service.userDownAuth = true;
 	  service.processStatus = true;
 
+    angular.element("#remoteOverwrite").hide();
+    if(service.localOverwrite) {
+      angular.element("#localOverwrite").show();
+    }
+    else {
+      angular.element("#localOverwrite").hide();
+    }
+
       connectionService.runCommand("du -sb " + String(service.remoteWD + "/" + service.remoteFocus)).then(function (data) {
           service.processStatus = false;
           let data_response = data.split(/[	]+/); //NOTE: Matches tab spaces
@@ -228,6 +249,7 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
    
    // Upload entire directory
    service.uploadCall = function() {
+
       let boolStarter = true;
 	  service.processStatus = true;
 	  service.userUpAuth = false;
@@ -297,6 +319,22 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
    } 
    
    service.remoteHighlight = function(id) {
+      service.remoteOverwrite = false;
+      service.localOverwrite = false;
+      if(id.Class==="ext_txt") {
+        angular.element("#fileStats").show();
+        angular.element("#flocation").text(id.location);
+        angular.element("#fsize").text(id.size);
+        angular.element("#fmtime").text(id.mtime);
+      }
+      else {
+        angular.element("#fileStats").hide();
+      }
+      for(let dirObj of service.localFiles) {
+        if(id.name === dirObj.name) {
+        service.localOverwrite = true; 
+        }
+      }
 	  angular.element("#btnDownload").removeAttr('disabled');       // Shows download button
       angular.element("#btnUpload").attr('disabled', '');           // Hides upload button
       angular.element("#l" + service.localFocus.replace(/\./g, "\\.")).removeClass('highlight');
@@ -317,7 +355,25 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
    }
    
    service.localHighlight = function(id) {
-      angular.element("#btnDownload").attr('disabled', '');         // Hides download button
+        service.localOverwrite = false;
+        service.remoteOverwrite = false;
+        if(id.Class==="ext_txt") {
+        angular.element("#fileStats").show();
+        angular.element("#flocation").text(id.location);
+        angular.element("#fsize").text(id.size);
+        angular.element("#fmtime").text(id.mtime);
+        }
+        else {
+          angular.element("#fileStats").hide();
+        }
+        for(let dirObj of service.remoteFiles) {
+          console.log(dirObj.name);
+          console.log(id.name);
+          if(id.name === dirObj.name) {
+            service.remoteOverwrite = true; 
+          }
+        }
+        angular.element("#btnDownload").attr('disabled', '');         // Hides download button
       angular.element("#btnUpload").removeAttr('disabled');         // Shows upload button
       angular.element("#r" + service.remoteFocus.replace(/\./g, "\\.")).removeClass('highlight');
       service.remoteFocus = "";
