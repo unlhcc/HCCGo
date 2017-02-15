@@ -26,6 +26,8 @@ jobViewModule.controller('jobViewCtrl', ['$scope', '$log', '$timeout', 'connecti
 
   // query the db for the specific job and check if out/err is loaded
   dbService.getSubmittedJobsDB().then(function(db) {
+    var outDownload = true;
+    var errDownload = true;
     db.find({_id: $routeParams.jobId}, function (err, docs) {
       var result = docs[0];
       if (err) {
@@ -40,21 +42,20 @@ jobViewModule.controller('jobViewCtrl', ['$scope', '$log', '$timeout', 'connecti
         // In parallel, get the size of the output and error
         connectionService.getFileSize(result.outputPath).then(function(size) {
           // If the file is larger than 5MB
-          result.outDownload = true;
           if(size > 5*1025*1024) {
             result.outText = "The Output file is too large to be displayed here.";
-            result.outDownload = false;
+            outDownload = false;
           } else {
             connectionService.getFileText(result.outputPath).then(function(data) {
               var text = data.length>0 ? data : "(none)";
               result.outText = text;
-              result.outDownload = text != "(none)";
+              outDownload = text != "(none)";
               db.update(
                 { _id: $routeParams.jobId },
                 { $set:
                   {
                   "outText": text,
-                  "outDownload": result.outDownload
+                  "outDownload": outDownload
                   }
                 },
                 { returnUpdatedDocs: true },
@@ -71,16 +72,15 @@ jobViewModule.controller('jobViewCtrl', ['$scope', '$log', '$timeout', 'connecti
 
 
         connectionService.getFileSize(result.errorPath).then(function(size) {
-          result.errDownload = true;
           if(size > 5*1025*1024) {
             result.errText = "The Error file is too large to be displayed here.";
-            result.errDownload = false;
+            errDownload = false;
           }
           else {
             connectionService.getFileText(result.errorPath).then(function(data) {
             var text = data.length>0 ? data : "(none)";
             result.errText = text;
-            result.errDownload = result.errText != "(none)";
+            errDownload = result.errText != "(none)";
             // Only save the output if the job is marked complete
             if (result.complete) {
               db.update(
@@ -88,7 +88,7 @@ jobViewModule.controller('jobViewCtrl', ['$scope', '$log', '$timeout', 'connecti
                 { $set:
                   {
                   "errText": text,
-                  "errDownload": result.errDownload
+                  "errDownload": errDownload
                   }
                 },
                 { returnUpdatedDocs: true },
@@ -99,13 +99,15 @@ jobViewModule.controller('jobViewCtrl', ['$scope', '$log', '$timeout', 'connecti
                   }
                 }
                 );
+                result.errDownload = errDownload;
+                result.outDownload = outDownload;
               }
             });
           }
         });
       }
       $scope.$apply(function() {
-        $scope.job = result;
+          $scope.job = result;
       });
     });
   });
