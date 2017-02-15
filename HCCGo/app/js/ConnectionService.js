@@ -8,7 +8,7 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', '$lo
                          sandhills: null,
                          glidein: null};
    const async = require('async');
-   const path = require('path').posix;
+   const path = require('path');
    const fs = require('fs');
    $log.debug(connectionList);
 
@@ -120,8 +120,8 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', '$lo
 
         // Check for writeable directory
         // Try to write to a test file
-        var dirname_path = path.dirname(file);
-        var test_path = path.join(dirname_path, ".hccgo-test" + makeid());
+        var dirname_path = path.posix.dirname(file);
+        var test_path = path.posix.join(dirname_path, ".hccgo-test" + makeid());
 
         sftp.open(test_path, 'w', function(err, handle) {
           if (err){
@@ -366,7 +366,7 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', '$lo
       async.eachSeries(dirList, function(dir, done) {
           var dirs = [];
 	      var exists = false;
-          dir = dest + path.relative(root,dir);
+          dir = dest + path.posix.relative(root,dir);
           $log.debug("Creating folder: " + dir);
           async.until(function() {
               return exists;
@@ -375,7 +375,7 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', '$lo
                   if (err) {
                       $log.debug("STAT :: SFTP :: " + dir);
                       dirs.push(dir);
-                      dir = path.dirname(dir);
+                      dir = path.posix.dirname(dir);
                   } else {
                       exists = true;
                   }
@@ -627,14 +627,14 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', '$lo
                            $log.debug("New Folders: ");
                            $log.debug(mkFolders);
                            // Set destination directory setting
-                           dest = dest + path.basename(src) + '/';
+                           dest = dest + path.posix.basename(src) + '/';
                            water(err, true);
                        });
                    } else if (stats.isFile()) {
                        localFiles.push(src);
                        sizeTotal += stats.size;
                        filesTotal += 1;
-                       src = path.dirname(src);
+                       src = path.posix.dirname(src);
                        water(err, false);
                    }
                });
@@ -658,7 +658,7 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', '$lo
 
                   uploaderQueue.push({
                       name: file, local: file,
-                      remote: dest + path.relative(src,file),
+                      remote: dest + path.posix.relative(src,file),
                       data: function(total_transferred) {
                           callback(total_transferred, counter, filesTotal, currentTotal, sizeTotal);
                           return 0;
@@ -818,6 +818,7 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', '$lo
                            $log.debug(mkFolders);
                            // Set destination directory setting
                            localPath = localPath + path.basename(remotePath) + '/';
+						   localPath = path.normalize(localPath);
                            water(err, true);
                        });
                    } else if (data.isFile()) {
