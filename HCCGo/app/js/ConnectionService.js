@@ -1,6 +1,23 @@
 
 connectionModule = angular.module('ConnectionServiceModule', [])
 
+/**
+ * The connectionService is used throughout the entire app, from filetransfer to login authentication.
+ * Uses a mixture of protocols to accomplish these tasks.
+ * 
+ * @ngdoc service
+ * @memberof HCCGo
+ * @class connectionService
+ * @requires $log
+ * @requires $q
+ * @requires $routeParams
+ * @requires $location
+ * @requires notifierService
+ * @requires async
+ * @requires path
+ * @requires fs
+ * @requires ssh2
+ */
 connectionModule.factory('connectionService',['$log', '$q', '$routeParams', '$location', 'notifierService', function($log, $q, $routeParams, $location, notifierService) {
 
    var connectionList = {crane: null,
@@ -872,14 +889,40 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', '$lo
                 }
        });
 
-   }
+   };
 
+   /**
+    * Allows a user to quickly download a file from the server
+    * @method quickDownload
+    * @memberof HCCgo.connectionService
+    * @param {String} remotePath - Where the file resides on the server
+    * @param {String} localPath - Location where the file will be sent
+    * @returns {Promise} A promise denoting whether the process was successful or not
+    */
+   var quickDownload = function(remotePath, localPath) {
+       var deferred = $q.defer();
+       connectionList[getClusterContext()].sftp(function (err, sftp) {
+           if (err) {
+               deferred.reject(err);
+           }
+           else
+           {
+               sftp.fastGet(remotePath, localPath, function(err) {
+                   console.log("File transfer successful!");
+                   sftp.end();
+                   deferred.resolve(true);
+               });
+           }
+       });
+       return deferred.promise;
+   };
    return {
    getConnection: getConnection,
    runCommand: runCommand,
    getUsername: getUsername,
    uploadFile: uploadFile,
    downloadFile: downloadFile,
+   quickDownload: quickDownload,
    submitJob: submitJob,
    closeStream: closeStream,
    readDir: readDir,
