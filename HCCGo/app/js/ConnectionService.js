@@ -613,7 +613,6 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', '$lo
                          }
                      });
                 }, function(err) {
-                    analyticsService.event('file upload', 'fail');
                     bfs(err);
                 });
             });
@@ -673,20 +672,19 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', '$lo
                       });
 
                }, function(err) {
-                 analyticsService.event('file upload', 'fail');
                   water(err);
                });
             }],
             function(err) {
                 if(err) {
-                  analyticsService.event('file upload', 'fail');
+                    analyticsService.event('file upload', 'fail');
                     $log.debug(err);
                     error(err);
                 } else {
+				    analyticsService.event('file upload', 'success', '', sizeTotal);
                     finished();
                 }
        });
-       analyticsService.event('file upload', 'success', '', sizeTotal);
     }
 
    var remoteStatQueue = async.cargo(function (task, callback) {
@@ -807,7 +805,6 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', '$lo
                         });
                     }
                 }, function(err) {
-                    analyticsService.event('file download', 'fail');
                     bfs(err);
                 });
             });
@@ -864,7 +861,6 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', '$lo
                       });
                }, function(err) {
                   //sftp.end();
-                  analyticsService.event('file download', 'fail');
                   water(err);
                });
             }],
@@ -874,10 +870,10 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', '$lo
                     $log.debug(err);
                     error(err);
                 } else {
+				    analyticsService.event('file download', 'success', '', sizeTotal);
                     finished();
                 }
        });
-       analyticsService.event('file download', 'success', '', sizeTotal);
    }
 
    return {
