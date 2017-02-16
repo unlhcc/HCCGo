@@ -12,7 +12,7 @@ filePathService = angular.module('filePathService', []);
  */
 filePathService.service('filePathService', function() {
 
-  var dataPath = process.env.APPDATA || (process.platform == 'darwin' ? process.env.HOME + '/Library/' : process.env.HOME);
+  var dataPath = process.env.APPDATA || (process.platform == 'darwin' ? process.env.HOME + '/Library' : process.env.HOME);
   var path = require('path');
   dataPath = path.join(dataPath, 'HCCGo');
   var jobHistoryPath = path.join(dataPath, 'jobHistory.db');

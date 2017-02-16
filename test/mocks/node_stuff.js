@@ -4,6 +4,7 @@ process = {}
 process.env = {}
 process.platform = 'darwin';
 process.env.HOME = "/home/derek"
+
 path = {}
 path.join = function() {
   new_array = [];
@@ -11,8 +12,7 @@ path.join = function() {
     new_array.push(arguments[i]);
   }
   return new_array.join('/');
-  
-}
+};
 
 mockLocation = {};
 new_location = "";
@@ -25,7 +25,6 @@ ipcRenderer = function(msg, func) {
   console.log("msg: " + msg);
 };
 electron = {'ipcRenderer':ipcRenderer};
-
 
 require = function(packageName) {
   switch(packageName) {
@@ -40,3 +39,5 @@ require = function(packageName) {
       break;
   }
 }
+
+

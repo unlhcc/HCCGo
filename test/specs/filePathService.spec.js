@@ -7,6 +7,21 @@ describe('File Path Service', function() {
   
   // Before each test set our injected Users factory (_Users_) to our local Users variable
   beforeEach(inject(function(_filePathService_) {
+    
+    // Do the file path join
+    spyOn(path, 'join');
+    
+    //window.require = function() {};
+    
+    spyOn(window, 'require').and.callFake(function(package) {
+      switch(packageName) {
+        case "path":
+          return path;
+          break;
+        
+      }
+    });
+    
     filePathService = _filePathService_;
   }));
   
@@ -16,19 +31,21 @@ describe('File Path Service', function() {
   });
   
   it('Return job history', function() {
-    expect(filePathService.getJobHistory()).toBe(path.join(process.env.HOME, 'Library/', 'HCCGo', 'jobHistory.db'));
+    expect(filePathService.getJobHistory()).toBe('/home/derek/Library/HCCGo/jobHistory.db');
+    
   });
   
   it('Return Data Path', function() {
-    expect(filePathService.getDataPath()).toBe(path.join(process.env.HOME, 'Library/', 'HCCGo'));
+    expect(filePathService.getDataPath()).toBe('/home/derek/Library/HCCGo');
+    
   });
   
   it('Return Submitted Jobs', function() {
-    expect(filePathService.getSubmittedJobs()).toBe(path.join(process.env.HOME, 'Library/', 'HCCGo', 'submittedJobs.db'));
+    expect(filePathService.getSubmittedJobs()).toBe('/home/derek/Library/HCCGo/submittedJobs.db');
   });
   
   it('Return Prefrence Path', function() {
-    expect(filePathService.getPreferencePath()).toBe(path.join(process.env.HOME, 'Library/', 'HCCGo', 'preferences.json'));
+    expect(filePathService.getPreferencePath()).toBe('/home/derek/Library/HCCGo/preferences.json');
   });
   
   
