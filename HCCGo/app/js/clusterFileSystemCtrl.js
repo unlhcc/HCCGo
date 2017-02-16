@@ -7,6 +7,7 @@ clusterUploadModule.controller('clusterFileSystemCtrl', ['$scope', '$log', '$tim
    // Initialization functions
    $scope.params = $routeParams; 
    $scope.fileManage = fileManageService;
+   $scope.focusFile = {};
    if (fileManageService.localFocus != "") {
       angular.element("#l" + fileManageService.localFocus.replace(/\./g, "\\.")).addClass('highlight');
    } else if (fileManageService.remoteFocus != "") {
@@ -19,5 +20,8 @@ clusterUploadModule.controller('clusterFileSystemCtrl', ['$scope', '$log', '$tim
                  function(newValue, oldValue) { 
 				     $log.debug("The files have changed");
 			    });*/
+   $scope.findHighlighted = function(file, place) {
 
+     $scope.focusFile = fileManageService[place].find(function(x) {return file === x.name});
+   }
 }]);
