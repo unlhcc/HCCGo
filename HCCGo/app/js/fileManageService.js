@@ -65,6 +65,9 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
 
    service.localFocus = new String("");
 
+   service.focus = {};
+
+
    let remoteRead = function(data, finish){
        let _tempFiles = [];
 
@@ -176,15 +179,6 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
 	  angular.element('#btnUpload').attr('disabled', '');
 	  service.userUpAuth = true;
 	  service.processStatus = true;
-
-    angular.element("#localOverwrite").hide();
-    console.log(service.localOverwrite);
-    if(service.remoteOverwrite) {
-      angular.element("#remoteOverwrite").show();
-    }
-    else {
-     angular.element("#remoteOverwrite").hide();
-    }
 	  
       connectionService.localSize(String(service.localWD + "/" + service.localFocus)).then( function(ldata) {
           if (service.remoteWD.indexOf(service.workWD) > -1) {
@@ -222,14 +216,6 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
 	  angular.element('#btnDownload').attr('disabled', '');
 	  service.userDownAuth = true;
 	  service.processStatus = true;
-
-    angular.element("#remoteOverwrite").hide();
-    if(service.localOverwrite) {
-      angular.element("#localOverwrite").show();
-    }
-    else {
-      angular.element("#localOverwrite").hide();
-    }
 
       connectionService.runCommand("du -sb " + String(service.remoteWD + "/" + service.remoteFocus)).then(function (data) {
           service.processStatus = false;
@@ -320,20 +306,16 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
    service.remoteHighlight = function(id) {
       service.remoteOverwrite = false;
       service.localOverwrite = false;
-      if(id.Class==="ext_txt") {
-        angular.element("#fileStats").show();
-        angular.element("#flocation").text(id.location);
-        angular.element("#fsize").text(id.size);
-        angular.element("#fmtime").text(id.mtime);
-      }
-      else {
-        angular.element("#fileStats").hide();
-      }
+      service.focus.location = id.location;
+      service.focus.size = id.size;
+      service.focus.mtime = id.mtime;
+
       for(let dirObj of service.localFiles) {
         if(id.name === dirObj.name) {
         service.localOverwrite = true; 
         }
       }
+      
 	  angular.element("#btnDownload").removeAttr('disabled');       // Shows download button
       angular.element("#btnUpload").attr('disabled', '');           // Hides upload button
       angular.element("#l" + service.localFocus.replace(/\./g, "\\.")).removeClass('highlight');
@@ -356,20 +338,16 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
    service.localHighlight = function(id) {
       service.localOverwrite = false;
       service.remoteOverwrite = false;
-      if(id.Class==="ext_txt") {
-        angular.element("#fileStats").show();
-        angular.element("#flocation").text(id.location);
-        angular.element("#fsize").text(id.size);
-        angular.element("#fmtime").text(id.mtime);
-      }
-      else {
-        angular.element("#fileStats").hide();
-      }
+      service.focus.location = id.location;
+      service.focus.size = id.size;
+      service.focus.mtime = id.mtime;
+
       for(let dirObj of service.remoteFiles) {
         if(id.name === dirObj.name) {
           service.remoteOverwrite = true; 
         }
       }
+
       angular.element("#btnDownload").attr('disabled', '');         // Hides download button
       angular.element("#btnUpload").removeAttr('disabled');         // Shows upload button
       angular.element("#r" + service.remoteFocus.replace(/\./g, "\\.")).removeClass('highlight');
