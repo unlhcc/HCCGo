@@ -12,7 +12,7 @@ describe('File Path Service', function() {
     //spyOn(path, 'join');
     
     //window.require = function() {};
-    process.platform = 'darwin';
+    process.platform = 'linux';
     process.env.HOME = "/home/derek"
     
     spyOn(window, 'require').and.callFake(function(package) {
