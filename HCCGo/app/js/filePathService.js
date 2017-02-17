@@ -12,52 +12,57 @@ filePathService = angular.module('filePathService', []);
  */
 filePathService.service('filePathService', function() {
 
-  var dataPath = process.env.APPDATA || (process.platform == 'darwin' ? process.env.HOME + '/Library' : process.env.HOME);
   var path = require('path');
-  dataPath = path.join(dataPath, 'HCCGo');
-  var jobHistoryPath = path.join(dataPath, 'jobHistory.db');
-  var submittedJobsPath = path.join(dataPath, 'submittedJobs.db')
-  var preferencesPath = path.join(dataPath, 'preferences.json');
-  return {
-    /**
-     * Get the job history path.  The job history is a nedb database.
-     * @method getJobHistory
-     * @memberof HCCGo.filePathService
-     * @return {String} Path to job history DB.
-     */
-    getJobHistory: function() {
-      return jobHistoryPath;
-    },
-    
-    /**
-     * Get the data path where things can be stored through updates.
-     * @method getDataPath
-     * @memberof HCCGo.filePathService
-     * @return {String} Path to the data path on the computer.
-     */
-    getDataPath: function() {
-      return dataPath;
-    },
-    
-    /**
-     * Get the submitted jobs DB.  The submitted jobs is a nedb database.
-     * @method getSubmittedJobs
-     * @memberof HCCGo.filePathService
-     * @return {String} Path to the submitted jobs DB.
-     */
-    getSubmittedJobs: function() {
-      return submittedJobsPath;
-    },
 
-     /**
-     * Get the preferences JSON filepath.
-     * @method getPreferences
-     * @memberof HCCGo.filePathService
-     * @return {String} Path to the preferences json file.
-     */
-    getPreferencePath: function() {
-      return preferencesPath;
-    }
-  };
+  
+  /**
+   * Get the job history path.  The job history is a nedb database.
+   * @method getJobHistory
+   * @memberof HCCGo.filePathService
+   * @return {String} Path to job history DB.
+   */
+  var getJobHistory = function() {
+    return path.join(getDataPath(), 'jobHistory.db');
+  }
+  
+  /**
+   * Get the data path where things can be stored through updates.
+   * @method getDataPath
+   * @memberof HCCGo.filePathService
+   * @return {String} Path to the data path on the computer.
+   */
+  var getDataPath = function() {
+    var dataPath = process.env.APPDATA || (process.platform == 'darwin' ? process.env.HOME + '/Library' : process.env.HOME);
+    dataPath = path.join(dataPath, 'HCCGo');
+    return dataPath;
+  }
+  
+  /**
+   * Get the submitted jobs DB.  The submitted jobs is a nedb database.
+   * @method getSubmittedJobs
+   * @memberof HCCGo.filePathService
+   * @return {String} Path to the submitted jobs DB.
+   */
+  var getSubmittedJobs = function() {
+    return path.join(getDataPath(), 'submittedJobs.db');
+  }
+
+   /**
+   * Get the preferences JSON filepath.
+   * @method getPreferences
+   * @memberof HCCGo.filePathService
+   * @return {String} Path to the preferences json file.
+   */
+  var getPreferencePath = function() {
+    return path.join(getDataPath(), 'preferences.json');
+  }
+  
+  
+  return {
+    getJobHistory: getJobHistory,
+    getDataPath: getDataPath,
+    getSubmittedJobs: getSubmittedJobs,
+    getPreferencePath: getPreferencePath
+  }
 
 });
