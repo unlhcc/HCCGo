@@ -2,6 +2,7 @@
 A GUI application for submitting and managing jobs at the Holland Computing Center.
 
 [Developer Documentation](https://unlhcc.github.io/hccgo-dev/)
+[![Build Status](https://travis-ci.org/unlhcc/HCCGo.svg?branch=master)](https://travis-ci.org/unlhcc/HCCGo)
 
 ## Setting up environment for running code
 To setup your environment to run the code you'll need to first clone the repository, install 'npm', and install 'grunt-cli' globally with the command:
