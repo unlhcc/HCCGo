@@ -30,8 +30,8 @@ jobHistoryModule.service('jobService', function() {
 
   }
 
-  $scope.loadJob = function(job) {
-
+  $scope.loadJob = function(job, clone) {
+    job.clone = clone;
     jobService.setJob(job);
     $location.path("cluster/" + $scope.params.clusterId + "/jobSubmission");
 
@@ -41,7 +41,9 @@ jobHistoryModule.service('jobService', function() {
   dbService.getJobHistoryDB().then(function(jobHistoryDB) {
     jobHistoryDB.find({}, function (err, docs) {
       // if data already loaded, just add them to the list
-      $scope.jobs = docs;
+      $scope.$apply(function() {
+        $scope.jobs = docs;
+      });
       if(err) console.log("Error fetching completed jobs: " + err);
     });
   });
