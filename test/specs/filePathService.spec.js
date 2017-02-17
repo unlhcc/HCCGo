@@ -9,9 +9,11 @@ describe('File Path Service', function() {
   beforeEach(inject(function(_filePathService_) {
     
     // Do the file path join
-    spyOn(path, 'join');
+    //spyOn(path, 'join');
     
     //window.require = function() {};
+    process.platform = 'darwin';
+    process.env.HOME = "/home/derek"
     
     spyOn(window, 'require').and.callFake(function(package) {
       switch(packageName) {
@@ -31,6 +33,7 @@ describe('File Path Service', function() {
   });
   
   it('Return job history', function() {
+
     expect(filePathService.getJobHistory()).toBe('/home/derek/Library/HCCGo/jobHistory.db');
     
   });

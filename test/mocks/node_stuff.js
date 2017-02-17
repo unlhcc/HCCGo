@@ -1,5 +1,5 @@
 
-
+/*
 process = {}
 process.env = {}
 process.platform = 'darwin';
@@ -41,3 +41,4 @@ require = function(packageName) {
 }
 
 
+*/

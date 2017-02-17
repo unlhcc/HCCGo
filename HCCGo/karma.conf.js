@@ -15,26 +15,26 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
-      './node_modules/angular/angular.js',                             // angular
-      './node_modules/angular-route/angular-route.js', // ui-router
-      './node_modules/angular-mocks/angular-mocks.js',                 // loads our modules for tests
-      './HCCGo/app/lib/angular-toastr/angular-toastr.tpls.js',
-      './HCCGo/node_modules/async/dist/async.js',
+      '../node_modules/angular/angular.js',                             // angular
+      '../node_modules/angular-route/angular-route.js', // ui-router
+      '../node_modules/angular-mocks/angular-mocks.js',                 // loads our modules for tests
+      './app/lib/angular-toastr/angular-toastr.tpls.js',
+      './node_modules/async/dist/async.js',
       
       // Mocks
-      './test/mocks/*.js',
+      '../test/mocks/*.js',
       
       // Application files
-      './HCCGo/app/js/filePathService.js',
-      './HCCGo/app/js/PreferencesManager.js',
-      './HCCGo/app/js/updaterService.js',
-      './HCCGo/app/js/ConnectionService.js',
-      './HCCGo/app/js/NotifierService.js',
-      './HCCGo/app/js/navService.js',
-      './HCCGo/app/js/app.js',
+      './app/js/filePathService.js',
+      './app/js/PreferencesManager.js',
+      './app/js/updaterService.js',
+      './app/js/ConnectionService.js',
+      './app/js/NotifierService.js',
+      './app/js/navService.js',
+      './app/js/app.js',
       
       // Specs
-      './test/specs/*.js'
+      '../test/specs/*.js'
 
     ],
 
@@ -47,6 +47,7 @@ module.exports = function(config) {
     // preprocess matching files before serving them to the browser
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
     preprocessors: {
+      '**/*.js': ['electron']
     },
 
 
@@ -75,7 +76,7 @@ module.exports = function(config) {
 
     // start these browsers
     // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
-    browsers: ['Chrome'],
+    browsers: ['Electron'],
 
 
     // Continuous Integration mode
@@ -84,6 +85,14 @@ module.exports = function(config) {
 
     // Concurrency level
     // how many browser should be started simultaneous
-    concurrency: Infinity
+    concurrency: Infinity,
+    
+    // DEV: `useIframe: false` is for launching a new window instead of using an iframe 
+    //   In Electron, iframes don't get `nodeIntegration` priveleges yet windows do 
+
+    client: {
+      useIframe: false,
+    }
+    
   })
 }
