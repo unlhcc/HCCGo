@@ -62,7 +62,7 @@
               <i class="mdi-action-trending-neutral" ng-if="job.running" />
               <i class="mdi-action-query-builder" ng-if="job.idle" />
               <i class="mdi-alert-error" ng-if="job.error" />
-              <i class="glyphicon glyphicon-check" ng-if="job.complete" />
+              <i class="glyphicon glyphicon-check" ng-if="job.complete && !job.error" />
             </div>
             <div class="row-content">
               <div class="action-secondary">
