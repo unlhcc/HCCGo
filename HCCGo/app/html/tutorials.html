@@ -1,0 +1,46 @@
+<div ng-include="'html/navbar.html'"></div>
+<div class="container">
+  
+  <div class="row">
+    <div class="col-md-4">
+      <div class="card">
+        <h2>Tutorials</h2>
+      </div>
+      
+    </div>
+    
+    <div class="col-md-8">
+      <div class="card">
+        <div class="list-group">
+          <div class="list-group-item jobstatus-link" ng-repeat-start="tutorial in tutorials | filter:q | orderBy:'timestamp':true" ng-click="click(tutorial)">
+            
+            <div class="row-content">
+              <h4 class="list-group-item-heading">{{tutorial.name}}</h4>
+              <p>
+                <!--
+                Lables for the tutorial
+                -->
+                <span ng-repeat-start="label in tutorial.labels" class="label label-default" ng-bind="label"></span> <span ng-repeat-end></span>
+              </p>
+              <p class="list-group-item-text">
+                <span>{{tutorial.description}}</span>
+              </p>
+            </div>
+          </div>
+          <div class="list-group-separator" ng-repeat-end ng-if="!$last"></div>
+          <div class="list-group-item empty-placeholder" ng-show="!tutorials.length">
+            <div>
+              <h3 ng-hide="loading">Looks like you don't have any tutorials here yet!</h3>
+              <h3 ng-show="loading">Loading Job Information...</h3>
+            </div>
+          </div>
+      
+        </div>
+      </div>
+    
+    
+    </div>
+  
+  
+  </div>
+</div>

@@ -15,7 +15,8 @@ var app = angular.module('HccGoApp', ['HccGoApp.WelcomeCtrl',
                               'updaterModule',
                               'HccGoApp.updatePageCtrl',
                               'HccGoApp.NavCtrl', 'dataUsageService', 'jobStatusService',
-                              'AnalyticsModule']).config([
+                              'AnalyticsModule',
+                              'HccGoApp.tutorialCtrl']).config([
   '$routeProvider', function($routeProvider) {
     return $routeProvider.when('/', {
       title: 'Welcome',
@@ -45,6 +46,10 @@ var app = angular.module('HccGoApp', ['HccGoApp.WelcomeCtrl',
       title: 'Update',
       templateUrl: 'html/update.html',
       controller: 'updatePageCtrl'
+    }).when('/tutorials', {
+      title: 'Tutorials',
+      templateUrl: 'html/tutorials.html',
+      controller: 'tutorialCtrl'
     }).otherwise({
       redirectTo: '/'
     });
