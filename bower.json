@@ -20,7 +20,8 @@
     "angular-toastr": "~1.7.0",
     "bootbox": "~4.4.0",
     "tether": "^1.4.0",
-    "ace-builds": "^1.2.6"
+    "ace-builds": "^1.2.6",
+    "font-awesome": "~4.7.0"
   },
   "exportsOverride": {
     "selectize": {
@@ -63,6 +64,16 @@
       ],
       "css": "**/*.css",
       "js": "**/*.js"
+    },
+    "font-awesome": {
+      "css": "**/*.css",
+      "fonts": [
+        "**/*.eot",
+        "**/*.svg",
+        "**/*.ttf",
+        "**/*.woff",
+        "**/*.woff2"
+      ]
     }
   },
   "resolutions": {

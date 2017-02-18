@@ -11,20 +11,31 @@
     
     <div class="col-md-8">
       <div class="card">
+        <div class="col-md-4">
+          <input type="search" class="form-control" ng-model="q" placeholder="Filter Tutorials..." />
+        </div>
+        <br />
+        <hr />
+        
         <div class="list-group">
-          <div class="list-group-item jobstatus-link" ng-repeat-start="tutorial in tutorials | filter:q | orderBy:'timestamp':true" ng-click="click(tutorial)">
+          <div class="list-group-item" ng-repeat-start="tutorial in tutorials | filter:q | orderBy:'timestamp':true">
             
             <div class="row-content">
-              <h4 class="list-group-item-heading">{{tutorial.name}}</h4>
+              <h4 class="list-group-item-heading"><a ng-click="click(tutorial)" href="javascript:void(0)">{{tutorial.name}}</a></h4>
               <p>
                 <!--
                 Lables for the tutorial
                 -->
                 <span ng-repeat-start="label in tutorial.labels" class="label label-default" ng-bind="label"></span> <span ng-repeat-end></span>
               </p>
-              <p class="list-group-item-text">
-                <span>{{tutorial.description}}</span>
-              </p>
+              <div class="list-group-item-text">
+                <p class="">
+                  <span>{{tutorial.description}}</span>
+                </p>
+                <p>
+                  <i class="fa fa-github fa-lg" aria-hidden="true"></i> <a ng-href="{{tutorial.link}}"> View on GitHub</a>
+                </p>
+              </div>
             </div>
           </div>
           <div class="list-group-separator" ng-repeat-end ng-if="!$last"></div>
