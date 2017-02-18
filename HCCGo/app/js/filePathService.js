@@ -21,7 +21,6 @@ filePathService.service('filePathService', function() {
   return {
     /**
      * Get the job history path.  The job history is a nedb database.
-     * @method getJobHistory
      * @memberof HCCGo.filePathService
      * @return {String} Path to job history DB.
      */
