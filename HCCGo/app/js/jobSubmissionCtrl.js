@@ -1,7 +1,7 @@
 
 jobSubmissionModule = angular.module('HccGoApp.jobSubmissionCtrl', ['ngRoute' ]);
 
-jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout','$rootScope', 'connectionService', '$routeParams', '$location', '$q', 'preferencesManager', 'notifierService', 'jobService', 'dbService', 'jobStatusService', function($scope, $log, $timeout, $rootScope, connectionService, $routeParams, $location, $q, preferencesManager, notifierService, jobService, dbService, jobStatusService) {
+jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout','$rootScope', 'connectionService', '$routeParams', '$location', '$q', 'preferencesManager', 'notifierService', 'jobService', 'dbService', 'jobStatusService', 'analyticsService', function($scope, $log, $timeout, $rootScope, connectionService, $routeParams, $location, $q, preferencesManager, notifierService, jobService, dbService, jobStatusService, analyticsService) {
 
   $scope.params = $routeParams;
 
@@ -29,7 +29,7 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
 
   }
 
-  // gets the job that was selected from job histroy
+  // gets the job that was selected from job history
   var loadedJob = jobService.getJob();
 
   if(loadedJob == null) {
@@ -40,8 +40,8 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
 
     // Put a placeholder into the commands editor
     editor.setValue("#SBATCH --option=\"value\"\n\n# Commands\n\necho \"Hello\"");
-    
-  
+
+
   }
   else {
     $scope.job =
@@ -159,7 +159,7 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
     other = other.join("\n");
 
     var getWorkProm = getWork();
-    getWorkProm.then(function(wp) { 
+    getWorkProm.then(function(wp) {
       for(path in $scope.job.change) {
         if ($scope.job.change[path]) {
           job[path] = wp + '\/' +  $scope.job[path].match(/\w*\.\w*/);
@@ -180,7 +180,7 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
               jobFile += "\nmodule load " + job.modules[i];
           }
       }
-    
+
       jobFile += "\n" + other + "\n";
 
     var now = Date.now();
@@ -275,9 +275,8 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
               callback(null);
             });
           });
-
         }, function(err) {
-          callback(new Error("Job submission failed!"))
+          callback(new Error("Job submission failed!"));
         });
 
       }
@@ -285,12 +284,14 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
     ], function(err, result) {
       // If there has been an error in the series
       if (err) {
+        analyticsService.event('job submission', 'fail');
         notifierService.error('There was an error in submitting your job to the cluster!', 'Job Submission Failed!');
         $("#submitbtn").prop('disabled', false);
         var curValue = 0;
         $('#submitprogress').css('width', curValue+'%').attr('aria-valuenow', curValue);
       } else {
         // Everything was successful!
+        analyticsService.event('job submission', 'success');
         notifierService.success('Your job was succesfully submitted to the cluster!', 'Job Submitted!');
         $scope.refreshCluster();
         $location.path("cluster/" + $scope.params.clusterId);

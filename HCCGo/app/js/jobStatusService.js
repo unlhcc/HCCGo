@@ -124,7 +124,7 @@ jobStatusService.service('jobStatusService',['$log','$q','notifierService', 'dbS
 												if (err) $log.error(err);
 											}
 										)};
-									// Call the function I just created above, it will return a 
+									// Call the function I just created above, it will return a
 									// new anonymous function.
 									})(db_jobs[i], cluster_job));
 
@@ -157,7 +157,7 @@ jobStatusService.service('jobStatusService',['$log','$q','notifierService', 'dbS
                             {
                             "complete": true,
                             "idle": false,
-                            "error": false,
+                            "error": job.State != "COMPLETED" && job.State != "RUNNING" && job.State != "IDLE",
                             "running": false,
                             "elapsed": job.Elapsed,
                             "reqMem": job.ReqMem,
