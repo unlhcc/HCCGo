@@ -86,7 +86,7 @@ welcomeModule.controller('welcomeCtrl', ['$scope', '$log', '$timeout', 'connecti
         else {
           $scope.$apply(function() {
             analyticsService.event('login', 'success');
-            $location.path("/cluster/" + $scope.selectedCluster.label);
+            $location.path("/cluster");
             $log.debug("Cluster label: " + $scope.selectedCluster.label);
           });
         }      

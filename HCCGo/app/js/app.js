@@ -22,23 +22,23 @@ var app = angular.module('HccGoApp', ['HccGoApp.WelcomeCtrl',
       title: 'Welcome',
       templateUrl: 'html/welcome.html',
       controller: 'welcomeCtrl'
-    }).when('/cluster/:clusterId', {
+    }).when('/cluster/', {
       title: 'Dashboard',
       templateUrl: 'html/clusterLanding.html',
       controller: 'clusterLandingCtrl'
-    }).when('/cluster/:clusterId/filesystem', {
+    }).when('/filesystem', {
       title: 'Filesystem',
       templateUrl: 'html/clusterFileSystem.html',
       controller: 'clusterFileSystemCtrl'
-    }).when('/cluster/:clusterId/jobSubmission', {
+    }).when('/jobSubmission', {
       title: 'Job Submission',
       templateUrl: 'html/jobSubmission.html',
       controller: 'jobSubmissionCtrl'
-    }).when('/cluster/:clusterId/jobHistory', {
+    }).when('/jobHistory', {
       title: 'Job History',
       templateUrl: 'html/jobHistory.html',
       controller: 'jobHistoryCtrl'
-    }).when('/cluster/:clusterId/jobview/:jobId', {
+    }).when('/jobview/:jobId', {
       title: 'Job View',
       templateUrl: 'html/jobView.html',
       controller: 'jobViewCtrl'

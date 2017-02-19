@@ -26,6 +26,11 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', '$lo
    const async = require('async');
    const path = require('path');
    const fs = require('fs');
+   var connectionDetails = {
+     "username": null,
+     "hostname": null,
+     "shorthost": null
+   }
    $log.debug(connectionList);
 
    /**
@@ -936,6 +941,7 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', '$lo
    checkWritable: checkWritable,
    getFileText: getFileText,
    getFileSize: getFileSize,
+   connectionDetails: connectionDetails,
    initiateConnection: function initiateConnection(username, password, hostname, cluster, needInput, completed) {
 
      var Client = require('ssh2').Client;
@@ -948,23 +954,11 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', '$lo
      }
 
      conn.on('ready', function() {
+      connectionDetails['username'] = username;
+      connectionDetails['hostname'] = hostname;
+      connectionDetails['shorthost'] = cluster;
       completed(null);
       $log.log('Client :: ready');
-      conn.exec('uptime', function (err, stream) {
-        if (err) {
-         $log.error("Error Logging executing");
-         return;
-        }
-
-        stream.on('close', function(code, signal) {
-
-         $log.info('Stream :: close :: code: ' + code + ', signal: ' + signal)
-        }).on('data', function(data) {
-         $log.log('STDOUT' + data);
-        }).stderr.on('data', function(data) {
-         $log.log('STDERR' + data);
-        });
-      });
      }).on('error', function(err) {
       $log.error(err);
       completed(err);

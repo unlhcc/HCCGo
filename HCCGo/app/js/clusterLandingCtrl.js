@@ -71,11 +71,11 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
 
   // Nav to jobHistory
   $scope.jobHistory = function() {
-     $location.path("cluster/" + $scope.params.clusterId + "/jobHistory");
+     $location.path("/jobHistory");
   }
 
   $scope.refreshCluster = function(force=false) {
-    getClusterStats($scope.params.clusterId, force);
+    getClusterStats(connectionService.connectionDetails.shorthost, force);
 
   }
 
@@ -101,7 +101,7 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
 
   $scope.viewOutErr = function(id) {
     // view the selected job's stander out and err
-    $location.path("cluster/" + $routeParams.clusterId + "/jobview/" + id);
+    $location.path("/jobview/" + id);
   }
 
   function getClusterStats(clusterId, force) {
@@ -155,7 +155,7 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
   }
   preferencesManager.getClusters().then(function(clusters) {
     // Get the cluster type
-    var clusterType = $.grep(clusters, function(e) {return e.label == $scope.params.clusterId})[0].type;
+    var clusterType = $.grep(clusters, function(e) {return e.label == connectionService.connectionDetails.shorthost})[0].type;
 
     switch (clusterType) {
       case "slurm":
@@ -166,7 +166,6 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
         break;
     }
     $rootScope.clusterInterface = clusterInterface;
-    $rootScope.clusterId = $scope.params.clusterId;
 
     // Update the cluster every 15 seconds
     var refreshingClusterPromise;

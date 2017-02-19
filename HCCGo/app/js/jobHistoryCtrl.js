@@ -21,19 +21,19 @@ jobHistoryModule.service('jobService', function() {
   $scope.params = $routeParams;
 
   $scope.cancel = function() {
-    $location.path("cluster/" + $scope.params.clusterId);
+    $location.path("/cluster");
   }
 
   $scope.loadDefault = function() {
 
-    $location.path("cluster/" + $scope.params.clusterId + "/jobSubmission");
+    $location.path("/jobSubmission");
 
   }
 
   $scope.loadJob = function(job, clone) {
     job.clone = clone;
     jobService.setJob(job);
-    $location.path("cluster/" + $scope.params.clusterId + "/jobSubmission");
+    $location.path("/jobSubmission");
 
   }
 
