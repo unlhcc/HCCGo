@@ -8,7 +8,11 @@
         "Matlab",
         "Beginner"
       ],
-      "link": "https://github.com/unlhcc/HCCGoWorkshops"
+      "link": "https://github.com/unlhcc/HCCGoWorkshops",
+      "type": "github",
+      "gitrepo": "https://github.com/unlhcc/HCCGoWorkshops.git",
+      "user": "unlhcc",
+      "repo": "HCCGoWorkshops"
     }
   ]
 

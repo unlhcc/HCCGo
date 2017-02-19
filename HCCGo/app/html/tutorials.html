@@ -21,7 +21,7 @@
           <div class="list-group-item" ng-repeat-start="tutorial in tutorials | filter:q | orderBy:'timestamp':true">
             
             <div class="row-content">
-              <h4 class="list-group-item-heading"><a ng-click="click(tutorial)" href="javascript:void(0)">{{tutorial.name}}</a></h4>
+              <h4 class="list-group-item-heading"><a ng-click="click(tutorial)" href="javascript:void(0)">{{tutorial.name}}</a> <small>{{tutorial.version}}</small></h4>
               <p>
                 <!--
                 Lables for the tutorial
@@ -32,9 +32,19 @@
                 <p class="">
                   <span>{{tutorial.description}}</span>
                 </p>
+                <p ng-show="tutorial.error" ng-model="tutorial.error">
+                </p>
                 <p>
                   <i class="fa fa-github fa-lg" aria-hidden="true"></i> <a ng-href="{{tutorial.link}}"> View on GitHub</a>
                 </p>
+                <div ng-show="tutorial.progress">
+                  <p>
+                    <span ng-model="tutorial.progressMessage"></span>
+                    <div class="progress progress-striped active">
+                      <div class="progress-bar" style="width: {{tutorial.progess}}%" aria-valuenow={{tutorial.progress}}></div>
+                    </div>
+                  </p>
+                </div>
               </div>
             </div>
           </div>
