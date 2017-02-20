@@ -49,6 +49,8 @@ jobHistoryModule.service('jobService', ['$q', 'connectionService', 'dbService', 
    * * commands (multi line, with `\n`s)
    * 
    * @memberof jobService
+   * @param {Object} job The job data structure
+   * @returns {Promise} 
    */
   var addDBJob = function(job) {
     toReturn = $q.defer();
