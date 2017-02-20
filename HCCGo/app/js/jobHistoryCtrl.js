@@ -1,22 +1,114 @@
 
 jobHistoryModule = angular.module('HccGoApp.jobHistoryCtrl', ['ngRoute' ]);
 
-jobHistoryModule.service('jobService', function() {
+
+/**
+ * Used to manage the job history.
+ * @class jobService
+ */
+jobHistoryModule.service('jobService', ['$q', 'connectionService', 'dbService', function($q, connectionService, dbService) {
 
   var job = null;
+  
+  var getJob = function() {
+    var temp = job;
+    job = null;
+    return temp;
+  }
+  
+  var setJob = function(value) {
+    job = value;
+  }
+  
+  var getDBJobs = function() {
+    var toReturn = $q.defer();
+    
+    dbService.getJobHistoryDB().then(function(jobHistoryDB) {
+      jobHistoryDB.find({}, function (err, docs) {
+        // if data already loaded, just add them to the list
+        return toReturn.resolve(docs);
+
+        if(err) console.log("Error fetching completed jobs: " + err);
+      });
+    });
+    
+    return toReturn.promise;
+    
+  }
+  
+  /**
+   * Add a job to the job history
+   * Required attributes:
+   * * runtime
+   * * memory
+   * * jobname
+   * * location
+   * * error
+   * * output
+   * * modules (Array)
+   * * commands (multi line, with `\n`s)
+   * 
+   * @memberof jobService
+   */
+  var addDBJob = function(job) {
+    toReturn = $q.defer();
+    var now = Date.now();
+    var set_default = function(obj, attribute_name, default_val) {
+      if (attribute_name in obj) {
+        return true;
+      } else {
+        obj[attribute_name] = default_val;
+        return false;
+      }
+    }
+    
+    set_default(obj, "runtime", "1:00:00");
+    set_default(obj, "memory", 1024);
+    set_default(obj, "jobname", "Default Job Name");
+    set_default(obj, "location", "$WORK/submit.slurm");
+    set_default(obj, "error", "$WORK/job.err");
+    set_default(obj, "output", "$WORK/job.out");
+    set_default(obj, "modules", []);
+    if (!set_default(obj, "commands", null)) {
+      toReturn.reject("No Commands in job");
+    }
+    
+    // Use a whitelist to only put some stuff in
+    var newJob = {
+      "runtime": job.runtime,
+      "memory": job.memory,
+      "jobname": job.jobname,
+      "location": job.location,
+      "error": job.error,
+      "output": job.output,
+      "modules": ((job.modules != null) ? job.modules : []),
+      "commands": job.commands,
+      "timestamp": now,
+      "cluster": connectionService.connectionDetails.shorthost
+    };
+    dbService.getJobHistoryDB().then(function(jobHistoryDB) {
+      jobHistoryDB.insert(newJob, function(err, newDoc) {
+        if(err) {
+          $log.error(err);
+          return toReturn.reject(err);
+        }
+        toReturn.resolve();
+      });
+    });
+    
+    return toReturn.promise;
+  }
+  
 
   return {
-    getJob: function() {
-      var temp = job;
-      job = null;
-      return temp;
-    },
-    setJob: function(value) {
-      job = value;
-    }
-  };
+    getJob: getJob,
+    setJob: setJob,
+    getDBJobs: getDBJobs,
+    addDBJob: addDBJob
+    
+  }
 
-}).controller('jobHistoryCtrl', ['$scope', '$log', '$timeout', 'connectionService', '$routeParams', '$location', '$q', 'preferencesManager', 'jobService', 'dbService', function($scope, $log, $timeout, connectionService, $routeParams, $location, $q, preferencesManager, jobService, dbService) {
+}]).controller('jobHistoryCtrl', ['$scope', '$log', '$timeout', 'connectionService', '$routeParams', '$location', '$q', 'preferencesManager', 'jobService', 'dbService', function($scope, $log, $timeout, connectionService, $routeParams, $location, $q, preferencesManager, jobService, dbService) {
 
   $scope.params = $routeParams;
 
@@ -38,15 +130,10 @@ jobHistoryModule.service('jobService', function() {
   }
 
   // Get completed jobs from db file
-  dbService.getJobHistoryDB().then(function(jobHistoryDB) {
-    jobHistoryDB.find({}, function (err, docs) {
-      // if data already loaded, just add them to the list
-      $scope.$apply(function() {
-        $scope.jobs = docs;
-      });
-      if(err) console.log("Error fetching completed jobs: " + err);
-    });
+  jobService.getDBJobs().then(function(jobs) {
+    $scope.jobs = jobs;
   });
+
 
   $scope.deleteJob = function(job) {
     bootbox.confirm({

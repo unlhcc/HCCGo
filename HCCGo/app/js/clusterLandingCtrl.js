@@ -175,7 +175,7 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
       isRefreshingCluster = true;
       (function refreshEvery(){
         //Do refresh
-        getClusterStats($scope.params.clusterId);
+        getClusterStats(connectionService.connectionDetails.shorthost);
         //If async in then in callback do...
         refreshingClusterPromise = $timeout(refreshEvery,15000);
       }());
