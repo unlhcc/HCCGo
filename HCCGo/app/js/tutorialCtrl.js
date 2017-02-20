@@ -13,16 +13,16 @@ tutorialModule.controller('tutorialCtrl', ['$scope', '$log', '$routeParams', '$l
   const async = require("async");
   
   var init = function() {
-    
+
     preferencesManager.getTutorials().then(function(jsonTutorials) {
       $scope.tutorials = jsonTutorials.tutorials;
       
       getRepoConfigurations(jsonTutorials.tutorials);
-      
-      
+
+
     }, function(err) {
       // Error getting the tutorials
-      
+
     });
   };
     
@@ -50,11 +50,16 @@ tutorialModule.controller('tutorialCtrl', ['$scope', '$log', '$routeParams', '$l
   }
   
   $scope.click = function(tutorial) {
-    
+    $(".download-repo").addClass("loading");
+    jobService.getDBJobs().then(function(jobs) {
+      // LOGIC HERE FOR CHECKING IF REPO HAS ALREADY BEEN DOWNLOADED
+    });
     async.series([
       function(callback) {
         tutorial.progress = 33;
+        $('#submitprogress').css('width', tutorial.progress+'%').attr('aria-valuenow', tutorial.progress);
         tutorial.progressMessage = "Clone to cluster...";
+      
         
         // Run the git clone
         connectionService.runCommand("cd $WORK; git clone " + tutorial.gitrepo ).then(function(data){
@@ -66,6 +71,7 @@ tutorialModule.controller('tutorialCtrl', ['$scope', '$log', '$routeParams', '$l
       
       function(callback) {  
         tutorial.progress = 66;
+        $('#submitprogress').css('width', tutorial.progress+'%').attr('aria-valuenow', tutorial.progress);
         tutorial.progressMessage = "Importing job submissions...";
         importSubmitScripts(tutorial.submits).then(function() {
           callback(null);
@@ -84,18 +90,17 @@ tutorialModule.controller('tutorialCtrl', ['$scope', '$log', '$routeParams', '$l
         }
         
         tutorial.progess = 100;
+        $('#submitprogress').css('width', tutorial.progress+'%').attr('aria-valuenow', tutorial.progress);
         tutorial.progressMessage = "Done!";
         
         notifierService.success(tutorial.submits.length + " Jobs imported into Submission DB", "Tutorial Succesfully Imported");
+        $(".download-repo").removeClass("loading");
         $timeout(function() {
           tutorial.progress = 0;
         }, 2000);
           
       }
     );
-    
-    
-    
   }
   
   var importSubmitScripts = function(submits) {
