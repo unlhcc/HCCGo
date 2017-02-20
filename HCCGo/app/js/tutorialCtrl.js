@@ -8,7 +8,7 @@ tutorialModule = angular.module('HccGoApp.tutorialCtrl', ['ngRoute' ]);
  * @service 
  *
  */
-tutorialModule.controller('tutorialCtrl', ['$scope', '$log', '$routeParams', '$location', '$q', 'preferencesManager', 'notifierService', '$http', 'connectionService', '$timeout', function($scope, $log, $routeParams, $location, $q, preferencesManager, notifierService, $http, connectionService, $timeout) {
+tutorialModule.controller('tutorialCtrl', ['$scope', '$log', '$routeParams', '$location', '$q', 'preferencesManager', 'notifierService', '$http', 'connectionService', '$timeout', 'jobService', function($scope, $log, $routeParams, $location, $q, preferencesManager, notifierService, $http, connectionService, $timeout, jobService) {
   
   const async = require("async");
   
@@ -37,6 +37,7 @@ tutorialModule.controller('tutorialCtrl', ['$scope', '$log', '$routeParams', '$l
         tutorial.name = packagedetails.name;
         tutorial.version = packagedetails.version;
         tutorial.description = packagedetails.description;
+        tutorial.submits = packagedetails.submits;
         tutorial.error = null;
       }, function(err) {
         // If there was an error getting the details
@@ -66,10 +67,13 @@ tutorialModule.controller('tutorialCtrl', ['$scope', '$log', '$routeParams', '$l
       function(callback) {  
         tutorial.progress = 66;
         tutorial.progressMessage = "Importing job submissions...";
-        
-        $timeout(function() {
+        importSubmitScripts(tutorial.submits).then(function() {
           callback(null);
-        }, 1000);
+        }, function(err) {
+          callback(err);
+        });
+        
+        
 
         // Import job submissions
       }],
@@ -81,7 +85,8 @@ tutorialModule.controller('tutorialCtrl', ['$scope', '$log', '$routeParams', '$l
         
         tutorial.progess = 100;
         tutorial.progressMessage = "Done!";
-          
+        
+        notifierService.success(tutorial.submits.length + " Jobs imported into Submission DB", "Tutorial Succesfully Imported");
         $timeout(function() {
           tutorial.progress = 0;
         }, 2000);
@@ -92,6 +97,25 @@ tutorialModule.controller('tutorialCtrl', ['$scope', '$log', '$routeParams', '$l
     
     
   }
+  
+  var importSubmitScripts = function(submits) {
+    var toReturn = $q.defer();
+    
+    async.each(submits, function(submit_script, callback) {
+      jobService.addDBJob(submit_script).then(function() {
+        callback();
+      }, function(err) {
+        callback(err);
+      });
+    }, function(err) {
+      if (err) return toReturn.reject(err);
+      return toReturn.resolve();
+    });
+    
+    return toReturn.promise;
+    
+  }
+  
   
   /**
    * Get the `package.json` file from the github repo to fill in details.

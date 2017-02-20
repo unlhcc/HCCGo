@@ -64,14 +64,14 @@ jobHistoryModule.service('jobService', ['$q', 'connectionService', 'dbService', 
       }
     }
     
-    set_default(obj, "runtime", "1:00:00");
-    set_default(obj, "memory", 1024);
-    set_default(obj, "jobname", "Default Job Name");
-    set_default(obj, "location", "$WORK/submit.slurm");
-    set_default(obj, "error", "$WORK/job.err");
-    set_default(obj, "output", "$WORK/job.out");
-    set_default(obj, "modules", []);
-    if (!set_default(obj, "commands", null)) {
+    set_default(job, "runtime", "1:00:00");
+    set_default(job, "memory", 1024);
+    set_default(job, "jobname", "Default Job Name");
+    set_default(job, "location", "$WORK/submit.slurm");
+    set_default(job, "error", "$WORK/job.err");
+    set_default(job, "output", "$WORK/job.out");
+    set_default(job, "modules", []);
+    if (!set_default(job, "commands", null)) {
       toReturn.reject("No Commands in job");
     }
     
