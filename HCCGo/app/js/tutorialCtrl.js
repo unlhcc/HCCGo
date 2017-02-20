@@ -97,6 +97,8 @@ tutorialModule.controller('tutorialCtrl', ['$scope', '$log', '$routeParams', '$l
    * Get the `package.json` file from the github repo to fill in details.
    * Retrives the package using the `raw.githubusercontent.com` raw link.
    * @tutorial writing-tutorials
+   * @param {String} user Username of github repo
+   * @param {String} repo Repository name on Github
    * @memberof tutorialCtrl
    */
   var getPackageJson = function(user, repo) {
