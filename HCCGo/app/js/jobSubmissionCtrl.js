@@ -56,6 +56,16 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
     };
     editor.setValue($scope.job.commands);
   }
+  
+  // Resolve any instances of $WORK in the error, output, or location 
+  // to the actual work directory.
+  getWork().then(function(workPath) {
+    // Search for $WORK, replace with workPath
+    $scope.job.location = $scope.job.location.replace("$WORK", workPath);
+    $scope.job.error = $scope.job.error.replace("$WORK", workPath);
+    $scope.job.output = $scope.job.output.replace("$WORK", workPath);
+    
+  });
 
   $scope.chkDir = function(path, identifier) {
     if (!$scope.job.change) {
