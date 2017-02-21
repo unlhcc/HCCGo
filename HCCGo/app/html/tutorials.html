@@ -40,9 +40,9 @@
                 <div ng-show="tutorial.progress">
                   <p>
                     {{tutorial.progressMessage}}
-                    <div class="progress progress-striped active">
-                      <div class="progress-bar" style="width: {{tutorial.progess}}%" aria-valuenow={{tutorial.progress}}> {{tutorial.progress}}</div>
-                    </div>
+                  <div class="progress">
+                    <div class="progress-bar progress-bar-striped active" id="submitprogress" role="progressbar" aria-valuemax="100"></div>
+                  </div>
                   </p>
                 </div>
               </div>

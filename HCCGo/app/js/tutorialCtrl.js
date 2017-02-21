@@ -45,6 +45,7 @@ tutorialModule.controller('tutorialCtrl', ['$scope', '$log', '$routeParams', '$l
         tutorial.submits = packagedetails.submits;
         tutorial.labels = packagedetails.tags;
         tutorial.error = null;
+        tutorial.progress = 0;
       }, function(err) {
         // If there was an error getting the details
         tutorial.error = err;
@@ -62,6 +63,7 @@ tutorialModule.controller('tutorialCtrl', ['$scope', '$log', '$routeParams', '$l
     async.series([
       function(callback) {
         tutorial.progress = 33;
+        console.log(tutorial.progress);
         $('#submitprogress').css('width', tutorial.progress+'%').attr('aria-valuenow', tutorial.progress);
         tutorial.progressMessage = "Clone to cluster...";
       
@@ -76,6 +78,7 @@ tutorialModule.controller('tutorialCtrl', ['$scope', '$log', '$routeParams', '$l
       
       function(callback) {  
         tutorial.progress = 66;
+        console.log(tutorial.progress);
         $('#submitprogress').css('width', tutorial.progress+'%').attr('aria-valuenow', tutorial.progress);
         tutorial.progressMessage = "Importing job submissions...";
         importSubmitScripts(tutorial.submits).then(function() {
@@ -94,7 +97,8 @@ tutorialModule.controller('tutorialCtrl', ['$scope', '$log', '$routeParams', '$l
           tutorial.error = err;
         }
         
-        tutorial.progess = 100;
+        tutorial.progress = 100;
+        console.log(tutorial.progress);
         $('#submitprogress').css('width', tutorial.progress+'%').attr('aria-valuenow', tutorial.progress);
         tutorial.progressMessage = "Done!";
         
