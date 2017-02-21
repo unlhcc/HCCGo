@@ -53,7 +53,7 @@ jobHistoryModule.service('jobService', ['$q', 'connectionService', 'dbService', 
    * @returns {Promise} 
    */
   var addDBJob = function(job) {
-    toReturn = $q.defer();
+    var toReturn = $q.defer();
     var now = Date.now();
     var set_default = function(obj, attribute_name, default_val) {
       if (attribute_name in obj) {

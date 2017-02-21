@@ -38,6 +38,7 @@ tutorialModule.controller('tutorialCtrl', ['$scope', '$log', '$routeParams', '$l
         tutorial.version = packagedetails.version;
         tutorial.description = packagedetails.description;
         tutorial.submits = packagedetails.submits;
+        tutorial.labels = packagedetails.tags;
         tutorial.error = null;
       }, function(err) {
         // If there was an error getting the details
@@ -103,6 +104,11 @@ tutorialModule.controller('tutorialCtrl', ['$scope', '$log', '$routeParams', '$l
     );
   }
   
+  /**
+   * Import the submission scripts from the package.json
+   * @memberof tutorialCtrl
+   * @param {Array} submits Array of submission files 
+   */
   var importSubmitScripts = function(submits) {
     var toReturn = $q.defer();
     
