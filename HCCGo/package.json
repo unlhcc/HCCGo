@@ -26,7 +26,8 @@
     "node-notifier": "^4.6.0",
     "path": ">= 0.12.7",
     "ssh2": ">= 0.3.3",
-    "uuid": "^3.0.1"
+    "uuid": "^3.0.1",
+    "escape-html": ">=1.0.3"
   },
   "devDependencies": {
     "asar": "^0.12.3",

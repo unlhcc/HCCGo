@@ -11,7 +11,7 @@ tutorialModule = angular.module('HccGoApp.tutorialCtrl', ['ngRoute' ]);
 tutorialModule.controller('tutorialCtrl', ['$scope', '$log', '$routeParams', '$location', '$q', 'preferencesManager', 'notifierService', '$http', 'connectionService', '$timeout', 'jobService', function($scope, $log, $routeParams, $location, $q, preferencesManager, notifierService, $http, connectionService, $timeout, jobService) {
   
   const async = require("async");
-  
+  const escape = require("escape-html");
   var init = function() {
     $(".download-json").addClass("loading");
     preferencesManager.getTutorials().then(function(jsonTutorials) {
@@ -150,6 +150,7 @@ tutorialModule.controller('tutorialCtrl', ['$scope', '$log', '$routeParams', '$l
     
     $http.get(url).
       success(function(data, status, headers, config) {
+        data = JSON.parse(sanitizeJSON(JSON.stringify(data)));
         toReturn.resolve(data);
         
       }).error(function(data, status, headers, config) {
@@ -162,4 +163,8 @@ tutorialModule.controller('tutorialCtrl', ['$scope', '$log', '$routeParams', '$l
   
   
   init();
+
+  function sanitizeJSON(unsanitized){	
+    return unsanitized.replace(/\\/g, "\\\\").replace(/\n/g, "\\n").replace(/\r/g, "\\r").replace(/\t/g, "\\t").replace(/\f/g, "\\f").replace(/"/g,"\\\"").replace(/'/g,"\\\'").replace(/\&/g, "\\&"); 
+  }
 }]);
