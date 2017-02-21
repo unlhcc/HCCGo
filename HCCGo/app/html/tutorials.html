@@ -1,5 +1,5 @@
 <div ng-include="'html/navbar.html'"></div>
-<div class="container">
+<div class="container download-json">
   
   <div class="row">
     <div class="col-md-4">
@@ -18,7 +18,7 @@
         <hr />
         
         <div class="list-group">
-          <div class="list-group-item download-repo" ng-repeat-start="tutorial in tutorials | filter:q | orderBy:'timestamp':true">
+          <div class="list-group-item " ng-repeat-start="tutorial in tutorials | filter:q | orderBy:'timestamp':true">
             
             <div class="row-content">
               <h4 class="list-group-item-heading"><a ng-click="click(tutorial)" href="javascript:void(0)">{{tutorial.name}}</a> <small>{{tutorial.version}}</small></h4>

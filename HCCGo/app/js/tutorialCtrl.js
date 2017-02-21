@@ -13,17 +13,22 @@ tutorialModule.controller('tutorialCtrl', ['$scope', '$log', '$routeParams', '$l
   const async = require("async");
   
   var init = function() {
-
+    $(".download-json").addClass("loading");
     preferencesManager.getTutorials().then(function(jsonTutorials) {
       $scope.tutorials = jsonTutorials.tutorials;
       
       getRepoConfigurations(jsonTutorials.tutorials);
 
-
+      $timeout(() => $(".download-json").removeClass("loading"), 500);
     }, function(err) {
       // Error getting the tutorials
-
+      if (err) {
+        notifierService.error("Problem reading tutorial file!", "Error");
+        $(".download-json").removeClass("loading");
+      }
+      
     });
+
   };
     
     // Get the tutorials
@@ -51,7 +56,6 @@ tutorialModule.controller('tutorialCtrl', ['$scope', '$log', '$routeParams', '$l
   }
   
   $scope.click = function(tutorial) {
-    $(".download-repo").addClass("loading");
     jobService.getDBJobs().then(function(jobs) {
       // LOGIC HERE FOR CHECKING IF REPO HAS ALREADY BEEN DOWNLOADED
     });
@@ -95,7 +99,6 @@ tutorialModule.controller('tutorialCtrl', ['$scope', '$log', '$routeParams', '$l
         tutorial.progressMessage = "Done!";
         
         notifierService.success(tutorial.submits.length + " Jobs imported into Submission DB", "Tutorial Succesfully Imported");
-        $(".download-repo").removeClass("loading");
         $timeout(function() {
           tutorial.progress = 0;
         }, 2000);
@@ -154,7 +157,5 @@ tutorialModule.controller('tutorialCtrl', ['$scope', '$log', '$routeParams', '$l
   }
   
   
-  
   init();
-  
 }]);
