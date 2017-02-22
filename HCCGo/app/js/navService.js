@@ -15,7 +15,6 @@ fileManageService.factory('navService',['$log', '$q', '$location', '$routeParams
    //
    // Gets directory strings from remote server
    //
-   service.params = $routeParams;
    service.currentPath = $location.path();
    service.username = new String("");
 
@@ -25,22 +24,25 @@ fileManageService.factory('navService',['$log', '$q', '$location', '$routeParams
    };
 
    service.goHome = function() {
-     $location.path("/cluster/" + $routeParams.clusterId);
+     $location.path("/cluster");
    };
 
    service.goToSCP = function() {
-      $location.path("/cluster/" + $routeParams.clusterId + "/filesystem");
+      $location.path("/filesystem");
    };
    
    // Nav to jobHistory
    service.jobHistory = function() {
-      $location.path("cluster/" + $routeParams.clusterId + "/jobHistory");
+      $location.path("/jobHistory");
+   }
+   
+   service.goToTutorials = function() {
+      $location.path("/tutorials");
    }
    
    //if($templateCache.get('username') == null){
-   connectionService.getUsername().then(function(username) {
-       service.username = username;
-   })
+   service.username = connectionService.connectionDetails.username;
+   service.shorthost = connectionService.connectionDetails.shorthost;
   
    return service;
   

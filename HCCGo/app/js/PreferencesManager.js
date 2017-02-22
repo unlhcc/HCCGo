@@ -78,6 +78,35 @@ preferencesModule.factory('preferencesManager',['$log', '$q', 'filePathService',
   var addCluster = function(cluster) {
     
   }
+  
+  
+  /**
+   * Get the array of tutorials in the tutorials.json file
+   * This file is distributed with the Application.
+   * @method getTutorials
+   * @memberof PreferencesManager
+   * @returns {Promise.<object>}
+   */
+  var getTutorials = function() {
+    var toReturn = $q.defer();
+    
+    // Get the path to the tutorials file
+    var path = require("path");
+    var tutorials = path.join(__dirname, 'data/tutorials.json');
+    
+    // Read in the tutorials file
+    fs.readFile(tutorials, function(err, data) {
+      if (err) {
+        return toReturn.reject(err);
+      }
+      
+      return toReturn.resolve(JSON.parse(data));
+    })
+
+    
+    return toReturn.promise;
+  }
+  
   /**
      * Get the currently set preferences
      * @method getPreferences
@@ -126,7 +155,8 @@ preferencesModule.factory('preferencesManager',['$log', '$q', 'filePathService',
       setClusters: setClusters,
       addCluster: addCluster,
       getPreferences: getPreferences,
-      setPreferences: setPreferences
+      setPreferences: setPreferences,
+      getTutorials: getTutorials
       
     }
 }]);

@@ -56,6 +56,16 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
     };
     editor.setValue($scope.job.commands);
   }
+  
+  // Resolve any instances of $WORK in the error, output, or location 
+  // to the actual work directory.
+  getWork().then(function(workPath) {
+    // Search for $WORK, replace with workPath
+    $scope.job.location = $scope.job.location.replace("$WORK", workPath);
+    $scope.job.error = $scope.job.error.replace("$WORK", workPath);
+    $scope.job.output = $scope.job.output.replace("$WORK", workPath);
+    
+  });
 
   $scope.chkDir = function(path, identifier) {
     if (!$scope.job.change) {
@@ -72,7 +82,7 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
   }
 
   $scope.cancel = function() {
-    $location.path("cluster/" + $scope.params.clusterId + "/jobHistory");
+    $location.path("/jobHistory");
   }
 
   /**
@@ -80,7 +90,7 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
    *
    */
   $scope.refreshCluster = function() {
-    jobStatusService.refreshDatabase($rootScope.clusterInterface, $rootScope.clusterId, true);
+    jobStatusService.refreshDatabase($rootScope.clusterInterface, connectionService.connectionDetails.shorthost, true);
   }
   // Get available modules
   function getModules() {
@@ -200,7 +210,7 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
               output: job.output,
               modules: ((job.modules != null) ? job.modules : []),
               commands: job.commands,
-              cluster: $scope.params.clusterId
+              cluster: connectionService.connectionDetails.shorthost
             }
           },
           {},
@@ -221,7 +231,7 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
         "modules": ((job.modules != null) ? job.modules : []),
         "commands": job.commands,
         "timestamp": now,
-        "cluster": $scope.params.clusterId
+        "cluster": connectionService.connectionDetails.shorthost
       }
       dbService.getJobHistoryDB().then(function(jobHistoryDB) {
         jobHistoryDB.insert(newJob, function(err, newDoc) {
@@ -254,7 +264,7 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
           var doc = {
             "jobId": data.split(" ")[3].trim(),
             "complete": false,
-            "cluster": $scope.params.clusterId,
+            "cluster": connectionService.connectionDetails.shorthost,
             "runtime": job.runtime,
             "memory": job.memory,
             "jobname": job.jobname,
@@ -264,7 +274,6 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
             "modules": ((job.modules != null) ? job.modules : []),
             "commands": job.commands,
             "timestamp": now,
-            "cluster": $scope.params.clusterId,
             "jobFile": jobFile,
             "status": "SUBMITTED",
             "jobName": job.jobname
@@ -294,7 +303,7 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
         analyticsService.event('job submission', 'success');
         notifierService.success('Your job was succesfully submitted to the cluster!', 'Job Submitted!');
         $scope.refreshCluster();
-        $location.path("cluster/" + $scope.params.clusterId);
+        $location.path("/cluster");
       }
     });
   });
