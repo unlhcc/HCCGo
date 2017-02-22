@@ -69,7 +69,8 @@
                         <table style="width: 100%">
                             <tr>
                               <div>Upload location: {{fileManage.remoteWD}}</div>
-                              <div>Upload size: <span ng-if="fileManage.accuSize > 1024*1024*1024">{{fileManage.accuSize / 1024 / 1024 / 1024 | number:2}} GB</span><span ng-if="fileManage.accuSize < 1024*1024*1024 && fileManage.accuSize > 1024*1024">{{fileManage.accuSize / 1024 / 1024 | number:2}} MB</span><span ng-if="fileManage.accuSize < 1024*1024">{{fileManage.accuSize / 1024 | number:2}} KB</span></div>
+                              <div>Upload size: {{fileManage.humanFileSize(fileManage.accuSize)}}
+                              </div>
                               <div>Available space on remote disk: {{fileManage.diskAvail}}%</div>
                               <div>Percent of space to be taken: {{fileManage.diskQuota}}%</div>
                               <span class="text-danger" ng-show="fileManage.remoteOverwrite">This upload will overwrite the file on the cluster</span>
@@ -91,8 +92,7 @@
                       <table style="width: 100%">
                          <tr>
                             <div>Download location: {{fileManage.localWD}}</div>
-                            <div>Download size: <span ng-if="fileManage.accuSize > 1024*1024*1024">{{fileManage.accuSize / 1024 / 1024 / 1024 | number:2}} GB</span><span ng-if="fileManage.accuSize < 1024*1024*1024 && fileManage.accuSize > 1024*1024">{{fileManage.accuSize / 1024 / 1024 | number:2}} MB</span><span ng-if="fileManage.accuSize < 1024*1024">{{fileManage.accuSize / 1024 | number:2}} KB</span>
-                            </div>
+                            <div>Download size: {{fileManage.humanFileSize(fileManage.accuSize)}}</div>
                             <div>Available space on disk: {{fileManage.diskAvail}}%</div>
                             <div>Percent of space to be taken: {{fileManage.diskQuota}}%</div>
                             <span class="text-danger" ng-show="fileManage.localOverwrite">This download will overwrite the file on your computer</span>
