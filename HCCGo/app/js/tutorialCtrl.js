@@ -150,7 +150,6 @@ tutorialModule.controller('tutorialCtrl', ['$scope', '$log', '$routeParams', '$l
     
     $http.get(url).
       success(function(data, status, headers, config) {
-        data = JSON.parse(sanitizeJSON(JSON.stringify(data)));
         toReturn.resolve(data);
         
       }).error(function(data, status, headers, config) {

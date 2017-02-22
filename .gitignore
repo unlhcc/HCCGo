@@ -15,6 +15,9 @@ packageWin/*
 packageOsx/*
 packageNix/*
 HCCGo/app/html/beta_notice.html
+HCCGo/app/html/tutorial_help.html
+docs/*
+
 
 *.swp
 

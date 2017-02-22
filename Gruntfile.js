@@ -39,7 +39,8 @@ module.exports = function(grunt) {
     marked: {
       dist: {
         files: {
-          'HCCGo/app/html/beta_notice.html': 'HCCGo/app/markdown/beta_notice.md'
+          'HCCGo/app/html/beta_notice.html': 'HCCGo/app/markdown/beta_notice.md',
+          'HCCGo/app/html/tutorial_help.html': 'HCCGo/app/markdown/tutorial_help.md'
         }
       }
     },
