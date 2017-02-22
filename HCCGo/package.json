@@ -14,7 +14,7 @@
     "HCC"
   ],
   "author": "Derek Weitzel",
-  
+  "homepage": "https://github.com/unlhcc/HCCGo",
   "dependencies": {
     "async": ">= 1.5.2",
     "c3": ">= 0.4.11",
