@@ -32,10 +32,6 @@ preferencesModule.factory('preferencesManager',['$log', '$q', 'filePathService',
     })
     
     
-    
-    console.log("Current Directory = " + process.cwd());
-    console.log(fs.readdirSync(process.cwd()));
-    
     // Initialize the file and id if not initialized
     readPrefDefer = $q.defer();
     preferencesDefer = readPrefDefer.promise;
