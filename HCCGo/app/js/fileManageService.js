@@ -60,6 +60,10 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
    service.remoteFocus = new String("");
 
    service.localFocus = new String("");
+   
+   service.lblRemote = "Home";
+   
+   service.lblSwitch = "Work";
 
    let remoteRead = function(data, finish){
        let _tempFiles = [];
@@ -125,12 +129,12 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
 
        if(service.remoteWD.indexOf(service.workWD) > -1) {
            service.remoteWD = service.homeWD;
-		   angular.element('#lblSwitch').text('Work');
-           angular.element('#lblRemote').text('Home');
+		   service.lblSwitch = "Work";
+		   service.lblRemote = "Home";
        } else {
            service.remoteWD = service.workWD;
-		   angular.element('#lblSwitch').text('Home');
-           angular.element('#lblRemote').text('Work');
+		   service.lblSwitch = "Home";
+		   service.lblRemote = "Work";
        }
 
        remoteRead(service.remoteWD);
