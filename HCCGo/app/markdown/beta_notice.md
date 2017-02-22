@@ -6,7 +6,7 @@ So many things!
 
 * View the output and error of a job.
 * Receive automatic updates when new releases are available.
-* So...many...bugfixes.
+* Include a tutorials page to install HCC tutorials.
 
 If you need any help, feel free to make an issue here: https://github.com/unlhcc/HCCGo/issues
 
