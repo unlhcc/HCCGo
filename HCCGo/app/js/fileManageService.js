@@ -66,6 +66,24 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
    service.localFocus = new String("");
 
    service.focus = {};
+   
+   
+   // https://stackoverflow.com/questions/10420352/converting-file-size-in-bytes-to-human-readable
+   let humanFileSize = function(bytes, si) {
+      var thresh = si ? 1000 : 1024;
+      if(Math.abs(bytes) < thresh) {
+         return bytes + ' B';
+      }
+      var units = si
+      ? ['kB','MB','GB','TB','PB','EB','ZB','YB']
+      : ['KiB','MiB','GiB','TiB','PiB','EiB','ZiB','YiB'];
+      var u = -1;
+      do {
+         bytes /= thresh;
+         ++u;
+      } while(Math.abs(bytes) >= thresh && u < units.length - 1);
+      return bytes.toFixed(1)+' '+units[u];
+   }
 
 
    let remoteRead = function(data, finish){
@@ -79,7 +97,7 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
               if (file.longname.charAt(0) == 'd') {
                   _tempFiles.unshift({Class: "directory", name: file.filename});
               } else {
-                  _tempFiles.push({Class: "ext_txt", name: file.filename, location: data + "/" + file.filename, size: (file.attrs.size / 1000).toFixed(2) + " KB",mtime: new Date(1e3 * file.attrs.mtime)});
+                  _tempFiles.push({Class: "ext_txt", name: file.filename, location: data + "/" + file.filename, size: humanFileSize(file.attrs.size) ,mtime: new Date(1e3 * file.attrs.mtime)});
               }
 
               // Indicates iteree is over
@@ -108,7 +126,7 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
                  } else if (stats.isDirectory()) {
                      _tempFiles.unshift({Class: "directory", name: file});
                  } else if (stats.isFile()) {
-                     _tempFiles.push({Class: "ext_txt", name: file, location: data + "/" + file, size: (stats.size/1000).toFixed(2) + " KB", mtime: stats.mtime});
+                     _tempFiles.push({Class: "ext_txt", name: file, location: data + "/" + file, size: humanFileSize(stats.size), mtime: stats.mtime});
                  }
              });
 
