@@ -1,14 +1,30 @@
 
 connectionModule = angular.module('ConnectionServiceModule', [])
 
-connectionModule.factory('connectionService',['$log', '$q', '$routeParams', '$location', 'notifierService', function($log, $q, $routeParams, $location, notifierService) {
-
+/**
+ * The connectionService is used throughout the entire app, from filetransfer to login authentication.
+ * Uses a mixture of protocols to accomplish these tasks.
+ *
+ * @ngdoc service
+ * @memberof HCCGo
+ * @class connectionService
+ * @requires $log
+ * @requires $q
+ * @requires $routeParams
+ * @requires $location
+ * @requires notifierService
+ * @requires async
+ * @requires path
+ * @requires fs
+ * @requires ssh2
+ */
+connectionModule.factory('connectionService',['$log', '$q', '$routeParams', '$location', 'notifierService', 'analyticsService', function($log, $q, $routeParams, $location, notifierService, analyticsService) {
    var connectionList = {crane: null,
                          tusker: null,
                          sandhills: null,
                          glidein: null};
    const async = require('async');
-   const path = require('path').posix;
+   const path = require('path');
    const fs = require('fs');
    $log.debug(connectionList);
 
@@ -120,8 +136,8 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', '$lo
 
         // Check for writeable directory
         // Try to write to a test file
-        var dirname_path = path.dirname(file);
-        var test_path = path.join(dirname_path, ".hccgo-test" + makeid());
+        var dirname_path = path.posix.dirname(file);
+        var test_path = path.posix.join(dirname_path, ".hccgo-test" + makeid());
 
         sftp.open(test_path, 'w', function(err, handle) {
           if (err){
@@ -366,7 +382,7 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', '$lo
       async.eachSeries(dirList, function(dir, done) {
           var dirs = [];
 	      var exists = false;
-          dir = dest + path.relative(root,dir);
+          dir = dest + path.posix.relative(root,dir);
           $log.debug("Creating folder: " + dir);
           async.until(function() {
               return exists;
@@ -375,7 +391,7 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', '$lo
                   if (err) {
                       $log.debug("STAT :: SFTP :: " + dir);
                       dirs.push(dir);
-                      dir = path.dirname(dir);
+                      dir = path.posix.dirname(dir);
                   } else {
                       exists = true;
                   }
@@ -627,14 +643,14 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', '$lo
                            $log.debug("New Folders: ");
                            $log.debug(mkFolders);
                            // Set destination directory setting
-                           dest = dest + path.basename(src) + '/';
+                           dest = dest + path.posix.basename(src) + '/';
                            water(err, true);
                        });
                    } else if (stats.isFile()) {
                        localFiles.push(src);
                        sizeTotal += stats.size;
                        filesTotal += 1;
-                       src = path.dirname(src);
+                       src = path.posix.dirname(src);
                        water(err, false);
                    }
                });
@@ -658,7 +674,7 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', '$lo
 
                   uploaderQueue.push({
                       name: file, local: file,
-                      remote: dest + path.relative(src,file),
+                      remote: dest + path.posix.relative(src,file),
                       data: function(total_transferred) {
                           callback(total_transferred, counter, filesTotal, currentTotal, sizeTotal);
                           return 0;
@@ -676,13 +692,14 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', '$lo
             }],
             function(err) {
                 if(err) {
+                    analyticsService.event('file upload', 'fail');
                     $log.debug(err);
                     error(err);
                 } else {
+				    analyticsService.event('file upload', 'success', '', sizeTotal);
                     finished();
                 }
        });
-
     }
 
    var remoteStatQueue = async.cargo(function (task, callback) {
@@ -818,6 +835,7 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', '$lo
                            $log.debug(mkFolders);
                            // Set destination directory setting
                            localPath = localPath + path.basename(remotePath) + '/';
+						   localPath = path.normalize(localPath);
                            water(err, true);
                        });
                    } else if (data.isFile()) {
@@ -864,21 +882,49 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', '$lo
             }],
             function(err) {
                 if(err) {
+                    analyticsService.event('file download', 'fail');
                     $log.debug(err);
                     error(err);
                 } else {
+				    analyticsService.event('file download', 'success', '', sizeTotal);
                     finished();
                 }
        });
 
-   }
+   };
 
+   /**
+    * Allows a user to quickly download a file from the server
+    * @method quickDownload
+    * @memberof HCCgo.connectionService
+    * @param {String} remotePath - Where the file resides on the server
+    * @param {String} localPath - Location where the file will be sent
+    * @returns {Promise} A promise denoting whether the process was successful or not
+    */
+   var quickDownload = function(remotePath, localPath) {
+       var deferred = $q.defer();
+       connectionList[getClusterContext()].sftp(function (err, sftp) {
+           if (err) {
+               deferred.reject(err);
+           }
+           else
+           {
+               sftp.fastGet(remotePath, localPath, function(err) {
+                   console.log("File transfer successful!");
+                   sftp.end();
+                   deferred.resolve(true);
+               });
+           }
+       });
+       return deferred.promise;
+   };
    return {
    getConnection: getConnection,
    runCommand: runCommand,
    getUsername: getUsername,
    uploadFile: uploadFile,
    downloadFile: downloadFile,
+   quickDownload: quickDownload,
    submitJob: submitJob,
    closeStream: closeStream,
    readDir: readDir,
@@ -895,12 +941,12 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', '$lo
      var Client = require('ssh2').Client;
      var conn = new Client();
      try {
-     
+
      if (username.length === 0 || password.length === 0)
      {
          completed("0 Length username or password given");
      }
-     
+
      conn.on('ready', function() {
       completed(null);
       $log.log('Client :: ready');
@@ -911,7 +957,7 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', '$lo
         }
 
         stream.on('close', function(code, signal) {
-         
+
          $log.info('Stream :: close :: code: ' + code + ', signal: ' + signal)
         }).on('data', function(data) {
          $log.log('STDOUT' + data);
@@ -923,10 +969,10 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', '$lo
       $log.error(err);
       completed(err);
 
-         
+
      }).on('keyboard-interactive', function(name, instructions,  instructionsLang, prompts, finishFunc) {
       $log.log("Name: " + name + ", instructions: " + instructions + "prompts" + prompts);
-      
+
 
       if (prompts[0].prompt == "Password: ") {
         finishFunc([password]);

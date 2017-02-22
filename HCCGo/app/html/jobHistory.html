@@ -11,8 +11,11 @@
                  <h4 class="panel-title jobhistory">{{ job.jobname }}<small class="jobdate"> {{ job.timestamp | date:'M-d-yyyy' }} </small></h4>
                </div>
                <div class="col-sm-4 col-sm-offset-4">
-                 <button class="btn btn-sm btn-danger pull-right delbutton" ng-click="deleteJob(job,$index)">Delete</button>
-                 <button class="btn btn-sm btn-info pull-right loadbutton" ng-click="loadJob(job)">Load</button>
+                 <div class="btn-group pull-right jobHistoryButtonGroup" role="group">
+                   <button class="btn btn-sm btn-danger pull-right" ng-click="deleteJob(job)">Delete</button>
+                   <button class="btn btn-sm btn-primary pull-right" ng-click="loadJob(job, true)">Clone</button>
+                   <button class="btn btn-sm btn-info pull-right" ng-click="loadJob(job, false)">Load</button>
+                 </div>
                </div>
              </div>
              <div class="row">
