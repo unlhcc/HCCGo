@@ -38,6 +38,14 @@
                             </button>
                             <br/>
                             <div id="tranContent"></div>
+                            <div id="fileStats" ng-show="focusFile.location">
+                              <h5>Path to file</h5>
+                              <p>{{ focusFile.location }}</p>
+                              <h5>Size</h5>
+                              <p>{{ focusFile.size | humanReadable }}</p>
+                              <h5>Last Modified</h5>
+                              <p>{{ focusFile.mtime | date: "MMM d, y h:mm:ss a" }}</p>
+                            </div>
                          </div>
                       </div>
                      <div class="panel panel-default width-control">
@@ -61,9 +69,10 @@
                         <table style="width: 100%">
                             <tr>
                               <div>Upload location: {{fileManage.remoteWD}}</div>
-                              <div>Upload size: <span ng-if="fileManage.accuSize > 1024*1024*1024">{{fileManage.accuSize / 1024 / 1024 / 1024 | number:2}} GB</span><span ng-if="fileManage.accuSize < 1024*1024*1024 && fileManage.accuSize > 1024*1024">{{fileManage.accuSize / 1024 / 1024 | number:2}} MB</span><span ng-if="fileManage.accuSize < 1024*1024">{{fileManage.accuSize / 1024 | number:2}} KB</span></div>
+                              <div>Upload size: {{fileManage.accuSize | humanReadable}}</div>
                               <div>Available space on remote disk: {{fileManage.diskAvail}}%</div>
                               <div>Percent of space to be taken: {{fileManage.diskQuota}}%</div>
+                              <span class="text-danger" ng-show="fileManage.remoteOverwrite">This upload will overwrite the file on the cluster</span>
                               <td>
                               <button id="upDeny" ng-click="fileManage.verifyUploadCancel()" type="button" class="btn btn-primary btn-block" style="background-color: #FF0000;">
                                <span aria-hidden="true">Cancel</span>
@@ -82,10 +91,10 @@
                       <table style="width: 100%">
                          <tr>
                             <div>Download location: {{fileManage.localWD}}</div>
-                            <div>Download size: <span ng-if="fileManage.accuSize > 1024*1024*1024">{{fileManage.accuSize / 1024 / 1024 / 1024 | number:2}} GB</span><span ng-if="fileManage.accuSize < 1024*1024*1024 && fileManage.accuSize > 1024*1024">{{fileManage.accuSize / 1024 / 1024 | number:2}} MB</span><span ng-if="fileManage.accuSize < 1024*1024">{{fileManage.accuSize / 1024 | number:2}} KB</span>
-                            </div>
+                            <div>Download size: {{fileManage.accuSize | humanReadable}}</div>
                             <div>Available space on disk: {{fileManage.diskAvail}}%</div>
                             <div>Percent of space to be taken: {{fileManage.diskQuota}}%</div>
+                            <span class="text-danger" ng-show="fileManage.localOverwrite">This download will overwrite the file on your computer</span>
                             <td>
                             <button id="downConfirm" ng-click="fileManage.downloadCall()" type="button" class="btn btn-primary btn-block" style="">
                                 <span aria-hidden="true">Confirm</span>
@@ -104,7 +113,7 @@
              </div>
              <div class="col-xs-6 col-sm-4">
                     <div class="panel panel-default width-control">
-                    <div class="panel-heading"><h2>Remote</h2> <b><span id="lblRemote">Home</span></b> 
+                    <div class="panel-heading"><h2>Remote</h2> <b><span>{{fileManage.lblRemote}}</span></b> 
                     <div id="divremoteDir">{{fileManage.remoteWD}}</div>
                        <nav>
                             <ul id="remote-directories" class="pager">
@@ -115,7 +124,7 @@
                                 </li>
                                 <li class="previous">
                                     <a id="remoteSwitch" ng-click="fileManage.wdSwitcher()">
-                                        <span aria-hidden="true">&#8646;</span>Switch to <span id="lblSwitch">Work</span>
+                                        <span aria-hidden="true">&#8646;</span>Switch to <span>{{fileManage.lblSwitch}}</span>
                                     </a>
                                 </li>
                             </ul>
