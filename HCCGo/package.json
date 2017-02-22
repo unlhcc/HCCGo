@@ -13,6 +13,7 @@
   "keywords": [
     "HCC"
   ],
+  "authors": [ "Derek Weitzel", "Adam Fitzgibbon", "Jerrod Dixon", "Casey Largent", "Cory Kellig", "Matthew Okalebo"]
   "dependencies": {
     "async": ">= 1.5.2",
     "c3": ">= 0.4.11",
