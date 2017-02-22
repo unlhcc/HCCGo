@@ -1,6 +1,6 @@
 {
   "name": "HCCGo",
-  "version": "0.3.0-beta.1",
+  "version": "0.3.0",
   "main": "./main.js",
   "description": "Interface for HCC Resouces",
   "scripts": {
