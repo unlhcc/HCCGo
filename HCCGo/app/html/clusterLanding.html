@@ -65,12 +65,18 @@
               <i class="mdi-action-trending-neutral" ng-if="job.running" />
               <i class="mdi-action-query-builder" ng-if="job.idle" />
               <i class="mdi-alert-error" ng-if="job.error" />
-              <i class="glyphicon glyphicon-check" ng-if="job.complete && !job.error" />
+              <i class="glyphicon glyphicon-check" ng-if="job.complete && !job.error && !job.cancelled" />
+              <i class="glyphicon glyphicon-ban-circle" ng-if="job.cancelled"/>
+              
             </div>
             <div class="row-content">
               <div class="action-secondary">
                 <a class="deleteButton" href="javascript:void(0)" ng-click="removeCompletedJob(job._id, $event)" ng-if="job.complete">
                   <i class="glyphicon glyphicon-remove"></i>
+                </a>
+                <div id="cancelConfirm"></div>
+                <a class="cancelButton" href="javascript:void(0)" ng-click="cancelRunningJob(job.jobId, $event)" ng-if="job.running">
+                  <i class="glyphicon glyphicon-ban-circle"></i>
                 </a>
               </div>
               <h4 class="list-group-item-heading">{{job.jobName}}</h4>

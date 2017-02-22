@@ -86,6 +86,7 @@ jobStatusService.service('jobStatusService',['$log','$q','notifierService', 'dbS
 						for (var i = 0; i < db_jobs.length; i++) {
 							if (!cluster_jobs.hasOwnProperty(db_jobs[i].jobId) ) {
 								// Recenty completed job (or disappeared from the squeue output)
+								console.log(db_jobs[i]);
 								db_jobs[i].status = 'COMPLETE';
 								recent_completed.push(db_jobs[i]);
 								db_jobs.splice(i, 1);
@@ -157,8 +158,9 @@ jobStatusService.service('jobStatusService',['$log','$q','notifierService', 'dbS
                             {
                             "complete": true,
                             "idle": false,
-                            "error": job.State != "COMPLETED" && job.State != "RUNNING" && job.State != "IDLE",
+                            "error": job.State != "COMPLETED" && job.State != "RUNNING" && job.State != "IDLE" && job.State != "CANCELLED",
                             "running": false,
+                            "cancelled" : job.State === "CANCELLED",
                             "elapsed": job.Elapsed,
                             "reqMem": job.ReqMem,
                             "jobName": job.JobName,
@@ -170,7 +172,8 @@ jobStatusService.service('jobStatusService',['$log','$q','notifierService', 'dbS
                           { returnUpdatedDocs: true },
                           function (err, numReplaced, affectedDocuments) {
                             // update db with data so it doesn't have to be queried again
-                            if (!err) {
+                            
+                            if (!err && !affectedDocuments.cancelled) {
                               notifierService.success('Your job, ' + affectedDocuments.jobName + ', has been completed', 'Job Completed!');
                               $log.debug("Completed job is: " + affectedDocuments);
 

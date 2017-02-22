@@ -99,6 +99,18 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
     $event.stopPropagation();
   }
 
+  $scope.cancelRunningJob = function(id, $event) {
+    if(confirm("Are you sure you want to cancel job " + id)) {
+     connectionService.runCommand("scancel " + id).then(function() {
+      });
+    }
+    $event.stopPropagation();
+    //connectionService.runCommand("scancel " + id).then(function() {
+      // show notification
+   //});
+
+  }
+
   $scope.viewOutErr = function(id) {
     // view the selected job's stander out and err
     $location.path("cluster/" + $routeParams.clusterId + "/jobview/" + id);
