@@ -19,5 +19,5 @@ clusterUploadModule.controller('clusterFileSystemCtrl', ['$scope', '$log', '$tim
                  function(newValue, oldValue) { 
 				     $log.debug("The files have changed");
 			    });*/
-
+   $scope.focusFile = fileManageService.focus;
 }]);
