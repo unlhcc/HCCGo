@@ -31,6 +31,7 @@ module.exports = function(config) {
       './app/js/ConnectionService.js',
       './app/js/NotifierService.js',
       './app/js/navService.js',
+      './app/js/analytics.js',
       './app/js/app.js',
       
       // Specs

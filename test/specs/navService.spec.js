@@ -8,6 +8,9 @@ describe('Navbar Service', function() {
   beforeEach(angular.mock.module('ConnectionServiceModule'));
   beforeEach(angular.mock.module('NotifierModule'));
   beforeEach(angular.mock.module('updaterModule'));
+  beforeEach(angular.mock.module('AnalyticsModule'));
+  beforeEach(angular.mock.module('PreferencesManager'));
+  beforeEach(angular.mock.module('filePathService'));
   beforeEach(angular.mock.module('ngRoute'));
   
   // Before each test set our injected Users factory (_Users_) to our local Users variable
