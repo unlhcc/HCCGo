@@ -1,0 +1,21 @@
+
+{ "tutorials":
+  [
+    {
+      "name": "Test Tutorial",
+      "description": "This is a test tutorial",
+      "labels": [
+        "Matlab",
+        "Beginner"
+      ],
+      "link": "https://github.com/unlhcc/HCCGoWorkshops",
+      "type": "github",
+      "gitrepo": "https://github.com/unlhcc/HCCGoWorkshops.git",
+      "user": "unlhcc",
+      "repo": "HCCGoWorkshops"
+    }
+  ]
+
+}
+
+

@@ -39,7 +39,8 @@ module.exports = function(grunt) {
     marked: {
       dist: {
         files: {
-          'HCCGo/app/html/beta_notice.html': 'HCCGo/app/markdown/beta_notice.md'
+          'HCCGo/app/html/beta_notice.html': 'HCCGo/app/markdown/beta_notice.md',
+          'HCCGo/app/html/tutorial_help.html': 'HCCGo/app/markdown/tutorial_help.md'
         }
       }
     },
@@ -59,9 +60,9 @@ module.exports = function(grunt) {
         src: ['HCCGo/app/js'],
         options: {
           destination: 'docs',
-          configure: 'node_modules/angular-jsdoc/common/conf.json',
-          template: 'node_modules/angular-jsdoc/angular-template',
-          tutorial: 'tutorials',
+          configure: 'jsdoc.json',
+          template: './node_modules/minami',
+          tutorials: './dev-tutorials',
           readme: './README.md'
         }
       }

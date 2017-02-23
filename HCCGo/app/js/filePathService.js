@@ -13,7 +13,6 @@ filePathService = angular.module('filePathService', []);
 filePathService.service('filePathService', function() {
 
   var path = require('path');
-
   
   /**
    * Get the job history path.  The job history is a nedb database.

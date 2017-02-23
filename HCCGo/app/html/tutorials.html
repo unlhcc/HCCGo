@@ -1,0 +1,69 @@
+<div ng-include="'html/navbar.html'"></div>
+<div class="container download-json">
+  
+  <div class="row">
+    <div class="col-md-4">
+      <div class="card">
+        <div class="col-md-12">
+          <div ng-include="'html/tutorial_help.html'"></div>
+        </div>
+      </div>
+      
+    </div>
+    
+    <div class="col-md-8">
+      <div class="card">
+        <div class="col-md-4">
+          <input type="search" class="form-control" ng-model="q" placeholder="Filter Tutorials..." />
+        </div>
+        <br />
+        <hr />
+        
+        <div class="list-group">
+          <div class="list-group-item " ng-repeat-start="tutorial in tutorials | filter:q | orderBy:'timestamp':true">
+            
+            <div class="row-content">
+              <h4 class="list-group-item-heading"><a ng-click="click(tutorial)" href="javascript:void(0)">{{tutorial.name}}</a> <small>{{tutorial.version}}</small></h4>
+              <p>
+                <!--
+                Lables for the tutorial
+                -->
+                <span ng-repeat-start="label in tutorial.labels" class="label label-default">{{label}}</span> <span ng-repeat-end></span>
+              </p>
+              <div class="list-group-item-text">
+                <p class="">
+                  <span>{{tutorial.description}}</span>
+                </p>
+                <p ng-show="tutorial.error" ng-model="tutorial.error">
+                </p>
+                <p>
+                  <i class="fa fa-github fa-lg" aria-hidden="true"></i> <a ng-href="{{tutorial.link}}"> View on GitHub</a>
+                </p>
+                <div ng-show="tutorial.progress">
+                  <p>
+                    {{tutorial.progressMessage}}
+                  <div class="progress">
+                    <div class="progress-bar progress-bar-striped active" id="submitprogress" role="progressbar" aria-valuemax="100"></div>
+                  </div>
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="list-group-separator" ng-repeat-end ng-if="!$last"></div>
+          <div class="list-group-item empty-placeholder" ng-show="!tutorials.length">
+            <div>
+              <h3 ng-hide="loading">Looks like you don't have any tutorials here yet!</h3>
+              <h3 ng-show="loading">Loading Job Information...</h3>
+            </div>
+          </div>
+      
+        </div>
+      </div>
+    
+    
+    </div>
+  
+  
+  </div>
+</div>

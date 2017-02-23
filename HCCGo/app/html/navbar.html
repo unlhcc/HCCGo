@@ -30,6 +30,13 @@
                File Management
        </button>
      </li>
+     <li>
+       <button type="button"
+           ng-click="servicer.goToTutorials()"
+           class="navbar-left btn btn-info navbar-btn">
+               Tutorials
+       </button>
+     </li>
     </ul>
 
     
@@ -46,7 +53,7 @@
       <li class="dropdown">
         <a href="javascript:void(0)" data-target="#" 
 		   class="dropdown-toggle" 
-		   data-toggle="dropdown"> {{servicer.username}}@{{servicer.params.clusterId}} <b class="caret"></b></a>
+		   data-toggle="dropdown"> {{servicer.username}}@{{servicer.shorthost}} <b class="caret"></b></a>
         <ul class="dropdown-menu">
           <li><a ng-click="servicer.logout()">Logout</a></li>
         </ul>
