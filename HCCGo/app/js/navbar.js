@@ -5,5 +5,5 @@ navBar.controller('NavCtrl', ['$scope', '$log', 'navService', 'connectionService
    // This controller intended purely to manage navigation bar
    // No code beyond navigational controls should be used here
    $scope.servicer = navService; 
-   
+   console.log($scope.servicer);
 }]);
