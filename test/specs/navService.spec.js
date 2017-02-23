@@ -16,14 +16,8 @@ describe('Navbar Service', function() {
   // Before each test set our injected Users factory (_Users_) to our local Users variable
   
   beforeEach(inject(function(_$rootScope_, _$q_, connectionService, _$location_, _$routeParams_) {
-    var $q = _$q_;
-    $scope = _$rootScope_.$new();
-    
-    // We use the $q service to create a mock instance of defer
-    deferred = _$q_.defer();
     
     // Use a Jasmine Spy to return the deferred promise
-    spyOn(connectionService, 'getUsername').and.returnValue(deferred.promise);
     $location = _$location_
     spyOn($location, 'path')
     
@@ -32,9 +26,6 @@ describe('Navbar Service', function() {
       "hostname": "example.unl.edu",
       "shorthost": "Example"
     }
-    
-    $routeParams = _$routeParams_;
-    $routeParams.clusterId = 'crane';
     
   }));
   
@@ -75,14 +66,8 @@ describe('Navbar Service', function() {
   
   
   it('should set username', function() {
-    
-    // Setup the data we wish to return for the .then function in the controller
-    deferred.resolve('derek');
-    
-    // We have to call apply for this to work
-    $scope.$apply();
 
-    // Since we called apply, not we can perform our assertions
+    // Make sure that the username and hostname are correct
     expect(navService.username).not.toBe(undefined);
     expect(navService.username).toBe('derek');
     
