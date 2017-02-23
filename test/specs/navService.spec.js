@@ -64,6 +64,14 @@ describe('Navbar Service', function() {
     
   });
   
+  it('should set location to tutorials', function() {
+    
+    navService.goToTutorials();
+    expect($location.path).toHaveBeenCalled();
+    expect($location.path).toHaveBeenCalledWith("/tutorials")
+    
+  });
+  
   
   it('should set username', function() {
 
