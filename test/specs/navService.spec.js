@@ -27,6 +27,12 @@ describe('Navbar Service', function() {
     $location = _$location_
     spyOn($location, 'path')
     
+    connectionService.connectionDetails = {
+      "username": "derek",
+      "hostname": "example.unl.edu",
+      "shorthost": "Example"
+    }
+    
     $routeParams = _$routeParams_;
     $routeParams.clusterId = 'crane';
     
@@ -47,7 +53,7 @@ describe('Navbar Service', function() {
     
     navService.goHome();
     expect($location.path).toHaveBeenCalled();
-    expect($location.path).toHaveBeenCalledWith("/cluster/crane");
+    expect($location.path).toHaveBeenCalledWith("/cluster");
     
   });
   
@@ -55,7 +61,7 @@ describe('Navbar Service', function() {
     
     navService.goToSCP();
     expect($location.path).toHaveBeenCalled();
-    expect($location.path).toHaveBeenCalledWith("/cluster/crane/filesystem");
+    expect($location.path).toHaveBeenCalledWith("/filesystem");
     
   });
   
@@ -63,7 +69,7 @@ describe('Navbar Service', function() {
     
     navService.jobHistory();
     expect($location.path).toHaveBeenCalled();
-    expect($location.path).toHaveBeenCalledWith("/cluster/crane/jobHistory")
+    expect($location.path).toHaveBeenCalledWith("/jobHistory")
     
   });
   
@@ -79,7 +85,9 @@ describe('Navbar Service', function() {
     // Since we called apply, not we can perform our assertions
     expect(navService.username).not.toBe(undefined);
     expect(navService.username).toBe('derek');
-      
+    
+    expect(navService.shorthost).not.toBe(undefined);
+    expect(navService.shorthost).toBe('Example');
       
     
   });
