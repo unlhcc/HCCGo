@@ -86,8 +86,10 @@ jobStatusService.service('jobStatusService',['$log','$q','notifierService', 'dbS
 						for (var i = 0; i < db_jobs.length; i++) {
 							if (!cluster_jobs.hasOwnProperty(db_jobs[i].jobId) ) {
 								// Recenty completed job (or disappeared from the squeue output)
-								console.log(db_jobs[i]);
+								//console.log(db_jobs[i]);
+
 								db_jobs[i].status = 'COMPLETE';
+								console.log("Hi");
 								recent_completed.push(db_jobs[i]);
 								db_jobs.splice(i, 1);
 								i--;
@@ -158,9 +160,9 @@ jobStatusService.service('jobStatusService',['$log','$q','notifierService', 'dbS
                             {
                             "complete": true,
                             "idle": false,
-                            "error": job.State != "COMPLETED" && job.State != "RUNNING" && job.State != "IDLE" && job.State != "CANCELLED",
+                            "error": job.State != "COMPLETED" && job.State != "RUNNING" && job.State != "IDLE" && !job.State.startsWith("CANCELLED"),
                             "running": false,
-                            "cancelled" : job.State === "CANCELLED",
+                            "cancelled" : job.State.startsWith("CANCELLED"),
                             "elapsed": job.Elapsed,
                             "reqMem": job.ReqMem,
                             "jobName": job.JobName,
@@ -175,7 +177,8 @@ jobStatusService.service('jobStatusService',['$log','$q','notifierService', 'dbS
                             
                             if (!err && !affectedDocuments.cancelled) {
                               notifierService.success('Your job, ' + affectedDocuments.jobName + ', has been completed', 'Job Completed!');
-                              $log.debug("Completed job is: " + affectedDocuments);
+                              $log.debug("Completed job is: ");
+                              $log.debug(affectedDocuments);
 
                               recent_completed_jobs.push(affectedDocuments);
                               return each_callback(null);

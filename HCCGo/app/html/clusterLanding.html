@@ -75,7 +75,7 @@
                   <i class="glyphicon glyphicon-remove"></i>
                 </a>
                 <div id="cancelConfirm"></div>
-                <a class="cancelButton" href="javascript:void(0)" ng-click="cancelRunningJob(job.jobId, $event)" ng-if="job.running">
+                <a class="cancelButton" href="javascript:void(0)" ng-click="cancelRunningJob(job.jobId, $event)" ng-if="job.running || job.idle">
                   <i class="glyphicon glyphicon-ban-circle"></i>
                 </a>
               </div>
