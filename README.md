@@ -2,6 +2,7 @@
 A GUI application for submitting and managing jobs at the Holland Computing Center.
 
 [Developer Documentation](https://unlhcc.github.io/hccgo-dev/)
+[![Build Status](https://travis-ci.org/unlhcc/HCCGo.svg?branch=master)](https://travis-ci.org/unlhcc/HCCGo)
 
 ## Tutorials
 
