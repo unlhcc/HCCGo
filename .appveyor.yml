@@ -19,6 +19,6 @@ test_script:
   - node --version
   - npm --version
   # run tests
-  - npm --prefix ./HCCGo test HCCGo
+  - npm --prefix ./HCCGo test
   - grunt packageWin
 
