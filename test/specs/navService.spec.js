@@ -27,7 +27,7 @@ describe('Navbar Service', function() {
     }
     
   }));
-  
+
   beforeEach(inject(function(_navService_) {
     
     navService = _navService_;
@@ -78,9 +78,8 @@ describe('Navbar Service', function() {
     expect(navService.username).not.toBe(undefined);
     expect(navService.username).toBe('derek');
     
-    expect(navService.hostname).not.toBe(undefined);
-    expect(navService.hostname).toBe('example.unl.edu');
-      
+    expect(navService.host).not.toBe(undefined);
+    expect(navService.host).toBe('example.unl.edu');
     
   });
   
