@@ -18,6 +18,7 @@ test_script:
   # Output useful info for debugging.
   - node --version
   - npm --version
+  - grunt bower
   # run tests
   - npm --prefix ./HCCGo test
   - grunt packageWin
