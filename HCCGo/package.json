@@ -1,6 +1,6 @@
 {
   "name": "HCCGo",
-  "version": "0.3.0-beta.1",
+  "version": "0.4.0-beta.1",
   "main": "./main.js",
   "description": "Interface for HCC Resouces",
   "scripts": {
@@ -8,7 +8,8 @@
     "packageWin": "node ./node_modules/electron-packager/cli.js ./ HCCGo --platform=win32 --arch=x64 --out ../packageWin/ --version 1.4.3 --overwrite --icon ./icons/HCCGo",
     "packageOsx": "node ./node_modules/electron-packager/cli.js ./ HCCGo --platform=darwin --arch=x64 --out ../packageOsx/ --version 1.4.3 --overwrite --icon ./icons/HCCGo --osx-sign",
     "packageNix": "node ./node_modules/electron-packager/cli.js ./ HCCGo --platform=linux --arch=x64 --out ../packageNix/ --version 1.4.3 --overwrite --icon ./icons/HCCGo",
-    "postinstall": "node postinstall.js"
+    "postinstall": "node postinstall.js",
+    "test": "./node_modules/.bin/karma start --single-run --browsers Electron"
   },
   "keywords": [
     "HCC"
@@ -34,11 +35,14 @@
   "devDependencies": {
     "asar": "^0.12.3",
     "devtron": "^1.2.1",
-    "electron": "^1.4.3",
+    "electron": "^1.4.15",
     "electron-packager": ">= 5.0.1",
-    "electron-prebuilt": ">= 0.30.3",
     "electron-rebuild": ">= 1.1.5",
     "grunt-marked": "^0.1.3",
+    "jasmine": "^2.5.3",
+    "karma": "^1.4.1",
+    "karma-electron": "^5.1.1",
+    "karma-jasmine": "^1.1.0",
     "nslog": "^3.0.0"
   }
 }

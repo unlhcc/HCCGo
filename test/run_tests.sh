@@ -3,6 +3,11 @@
 
 
 grunt docs
+grunt bower
+pushd HCCGo
+npm install
+popd
+npm test
 
 git config user.name "Automatic Publish"
 git config user.email "djw8605@gmail.com"

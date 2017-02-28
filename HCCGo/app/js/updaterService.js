@@ -10,7 +10,7 @@ updaterModule = angular.module('updaterModule', []);
  */
 var updaterService = function($log, $rootScope) {
 
-  const {ipcRenderer} = require('electron');
+  const ipcRenderer = require('electron').ipcRenderer;
   var updateDetails = null;
   var updateAvailable = false;
   
