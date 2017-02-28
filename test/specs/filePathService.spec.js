@@ -1,7 +1,6 @@
 
 describe('File Path Service', function() {
   var filePathService;
-  var isWin = /^win/.test(process.platform);
   var path = require("path");
   
   // Before each test load our api.users module
