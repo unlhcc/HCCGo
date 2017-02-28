@@ -1,6 +1,7 @@
 
 describe('File Path Service', function() {
   var filePathService;
+  var path = require("path");
   
   // Before each test load our api.users module
   beforeEach(angular.mock.module('filePathService'));
@@ -28,21 +29,25 @@ describe('File Path Service', function() {
     });
     
     it('Return job history', function() {
-      expect(filePathService.getJobHistory()).toBe('/home/derek/HCCGo/jobHistory.db');
+        var expectPath = path.join(process.env.HOME, 'HCCGo', 'jobHistory.db');
+        expect(filePathService.getJobHistory()).toBe(expectPath);
       
     });
     
     it('Return Data Path', function() {
-      expect(filePathService.getDataPath()).toBe('/home/derek/HCCGo');
+      var expectPath = path.join(process.env.HOME, 'HCCGo');
+      expect(filePathService.getDataPath()).toBe(expectPath);
       
     });
     
     it('Return Submitted Jobs', function() {
-      expect(filePathService.getSubmittedJobs()).toBe('/home/derek/HCCGo/submittedJobs.db');
+      var expectPath = path.join(process.env.HOME, 'HCCGo', 'submittedJobs.db');
+      expect(filePathService.getSubmittedJobs()).toBe(expectPath);
     });
     
     it('Return Prefrence Path', function() {
-      expect(filePathService.getPreferencePath()).toBe('/home/derek/HCCGo/preferences.json');
+      var expectPath = path.join(process.env.HOME, 'HCCGo', 'preferences.json');
+      expect(filePathService.getPreferencePath()).toBe(expectPath);
     });
     
   });
@@ -53,20 +58,24 @@ describe('File Path Service', function() {
     });
     
     it('Return job history', function() {
-      expect(filePathService.getJobHistory()).toBe('/home/derek/Library/HCCGo/jobHistory.db');
+      var expectPath = path.join(process.env.HOME, 'Library', 'HCCGo',  'jobHistory.db');
+      expect(filePathService.getJobHistory()).toBe(expectPath);
     });
     
     it('Return Data Path', function() {
-      expect(filePathService.getDataPath()).toBe('/home/derek/Library/HCCGo');
+      var expectPath = path.join(process.env.HOME, 'Library', 'HCCGo');
+      expect(filePathService.getDataPath()).toBe(expectPath);
       
     });
     
     it('Return Submitted Jobs', function() {
-      expect(filePathService.getSubmittedJobs()).toBe('/home/derek/Library/HCCGo/submittedJobs.db');
+      var expectPath = path.join(process.env.HOME, 'Library', 'HCCGo',  'submittedJobs.db');
+      expect(filePathService.getSubmittedJobs()).toBe(expectPath);
     });
     
     it('Return Prefrence Path', function() {
-      expect(filePathService.getPreferencePath()).toBe('/home/derek/Library/HCCGo/preferences.json');
+      var expectPath = path.join(process.env.HOME, 'Library', 'HCCGo',  'preferences.json');
+      expect(filePathService.getPreferencePath()).toBe(expectPath);
     });
     
   });
@@ -78,20 +87,24 @@ describe('File Path Service', function() {
     });
     
     it('Return job history', function() {
-      expect(filePathService.getJobHistory()).toBe('C:/users/derek/HCCGo/jobHistory.db');
+      var expectPath = path.join(process.env.APPDATA, 'HCCGo', 'jobHistory.db');
+      expect(filePathService.getJobHistory()).toBe(expectPath);
     });
     
     it('Return Data Path', function() {
-      expect(filePathService.getDataPath()).toBe('C:/users/derek/HCCGo');
+      var expectPath = path.join(process.env.APPDATA, 'HCCGo');
+      expect(filePathService.getDataPath()).toBe(expectPath);
       
     });
     
     it('Return Submitted Jobs', function() {
-      expect(filePathService.getSubmittedJobs()).toBe('C:/users/derek/HCCGo/submittedJobs.db');
+      var expectPath = path.join(process.env.APPDATA, 'HCCGo', 'submittedJobs.db');
+      expect(filePathService.getSubmittedJobs()).toBe(expectPath);
     });
     
     it('Return Prefrence Path', function() {
-      expect(filePathService.getPreferencePath()).toBe('C:/users/derek/HCCGo/preferences.json');
+      var expectPath = path.join(process.env.APPDATA, 'HCCGo', 'preferences.json');
+      expect(filePathService.getPreferencePath()).toBe(expectPath);
     });
     
   });

@@ -1,8 +1,12 @@
 # HCCGo
+
+[![Build Status](https://travis-ci.org/unlhcc/HCCGo.svg?branch=master)](https://travis-ci.org/unlhcc/HCCGo)
+[![Build status](https://ci.appveyor.com/api/projects/status/fgw8n9k22lp7xkdw/branch/master?svg=true)](https://ci.appveyor.com/project/djw8605/hccgo-668qn/branch/master)
+
 A GUI application for submitting and managing jobs at the Holland Computing Center.
 
 [Developer Documentation](https://unlhcc.github.io/hccgo-dev/)
-[![Build Status](https://travis-ci.org/unlhcc/HCCGo.svg?branch=master)](https://travis-ci.org/unlhcc/HCCGo)
+
 
 ## Tutorials
 

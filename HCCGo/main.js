@@ -4,6 +4,7 @@ const {app, BrowserWindow, globalShortcut, Menu} = require('electron');
 const {ipcMain} = require('electron');
 const {autoUpdater} = require('electron');
 
+if (require('electron-squirrel-startup')) return;
 
 let mainWindow = null;
 
