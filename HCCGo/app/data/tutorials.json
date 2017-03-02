@@ -2,17 +2,18 @@
 { "tutorials":
   [
     {
-      "name": "Test Tutorial",
-      "description": "This is a test tutorial",
-      "labels": [
-        "Matlab",
-        "Beginner"
-      ],
-      "link": "https://github.com/unlhcc/HCCGoWorkshops",
+      "name": "Beginner R Tutorials",
       "type": "github",
-      "gitrepo": "https://github.com/unlhcc/HCCGoWorkshops.git",
+      "gitrepo": "https://github.com/unlhcc/r-tutorial-beginner.git",
       "user": "unlhcc",
-      "repo": "HCCGoWorkshops"
+      "repo": "r-tutorial-beginner"
+    },
+    {
+      "name": "Advanced R Tutorials",
+      "type": "github",
+      "gitrepo": "https://github.com/unlhcc/r-tutorial-advanced.git",
+      "user": "unlhcc",
+      "repo": "r-tutorial-advanced"
     }
   ]
 
