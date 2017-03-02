@@ -12,6 +12,7 @@ dataUsageService = angular.module('dataUsageService', []);
  */
 dataUsageService.service('dataUsageService',['$q', '$log', function($q, $log) {
     var oldData = null;
+    var lastPromise = null;
     var lastRequestedTime = 0;
 	return {
 
@@ -24,21 +25,17 @@ dataUsageService.service('dataUsageService',['$q', '$log', function($q, $log) {
     	 * @returns {Promise} Promise object to be resolved in the controller
     	 */
 	 	getDataUsage: function(clusterInterface, force = false){
-	 	    var toReturn = $q.defer();
-            if (Date.now() - lastRequestedTime >= 300000 || force){
+	 	    
+            if (lastPromise === null || Date.now() - lastRequestedTime >= 300000 || force){
+                lastPromise = $q.defer();
                 $log.info('Updating Storage Info');
                 clusterInterface.getStorageInfo().then(function(data){
                     oldData = data;
                     lastRequestedTime = Date.now();
-                    toReturn.resolve(data);
+                    lastPromise.resolve(data);
                 });
             }
-            else {
-                toReturn.resolve(oldData);
-            }
-
-			
-			return toReturn.promise;	 			
+			return lastPromise.promise;	 			
 	 	}
 	 };
 }]);
