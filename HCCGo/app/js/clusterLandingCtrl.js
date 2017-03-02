@@ -132,7 +132,6 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
         $("#homeUsageGauge").removeClass("loading");
         $("#workUsageGauge").removeClass("loading");
         $("#graphrefresh").removeClass("spinning-image");
-        console.log(data);
 
         homeUsageGauge.internal.config.gauge_max = data[0].blocksLimit;
         homeUsageGauge.load({
