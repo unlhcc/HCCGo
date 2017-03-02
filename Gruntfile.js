@@ -18,8 +18,14 @@ module.exports = function(grunt) {
       build_electron_windows: {
         command: 'cd HCCGo/ && npm run-script packageWin'
       },
+      build_installer_windows: {
+        command: 'cd HCCGo/ && npm run-script installerWin'
+      },
 	  build_electron_macos: {
 	    command: 'cd HCCGo/ && npm run-script packageOsx'
+	  },
+    build_installer_macos: {
+	    command: 'cd HCCGo/ && npm run-script installerOsx'
 	  },
 	  build_electron_linux: {
 	    command: 'cd HCCGo/ && npm run-script packageNix'
@@ -86,12 +92,14 @@ module.exports = function(grunt) {
                                     'bower',
                                     'marked',
 				    'auto_install',
-				    'shell:build_electron_windows']);
+				    'shell:build_electron_windows',
+            'shell:build_installer_windows']);
   grunt.registerTask('packageOsx', ['less',
                                     'bower',
                                     'marked',
 				    'auto_install',
-				    'shell:build_electron_macos']);  
+				    'shell:build_electron_macos',
+            'shell:build_installer_macos']);
   grunt.registerTask('packageNix', ['less',
                                     'bower',
                                     'marked',

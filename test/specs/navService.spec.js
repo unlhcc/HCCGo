@@ -24,11 +24,10 @@ describe('Navbar Service', function() {
     connectionService.connectionDetails = {
       "username": "derek",
       "hostname": "example.unl.edu",
-      "shorthost": "Example"
     }
     
   }));
-  
+
   beforeEach(inject(function(_navService_) {
     
     navService = _navService_;
@@ -79,9 +78,8 @@ describe('Navbar Service', function() {
     expect(navService.username).not.toBe(undefined);
     expect(navService.username).toBe('derek');
     
-    expect(navService.shorthost).not.toBe(undefined);
-    expect(navService.shorthost).toBe('Example');
-      
+    expect(navService.host).not.toBe(undefined);
+    expect(navService.host).toBe('example.unl.edu');
     
   });
   
