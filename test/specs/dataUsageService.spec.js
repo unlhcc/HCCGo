@@ -3,7 +3,7 @@ describe('Data Usage Service', () => {
     var $q;
     var deferred;
 
-    beforeEach(angular.mock.module('Data Usage Service'));
+    beforeEach(angular.mock.module('dataUsageService'));
 
     beforeEach(inject(function(_dataUsageService_) {
         dataUsageService = dataUsageService;
