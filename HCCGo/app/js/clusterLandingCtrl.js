@@ -101,9 +101,7 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
 
   $scope.cancelRunningJob = function(id, $event) {
     if(confirm("Are you sure you want to cancel job " + id)) {
-      $scope.jobs.find(function(x) { return x.id === x }).cancelled = true;
-      connectionService.runCommand("scancel " + id).then(function() {
-        $scope.refreshCluster(true);
+     connectionService.runCommand("scancel " + id).then(function() {
       });
     }
     $event.stopPropagation();
