@@ -5,6 +5,7 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
 
   $scope.params = $routeParams;
   $scope.jobs = [];
+  $scope.cancelNumber = 0;
   var clusterInterface = null;
 
   // Generate empty graphs
@@ -99,16 +100,22 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
     $event.stopPropagation();
   }
 
-  $scope.cancelRunningJob = function(id, $event) {
-    if(confirm("Are you sure you want to cancel job " + id)) {
-     connectionService.runCommand("scancel " + id).then(function() {
-      });
-    }
+  $scope.cancelModal = function(id, $event) {
     $event.stopPropagation();
-    //connectionService.runCommand("scancel " + id).then(function() {
-      // show notification
-   //});
+    $scope.cancelNumber = id;
+    $("#cancel").modal("show");
+  }
 
+  $scope.cancelRunningJob = function(id, $event) {
+    var cancelledJob = $scope.jobs.find(function(x) { return x.jobId === id});
+
+    connectionService.runCommand("scancel " + id).then(function() {
+      notifierService.success("Your job, " + cancelledJob.jobName + " , has been cancelled", "Job Cancelled!");
+      $scope.refreshCluster(true);
+    },
+    function(err){
+      $log.log(err);
+    });
   }
 
   $scope.viewOutErr = function(id) {

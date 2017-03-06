@@ -89,14 +89,12 @@ jobStatusService.service('jobStatusService',['$log','$q','notifierService', 'dbS
 								//console.log(db_jobs[i]);
 
 								db_jobs[i].status = 'COMPLETE';
-								console.log("Hi");
 								recent_completed.push(db_jobs[i]);
 								db_jobs.splice(i, 1);
 								i--;
 							} else {
 								// Job showed up in the cluster jobs output, update it's status
 								cluster_job = cluster_jobs[db_jobs[i].jobId];
-
 								if (cluster_job.running) {
 									db_jobs[i].status = 'RUNNING';
 								} else if (cluster_job.idle) {
