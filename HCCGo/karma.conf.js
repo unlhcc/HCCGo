@@ -33,7 +33,7 @@ module.exports = function(config) {
       './app/js/navService.js',
       './app/js/analytics.js',
       './app/js/app.js',
-      './app/js/dataUsageService.js'
+      './app/js/dataUsageService.js',
       // Specs
       '../test/specs/*.js'
 
