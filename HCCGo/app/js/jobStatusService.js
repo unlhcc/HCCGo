@@ -86,8 +86,6 @@ jobStatusService.service('jobStatusService',['$log','$q','notifierService', 'dbS
 						for (var i = 0; i < db_jobs.length; i++) {
 							if (!cluster_jobs.hasOwnProperty(db_jobs[i].jobId) ) {
 								// Recenty completed job (or disappeared from the squeue output)
-								//console.log(db_jobs[i]);
-
 								db_jobs[i].status = 'COMPLETE';
 								recent_completed.push(db_jobs[i]);
 								db_jobs.splice(i, 1);

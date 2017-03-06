@@ -108,7 +108,6 @@ jobViewModule.controller('jobViewCtrl', ['$scope', '$log', '$timeout', 'connecti
       }
       $scope.$apply(function() {
           $scope.job = result;
-          console.log($scope.job);
       });
     });
   });
@@ -191,5 +190,4 @@ jobViewModule.controller('jobViewCtrl', ['$scope', '$log', '$timeout', 'connecti
     $event.stopPropagation();
     notifierService.success("Copied to Clipboard!", "Copied!");
   }
-  
 }]);

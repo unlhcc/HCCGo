@@ -11,7 +11,7 @@
         <p>Are you sure you want to cancel job {{ cancelNumber }}?</p>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-primary" data-dismiss="modal" ng-click="cancelRunningJob(cancelNumber, $event)">Confirm</button>
+        <button type="button" class="btn btn-primary" data-dismiss="modal" ng-click="cancelRunningJob(cancelNumber)">Confirm</button>
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Back</button>
       </div>
     </div>
@@ -93,7 +93,6 @@
                 <a class="deleteButton" href="javascript:void(0)" ng-click="removeCompletedJob(job._id, $event)" ng-if="job.complete">
                   <i class="glyphicon glyphicon-remove"></i>
                 </a>
-                <div id="cancelConfirm"></div>
                 <a class="cancelButton" href="javascript:void(0)" ng-click="cancelModal(job.jobId, $event)"  ng-if="job.running || job.idle">
                   <i class="glyphicon glyphicon-ban-circle"></i>
                 </a>
@@ -120,8 +119,6 @@
         </div>
       </div>
     </div>
-    
 
-</div>
 
 </div>

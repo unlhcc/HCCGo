@@ -80,11 +80,7 @@ SlurmClusterInterface.prototype.getCompletedJobs = function(docs) {
     }
     this.connectionService.runCommand("sacct -j " + docs[i].jobId + " -l --noconvert -P").then(function(data) {
       // parse data and make list of docs to update the db with
-      console.log("data:");
-      console.log(data);
       csv.parse(data, {delimiter: '|'}, function(err, data) {
-        console.log("parse data");
-        console.log(data);
         var headers = data[0] === undefined ? [] : data[0];
         var jobData = data[1] === undefined ? [] : data[1];
         var batchData = data[2] === undefined ? [] : data[2];
@@ -110,8 +106,6 @@ SlurmClusterInterface.prototype.getCompletedJobs = function(docs) {
         }
         completedJobs.push(returnData);
         if(i==docs.length) {
-          console.log("completed jobs");
-          console.log(completedJobs);
           if(completedJobs.length > 0) deferred.resolve(completedJobs);
           else deferred.reject("No running jobs have been completed.")
         }
