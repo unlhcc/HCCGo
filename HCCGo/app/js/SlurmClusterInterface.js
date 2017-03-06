@@ -83,8 +83,6 @@ SlurmClusterInterface.prototype.getCompletedJobs = function(docs) {
       console.log("data:");
       console.log(data);
       csv.parse(data, {delimiter: '|'}, function(err, data) {
-        console.log("parse data");
-        console.log(data);
         var headers = data[0] === undefined ? [] : data[0];
         var jobData = data[1] === undefined ? [] : data[1];
         var batchData = data[2] === undefined ? [] : data[2];
