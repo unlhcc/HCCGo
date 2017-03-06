@@ -15,6 +15,7 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
+      './app/js/GenericClusterInterface.js',
       '../node_modules/angular/angular.js',                             // angular
       '../node_modules/angular-route/angular-route.js', // ui-router
       '../node_modules/angular-mocks/angular-mocks.js',                 // loads our modules for tests
@@ -25,6 +26,9 @@ module.exports = function(config) {
       '../test/mocks/*.js',
       
       // Application files
+      './app/js/SlurmClusterInterface.js',
+      './app/js/CondorClusterInterface.js',
+
       './app/js/filePathService.js',
       './app/js/PreferencesManager.js',
       './app/js/updaterService.js',
@@ -33,8 +37,6 @@ module.exports = function(config) {
       './app/js/navService.js',
       './app/js/analytics.js',
       './app/js/app.js',
-      './app/js/GenericClusterInterface.js',
-      './app/js/SlurmClusterInterface.js',
       './app/js/dataUsageService.js',
       // Specs
       '../test/specs/*.js'
