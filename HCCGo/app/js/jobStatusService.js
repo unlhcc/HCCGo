@@ -173,8 +173,6 @@ jobStatusService.service('jobStatusService',['$log','$q','notifierService', 'dbS
                             
                             if (!err && !affectedDocuments.cancelled) {
                               notifierService.success('Your job, ' + affectedDocuments.jobName + ', has been completed', 'Job Completed!');
-                              $log.debug("Completed job is: ");
-                              $log.debug(affectedDocuments);
 
                               recent_completed_jobs.push(affectedDocuments);
                               return each_callback(null);
