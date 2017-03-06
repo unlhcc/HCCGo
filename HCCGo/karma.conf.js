@@ -33,7 +33,9 @@ module.exports = function(config) {
       './app/js/navService.js',
       './app/js/analytics.js',
       './app/js/app.js',
-      
+      './app/js/GenericClusterInterface.js',
+      './app/js/SlurmClusterInterface.js',
+      './app/js/dataUsageService.js',
       // Specs
       '../test/specs/*.js'
 
