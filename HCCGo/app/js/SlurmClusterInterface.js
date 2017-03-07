@@ -92,17 +92,15 @@ SlurmClusterInterface.prototype.getCompletedJobs = function(docs) {
           "MaxRSS"
         ]
         // loop through headers to get the indices of the desired fields
-          for(var j = 0; j < headers.length; j++) {
-            var index = desiredFields.indexOf(headers[j]);
-            if(index > -1) {
-              if(headers[j] == "JobName")
-                returnData[desiredFields[index]] = jobData[j] === undefined ? "" : jobData[j];
-              else
-                returnData[desiredFields[index]] = batchData[j] === undefined ? "" : batchData[j];
-            }
+        for(var j = 0; j < headers.length; j++) {
+          var index = desiredFields.indexOf(headers[j]);
+          if(index > -1) {
+            if(headers[j] == "JobName")
+              returnData[desiredFields[index]] = jobData[j] === undefined ? "" : jobData[j];
+            else
+              returnData[desiredFields[index]] = batchData[j] === undefined ? "" : batchData[j];
           }
-          
-
+        }
         completedJobs.push(returnData);
         if(i==docs.length) {
           if(completedJobs.length > 0) deferred.resolve(completedJobs);
