@@ -5,9 +5,9 @@
   "description": "Interface for HCC Resouces",
   "scripts": {
     "start": "node node_modules/electron/cli.js .",
-    "packageWin": "node ./node_modules/electron-packager/cli.js ./ HCCGo --platform=win32 --arch=x64 --out ../packageWin/ --version 1.4.3 --overwrite --icon ./icons/HCCGo --version-string.ProductName=HCCGo",
-    "packageOsx": "node ./node_modules/electron-packager/cli.js ./ HCCGo --platform=darwin --arch=x64 --out ../packageOsx/ --version 1.4.3 --overwrite --icon ./icons/HCCGo --osx-sign",
-    "packageNix": "node ./node_modules/electron-packager/cli.js ./ HCCGo --platform=linux --arch=x64 --out ../packageNix/ --version 1.4.3 --overwrite --icon ./icons/HCCGo",
+    "packageWin": "node ./node_modules/electron-packager/cli.js ./ HCCGo --platform=win32 --arch=x64 --out ../packageWin/ --electron-version 1.4.3 --overwrite --icon ./icons/HCCGo --version-string.ProductName=HCCGo",
+    "packageOsx": "node ./node_modules/electron-packager/cli.js ./ HCCGo --platform=darwin --arch=x64 --out ../packageOsx/ --electron-version 1.4.3 --overwrite --icon ./icons/HCCGo --osx-sign",
+    "packageNix": "node ./node_modules/electron-packager/cli.js ./ HCCGo --platform=linux --arch=x64 --out ../packageNix/ --electron-version 1.4.3 --overwrite --icon ./icons/HCCGo",
     "postinstall": "node postinstall.js",
     "installerWin": "node win-build-installer.js",
     "installerOsx": "electron-installer-dmg --background=icons/HCCGoDMG.png ../packageOsx/HCCGo-darwin-x64/HCCGo.app HCCGo --icon=icons/HCCGo.png  --overwrite",

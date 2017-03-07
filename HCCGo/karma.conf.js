@@ -21,7 +21,7 @@ module.exports = function(config) {
       '../node_modules/angular-mocks/angular-mocks.js',                 // loads our modules for tests
       './app/lib/angular-toastr/angular-toastr.tpls.js',
       './node_modules/async/dist/async.js',
-      
+      './app/js/GenericClusterInterface.js',
       // Mocks
       '../test/mocks/*.js',
       

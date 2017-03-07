@@ -145,7 +145,7 @@ tutorialModule.controller('tutorialCtrl', ['$scope', '$log', '$routeParams', '$l
    */
   var getPackageJson = function(user, repo) {
     
-    toReturn = $q.defer();
+    var toReturn = $q.defer();
     url = "https://raw.githubusercontent.com/" + user + "/" + repo + "/master/package.json";
     
     $http.get(url).
