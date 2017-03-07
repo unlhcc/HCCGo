@@ -111,7 +111,6 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
     job.idle = false;
     job.cancelled = true;
     job.complete = true;
-    console.log(job);
     connectionService.runCommand("scancel " + job.jobId).then(function() {
       notifierService.success("Your job, " + job.jobName + " , has been cancelled", "Job Cancelled!");
        dbService.getSubmittedJobsDB().then(function(db) {
@@ -130,11 +129,8 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
           },
           {},
           function (err, numReplaced, affectedDocuments) {
-          // update db with data so it doesn't have to be queried again
-          console.log(affectedDocuments);
           });
-      });
-                      
+      });     
       $scope.refreshCluster(true);
     },
     function(err){
