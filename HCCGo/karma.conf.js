@@ -20,7 +20,7 @@ module.exports = function(config) {
       '../node_modules/angular-mocks/angular-mocks.js',                 // loads our modules for tests
       './app/lib/angular-toastr/angular-toastr.tpls.js',
       './node_modules/async/dist/async.js',
-      
+      './app/js/GenericClusterInterface.js',
       // Mocks
       '../test/mocks/*.js',
       
@@ -33,7 +33,6 @@ module.exports = function(config) {
       './app/js/navService.js',
       './app/js/analytics.js',
       './app/js/app.js',
-      './app/js/GenericClusterInterface.js',
       './app/js/SlurmClusterInterface.js',
       './app/js/dataUsageService.js',
       // Specs

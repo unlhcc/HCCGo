@@ -4,18 +4,20 @@ describe('Data Usage Service', () => {
     var deferred;
 
     beforeEach(angular.mock.module('dataUsageService'));
-
-    beforeEach(inject(function(_dataUsageService_) {
-        dataUsageService = dataUsageService;
-    }));
-
     
     beforeEach(inject(function(_$q_) {
         $q = _$q_;
 
         deferred = $q.defer();
-
+        clusterInterface = {
+          getStorageInfo: function() {}
+        }
+        
         spyOn(clusterInterface, 'getStorageInfo').and.returnValue(deferred.promise);
+    }));
+    
+    beforeEach(inject(function(_dataUsageService_) {
+        dataUsageService = _dataUsageService_;
     }));
 
 
@@ -25,7 +27,7 @@ describe('Data Usage Service', () => {
     });
 
     it('should be resolved', function() {
-        expect(dataUsageservice.getDataUsage()).not.toBe(undefined);
+        expect(dataUsageService.getDataUsage(clusterInterface)).not.toBe(undefined);
 
     });
 });
