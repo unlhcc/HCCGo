@@ -38,6 +38,7 @@ describe('Data Usage Service', () => {
         $rootScope.$apply();
 
         expect(dataUsageService.getDataUsage(clusterInterface)).not.toBe(undefined);
+        expect(clusterInterface.getStorageInfo).toHaveBeenCalled();
         dataUsageService.getDataUsage(clusterInterface).then(function(data) {
             expect(data).toBe(Array.isArray());
         })
