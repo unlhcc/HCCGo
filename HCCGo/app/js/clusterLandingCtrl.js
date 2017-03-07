@@ -5,7 +5,7 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
 
   $scope.params = $routeParams;
   $scope.jobs = [];
-  $scope.cancelNumber = 0;
+  $scope.cancelJob = {};
   var clusterInterface = null;
 
   // Generate empty graphs
@@ -100,17 +100,41 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
     $event.stopPropagation();
   }
 
-  $scope.cancelModal = function(id, $event) {
+  $scope.cancelModal = function(job, $event) {
     $event.stopPropagation();
-    $scope.cancelNumber = id;
+    $scope.cancelJob = job;
     $("#cancel").modal("show");
   }
 
-  $scope.cancelRunningJob = function(id, $event) {
-    var cancelledJob = $scope.jobs.find(function(x) { return x.jobId === id});
-
-    connectionService.runCommand("scancel " + id).then(function() {
-      notifierService.success("Your job, " + cancelledJob.jobName + " , has been cancelled", "Job Cancelled!");
+  $scope.cancelRunningJob = function(job, $event) {
+    job.running = false;
+    job.idle = false;
+    job.cancelled = true;
+    job.complete = true;
+    console.log(job);
+    connectionService.runCommand("scancel " + job.jobId).then(function() {
+      notifierService.success("Your job, " + job.jobName + " , has been cancelled", "Job Cancelled!");
+       dbService.getSubmittedJobsDB().then(function(db) {
+        db.update(
+          { _id: job._id },
+          { $set:
+            {
+              "complete": true,
+              "idle": false,
+              "running": false,
+              "cancelled" : true,
+              "status": "COMPLETE",
+              "reportedStatus": "CANCELLED",
+              "justCancelled" : true
+            }
+          },
+          {},
+          function (err, numReplaced, affectedDocuments) {
+          // update db with data so it doesn't have to be queried again
+          console.log(affectedDocuments);
+          });
+      });
+                      
       $scope.refreshCluster(true);
     },
     function(err){
