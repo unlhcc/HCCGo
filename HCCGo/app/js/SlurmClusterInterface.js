@@ -50,7 +50,7 @@ SlurmClusterInterface.prototype.getJobs = function() {
       }
 
       curJob.runTime = entry.TIME;
-      curJob.startTime = entry.START_TIME;
+      curJob.startTime = entry.START_TIME.indexOf("T") !== -1 ? entry.START_TIME.replace(/T/g, " ") : entry.START_TIME;
       jobs[curJob.jobId] = curJob;
     });
 
