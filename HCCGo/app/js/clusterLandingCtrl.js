@@ -129,28 +129,24 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
       $("#graphrefresh").addClass("spinning-image");
 
       dataUsageService.getDataUsage(clusterInterface, force).then(function(data) {
-
         $("#homeUsageGauge").removeClass("loading");
         $("#workUsageGauge").removeClass("loading");
         $("#graphrefresh").removeClass("spinning-image");
 
+        homeUsageGauge.internal.config.gauge_max = data[0].blocksLimit;
         homeUsageGauge.load({
             columns: [
               ['Used', data[0].blocksUsed]
             ]
         });
 
-        // POSSIBLE FUTURE DEPRECATION: Messing with interals instead of using load function
-        homeUsageGauge.internal.config.gauge_max = data[0].blocksQuota;
-
+        workUsageGauge.internal.config.gauge_max = data[1].blocksLimit;
         workUsageGauge.load({
             columns: [
               ['Used', data[1].blocksUsed]
             ]
         });
 
-        // POSSIBLE FUTURE DEPRECATION: Messing with interals instead of using load function
-        workUsageGauge.internal.config.gauge_max = data[1].blocksLimit;
     });
   }
   preferencesManager.getClusters().then(function(clusters) {
@@ -193,7 +189,7 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
       if(isRefreshingGraphs) return;
       isRefreshingGraphs = true;
       (function refreshEvery() {
-        updateGraphs();
+        updateGraphs(true);
         refreshingGraphsPromise = $timeout(refreshEvery, 300000);
       }());
     };
