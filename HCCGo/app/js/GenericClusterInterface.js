@@ -60,24 +60,29 @@ GenericClusterInterface.prototype.getStorageInfo = function() {
     home.blocksLimit = KilobytestoGigabytes(split_output[3]);
     returnData.push(home);
 
-    connectionService.runCommand("lfs quota -g `id -g` /work").then(function(data) {
+    connectionService.runCommand("lfs quota -u `id -u` /work").then(function(data) {
       // Split the output
       reported_output = data.split("\n")[2];
 
       split_output = $.trim(reported_output).split(/[ ]+/);
 
       work.blocksUsed = KilobytestoGigabytes(split_output[1]);
-      work.blocksQuota = KilobytestoGigabytes(split_output[2]);
-      work.blocksLimit = KilobytestoGigabytes(split_output[3]);
-      returnData.push(work);
 
-      storagePromise.resolve(returnData);
+      connectionService.runCommand("lfs quota -g `id -g` /work").then(function(data) {
+        // Split the output
+        reported_output = data.split("\n")[2];
+
+        split_output = $.trim(reported_output).split(/[ ]+/);
+
+        work.blocksQuota = KilobytestoGigabytes(split_output[2]);
+        work.blocksLimit = KilobytestoGigabytes(split_output[3]);
+        returnData.push(work);
+        storagePromise.resolve(returnData);
+
+      });
 
     });
-
-
-
-
+    
   });
 
 
