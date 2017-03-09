@@ -6,14 +6,16 @@
       "type": "github",
       "gitrepo": "https://github.com/unlhcc/r-tutorial-beginner.git",
       "user": "unlhcc",
-      "repo": "r-tutorial-beginner"
+      "repo": "r-tutorial-beginner",
+      "link": "https://github.com/unlhcc/r-tutorial-beginner"
     },
     {
       "name": "Advanced R Tutorials",
       "type": "github",
       "gitrepo": "https://github.com/unlhcc/r-tutorial-advanced.git",
       "user": "unlhcc",
-      "repo": "r-tutorial-advanced"
+      "repo": "r-tutorial-advanced",
+      "link": "https://github.com/unlhcc/r-tutorial-advanced"
     }
   ]
 

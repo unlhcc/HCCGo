@@ -6,7 +6,7 @@
   *
   */
 
-var GenericClusterInterface = function(connectionService, $q) {
+GenericClusterInterface = function(connectionService, $q) {
   this.$q = $q;
   this.connectionService = connectionService;
 }
