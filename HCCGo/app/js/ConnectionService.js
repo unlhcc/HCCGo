@@ -236,11 +236,13 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', '$lo
    var submitJob = function(location) {
       var deferred = $q.defer();
       $log.debug("Running command: " + 'sbatch ' + location);
-      runCommand('sbatch ' + location).then(function(data) {
-        deferred.resolve(data);
-      }, function(data) { // thrown on failure
-        $log.log("Error log: " + data)
-        return deferred.reject("An error occurred when submitting the job.");
+      runCommand('cd ' + path.dirname(location)).then(function() {
+        runCommand('sbatch ' + location).then(function(data) {
+          deferred.resolve(data);
+        }, function(data) { // thrown on failure
+          $log.log("Error log: " + data)
+          return deferred.reject("An error occurred when submitting the job.");
+        });
       });
       return deferred.promise;
    }
