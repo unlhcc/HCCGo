@@ -79,7 +79,7 @@
                 <span class="jobid">ID: {{job.jobId}}</span>
                 <span class="runTime" ng-if="job.running">Runtime: {{job.runTime}}</span>
                 <span class="runTime" ng-if="job.complete">Runtime: {{job.elapsed}}</span>
-                <span class="startTime" ng-if="!job.running && !job.complete">Estimated Start: {{job.startTime}}</span>
+                <span class="startTime" ng-if="!job.running && !job.complete">Estimated Start: {{job.startTime | date : 'yyyy-MM-dd HH:mm:ss'}}</span>
               </p>
             </div>
           </div>
