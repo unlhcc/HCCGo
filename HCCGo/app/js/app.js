@@ -1,20 +1,24 @@
 var app = angular.module('HccGoApp', ['HccGoApp.WelcomeCtrl',
                               'ngRoute',
                               'ConnectionServiceModule',
-							  'NotifierModule',
+				                      'NotifierModule',
                               'HccGoApp.clusterLandingCtrl',
                               'PreferencesManager',
                               'HccGoApp.clusterFileSystemCtrl',
                               'HccGoApp.jobSubmissionCtrl',
                               'HccGoApp.jobHistoryCtrl',
                               'HccGoApp.jobViewCtrl',
+                              'HccGoApp.preferencesCtrl',
                               'filePathService',
-							  'navService',
+							                'navService',
                               'fileManageService',
                               'dbService',
                               'updaterModule',
                               'HccGoApp.updatePageCtrl',
-                              'HccGoApp.NavCtrl', 'dataUsageService', 'jobStatusService',
+                              'HccGoApp.NavCtrl',
+                              'dataUsageService',
+                              'jobStatusService',
+                              'preferencesService',
                               'AnalyticsModule',
                               'HccGoApp.tutorialCtrl']).config([
   '$routeProvider', function($routeProvider) {
@@ -50,6 +54,10 @@ var app = angular.module('HccGoApp', ['HccGoApp.WelcomeCtrl',
       title: 'Tutorials',
       templateUrl: 'html/tutorials.html',
       controller: 'tutorialCtrl'
+    }).when('/preferences', {
+      title: 'Preferences',
+      templateUrl: 'html/preferences.html',
+      controller: 'preferencesCtrl'
     }).otherwise({
       redirectTo: '/'
     });
