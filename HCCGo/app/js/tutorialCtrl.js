@@ -82,7 +82,7 @@ tutorialModule.controller('tutorialCtrl', ['$scope', '$log', '$routeParams', '$l
         tutorial.progress = 50;
         $('#submitprogress').css('width', tutorial.progress+'%').attr('aria-valuenow', tutorial.progress);
         tutorial.progressMessage = "Run Post Install Commands...";
-        if ( !tutorial.hasOwnProperty('postInstall') || tutorial.postInstall.length < 1) {
+        if ( !tutorial.hasOwnProperty('postInstall') || tutorial.postInstall == undefined || tutorial.postInstall.length < 1) {
           return callback(null);
         }
         var single_command = tutorial.postInstall.join(';');
