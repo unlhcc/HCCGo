@@ -44,6 +44,7 @@ tutorialModule.controller('tutorialCtrl', ['$scope', '$log', '$routeParams', '$l
         tutorial.description = packagedetails.description;
         tutorial.submits = packagedetails.submits;
         tutorial.labels = packagedetails.tags;
+        tutorial.postInstall = packagedetails.postInstall;
         tutorial.error = null;
         tutorial.progress = 0;
       }, function(err) {
@@ -62,7 +63,7 @@ tutorialModule.controller('tutorialCtrl', ['$scope', '$log', '$routeParams', '$l
     });
     async.series([
       function(callback) {
-        tutorial.progress = 33;
+        tutorial.progress = 25;
         console.log(tutorial.progress);
         $('#submitprogress').css('width', tutorial.progress+'%').attr('aria-valuenow', tutorial.progress);
         tutorial.progressMessage = "Clone to cluster...";
@@ -76,8 +77,25 @@ tutorialModule.controller('tutorialCtrl', ['$scope', '$log', '$routeParams', '$l
         });
       },
       
+      // Run the tutorials commands
+      function(callback) {
+        tutorial.progress = 50;
+        $('#submitprogress').css('width', tutorial.progress+'%').attr('aria-valuenow', tutorial.progress);
+        tutorial.progressMessage = "Run Post Install Commands...";
+        if ( !tutorial.hasOwnProperty('postInstall') || tutorial.postInstall.length < 1) {
+          return callback(null);
+        }
+        var single_command = tutorial.postInstall.join(';');
+        connectionService.runCommand(single_command).then(function(data) {
+          callback(null);
+        }, function(err) {
+          callback(err);
+        });
+        
+      },
+      
       function(callback) {  
-        tutorial.progress = 66;
+        tutorial.progress = 75;
         console.log(tutorial.progress);
         $('#submitprogress').css('width', tutorial.progress+'%').attr('aria-valuenow', tutorial.progress);
         tutorial.progressMessage = "Importing job submissions...";
