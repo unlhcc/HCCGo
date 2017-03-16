@@ -5,18 +5,18 @@ tutorialModule = angular.module('HccGoApp.tutorialCtrl', ['ngRoute' ]);
 /**
  * Controller for the tutorials page.
  * @class tutorialCtrl
- * @service 
+ * @service
  *
  */
-tutorialModule.controller('tutorialCtrl', ['$scope', '$log', '$routeParams', '$location', '$q', 'preferencesManager', 'notifierService', '$http', 'connectionService', '$timeout', 'jobService', function($scope, $log, $routeParams, $location, $q, preferencesManager, notifierService, $http, connectionService, $timeout, jobService) {
-  
+tutorialModule.controller('tutorialCtrl', ['$scope', '$log', '$routeParams', '$location', '$q', 'preferencesManager', 'notifierService', '$http', 'connectionService', '$timeout', 'jobService', 'analyticsService', function($scope, $log, $routeParams, $location, $q, preferencesManager, notifierService, $http, connectionService, $timeout, jobService, analyticsService) {
+
   const async = require("async");
   const escape = require("escape-html");
   var init = function() {
     $(".download-json").addClass("loading");
     preferencesManager.getTutorials().then(function(jsonTutorials) {
       $scope.tutorials = jsonTutorials.tutorials;
-      
+
       getRepoConfigurations(jsonTutorials.tutorials);
 
       $timeout(() => $(".download-json").removeClass("loading"), 500);
@@ -26,16 +26,16 @@ tutorialModule.controller('tutorialCtrl', ['$scope', '$log', '$routeParams', '$l
         notifierService.error("Problem reading tutorial file!", "Error");
         $(".download-json").removeClass("loading");
       }
-      
+
     });
 
   };
-    
+
     // Get the tutorials
 
-  
+
   var getRepoConfigurations = function(tutorials) {
-    
+
     // For each tutorials
     async.each(tutorials, function(tutorial) {
       getPackageJson(tutorial.user, tutorial.repo).then(function(packagedetails){
@@ -53,10 +53,10 @@ tutorialModule.controller('tutorialCtrl', ['$scope', '$log', '$routeParams', '$l
       });
 
     });
-    
-    
+
+
   }
-  
+
   $scope.click = function(tutorial) {
     jobService.getDBJobs().then(function(jobs) {
       // LOGIC HERE FOR CHECKING IF REPO HAS ALREADY BEEN DOWNLOADED
@@ -67,16 +67,17 @@ tutorialModule.controller('tutorialCtrl', ['$scope', '$log', '$routeParams', '$l
         console.log(tutorial.progress);
         $('#submitprogress').css('width', tutorial.progress+'%').attr('aria-valuenow', tutorial.progress);
         tutorial.progressMessage = "Clone to cluster...";
-      
-        
+
+
         // Run the git clone
         connectionService.runCommand("cd $WORK; git clone " + tutorial.gitrepo ).then(function(data){
+          analyticsService.event("tutorial clone", tutorial.name);
           callback(null);
         }, function(err) {
           callback(err);
         });
       },
-      
+
       // Run the tutorials commands
       function(callback) {
         tutorial.progress = 50;
@@ -91,10 +92,10 @@ tutorialModule.controller('tutorialCtrl', ['$scope', '$log', '$routeParams', '$l
         }, function(err) {
           callback(err);
         });
-        
+
       },
-      
-      function(callback) {  
+
+      function(callback) {
         tutorial.progress = 75;
         console.log(tutorial.progress);
         $('#submitprogress').css('width', tutorial.progress+'%').attr('aria-valuenow', tutorial.progress);
@@ -104,39 +105,39 @@ tutorialModule.controller('tutorialCtrl', ['$scope', '$log', '$routeParams', '$l
         }, function(err) {
           callback(err);
         });
-        
-        
+
+
 
         // Import job submissions
       }],
-    
+
       function(err, results) {
         if (err) {
           tutorial.error = err;
         }
-        
+
         tutorial.progress = 100;
         console.log(tutorial.progress);
         $('#submitprogress').css('width', tutorial.progress+'%').attr('aria-valuenow', tutorial.progress);
         tutorial.progressMessage = "Done!";
-        
+
         notifierService.success(tutorial.submits.length + " Jobs imported into Submission DB", "Tutorial Succesfully Imported");
         $timeout(function() {
           tutorial.progress = 0;
         }, 2000);
-          
+
       }
     );
   }
-  
+
   /**
    * Import the submission scripts from the package.json
    * @memberof tutorialCtrl
-   * @param {Array} submits Array of submission files 
+   * @param {Array} submits Array of submission files
    */
   var importSubmitScripts = function(submits) {
     var toReturn = $q.defer();
-    
+
     async.each(submits, function(submit_script, callback) {
       jobService.addDBJob(submit_script).then(function() {
         callback();
@@ -147,12 +148,12 @@ tutorialModule.controller('tutorialCtrl', ['$scope', '$log', '$routeParams', '$l
       if (err) return toReturn.reject(err);
       return toReturn.resolve();
     });
-    
+
     return toReturn.promise;
-    
+
   }
-  
-  
+
+
   /**
    * Get the `package.json` file from the github repo to fill in details.
    * Retrives the package using the `raw.githubusercontent.com` raw link.
@@ -162,26 +163,26 @@ tutorialModule.controller('tutorialCtrl', ['$scope', '$log', '$routeParams', '$l
    * @memberof tutorialCtrl
    */
   var getPackageJson = function(user, repo) {
-    
+
     var toReturn = $q.defer();
     url = "https://raw.githubusercontent.com/" + user + "/" + repo + "/master/package.json";
-    
+
     $http.get(url).
       success(function(data, status, headers, config) {
         toReturn.resolve(data);
-        
+
       }).error(function(data, status, headers, config) {
         toReturn.reject("Failed to get package.json");
-        
+
       });
-      
+
     return toReturn.promise;
   }
-  
-  
+
+
   init();
 
-  function sanitizeJSON(unsanitized){	
-    return unsanitized.replace(/\\/g, "\\\\").replace(/\n/g, "\\n").replace(/\r/g, "\\r").replace(/\t/g, "\\t").replace(/\f/g, "\\f").replace(/"/g,"\\\"").replace(/'/g,"\\\'").replace(/\&/g, "\\&"); 
+  function sanitizeJSON(unsanitized){
+    return unsanitized.replace(/\\/g, "\\\\").replace(/\n/g, "\\n").replace(/\r/g, "\\r").replace(/\t/g, "\\t").replace(/\f/g, "\\f").replace(/"/g,"\\\"").replace(/'/g,"\\\'").replace(/\&/g, "\\&");
   }
 }]);
