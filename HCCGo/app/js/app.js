@@ -18,7 +18,6 @@ var app = angular.module('HccGoApp', ['HccGoApp.WelcomeCtrl',
                               'HccGoApp.NavCtrl',
                               'dataUsageService',
                               'jobStatusService',
-                              'preferencesService',
                               'AnalyticsModule',
                               'HccGoApp.tutorialCtrl']).config([
   '$routeProvider', function($routeProvider) {

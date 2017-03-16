@@ -11,6 +11,6 @@ preferencesModule = angular.module('HccGoApp.preferencesCtrl', ['ngRoute' ]);
  * @requires $log
  * @requires preferencesService
  */
-preferencesModule.controller('preferencesCtrl', ['$scope', '$log', 'preferencesService', function($scope, $log, preferencesService) {
+preferencesModule.controller('preferencesCtrl', ['$scope', '$log', 'preferencesManager', function($scope, $log, preferencesManager) {
 
 }]);
