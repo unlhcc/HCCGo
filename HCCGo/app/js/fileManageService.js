@@ -8,6 +8,8 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
    const path = require('path');
    const fs = require('fs');
    const disk = require('diskusage');
+   const tmp = require('tmp');
+   const {shell} = require('electron');
 
    let service = {};
 
@@ -96,7 +98,7 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
               }
            });
        });
-   }
+   };
 
    let localRead = function(data, finish) {
       // Clears content of localFiles array
@@ -128,7 +130,7 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
              }
          }); 
       });
-   }
+   };
 
    service.wdSwitcher = function(){       
        service.userDownAuth = false;
@@ -147,7 +149,7 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
        remoteRead(service.remoteWD);
 	   
 	   return 0;
-   }
+   };
 
    service.cdSSH = function(data) {
        if (data.name != "..") {
@@ -163,7 +165,7 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
        remoteRead(service.remoteWD);
 	   
 	   return 0;
-   }
+   };
 
    service.cdLocal = function(data) {
        if (data.name != "..") {
@@ -177,7 +179,7 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
        angular.element('#btnUpload').attr('disabled', '');
 	   
        localRead(service.localWD);
-   }
+   };
    
    service.verifyUpload = function () {
 	  angular.element('#btnUpload').attr('disabled', '');
@@ -209,12 +211,12 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
               });
           }
       });
-   }
+   };
    
    service.verifyUploadCancel = function() {
 	  service.userUpAuth = false;
       notifierService.warning('Action cancelled by user.');
-   }
+   };
 
    service.verifyDownload = function () {
 	  angular.element('#btnDownload').attr('disabled', '');
@@ -230,13 +232,34 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
               service.diskAvail = Math.floor((info.free/info.total)*100);
           });
       });
-   }
+   };
    
    service.verifyDownloadCancel = function () {
 	  service.userDownAuth = false;
       notifierService.warning('Action cancelled by user.');
-   }
+   };
    
+   service.viewFile = function() {
+        connectionService.getFileSize(service.focus.location).then(function(size){
+            if (size > 5*105*1024) {
+                notifierService.warning("File must be downloaded to be viewed.", "File too big to view!");
+            }
+            else {
+                let file = "/" + service.focus.location.substring(service.focus.location.lastIndexOf("/"), service.focus.location.length);
+                tmp.dir({prefix: 'hcc_tmp', unsafeCleanup: true}, function _tempDirCreated(err, path, cleanupCallback) {
+                    connectionService.quickDownload(service.focus.location, path + file).then(function(flag) {
+                        if (flag) {
+                            shell.openItem(path + file);
+                        }
+                        else {
+                            notifierService.error("Error viewing the file!", "File View Failed!");
+                        }
+                    });
+                });
+            }
+        });
+    };
+
    // Upload entire directory
    service.uploadCall = function() {
       let boolStarter = true;
@@ -269,7 +292,7 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
 		 service.processStatus = false;
 		 notifierService.error(err, 'Error in ConnectionService');
        });
-   }
+   };
 
    service.downloadCall = function () {
       let boolStarter = true;
@@ -305,8 +328,8 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
 		 service.processStatus = false;
 		 notifierService.error(err, 'Error in ConnectionService');
        });
-   } 
-   
+   };
+
    service.remoteHighlight = function(id) {
       service.remoteOverwrite = false;
       service.localOverwrite = false;
@@ -321,6 +344,7 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
       }
       
 	  angular.element("#btnDownload").removeAttr('disabled');       // Shows download button
+      angular.element("#btnView").removeAttr('disabled');           // Shows view file button
       angular.element("#btnUpload").attr('disabled', '');           // Hides upload button
       angular.element("#l" + service.localFocus.replace(/\./g, "\\.")).removeClass('highlight');
       service.localFocus = "";
@@ -353,6 +377,7 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
       }
 
       angular.element("#btnDownload").attr('disabled', '');         // Hides download button
+      angular.element("#btnView").attr('disabled', '');             // Hides view file button
       angular.element("#btnUpload").removeAttr('disabled');         // Shows upload button
       angular.element("#r" + service.remoteFocus.replace(/\./g, "\\.")).removeClass('highlight');
       service.remoteFocus = "";
