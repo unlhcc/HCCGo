@@ -254,6 +254,7 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
                         else {
                             notifierService.error("Error viewing the file!", "File View Failed!");
                         }
+                        $timeout(() => {console.log("deleting!"); cleanupCallback();}, 3000);
                     });
                 });
             }
