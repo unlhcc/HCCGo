@@ -285,8 +285,8 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', '$lo
    /**
     * Run a command on the remote cluster and get the output
     * @param {String} comamnd - Command to execute
-    * @param {Integer} priority - Priority of the command, default: 1.  Higher numbers have lower priority.  0 is the highest priority.
-    * @memberof HCCGo.ConnectionServiceModule
+    * @param {Integer} [priority=1] - Priority of the command, default: 1.  Higher numbers have lower priority.  0 is the highest priority.
+    * @memberof HCCGo.connectionService
     *
     */
    var runCommand = function(command, priority) {
