@@ -260,7 +260,8 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', '$lo
       // Starts Command session
       // Always source /etc/bashrc on the remote cluster before
       // running commands
-      real_task = "if [ -f /etc/bashrc ]; then . /etc/bashrc; fi; " + task.name;
+      // How are we going to handle those people whose default shell is not bash?
+      real_task = "if [ -f /etc/bashrc ]; then . /etc/bashrc; fi; if [ -f ~/.bashrc ]; then . ~/.bashrc; fi; " + task.name;
       connectionList[getClusterContext()].exec(real_task, function(err, stream) {
 
          cumulData = "";
