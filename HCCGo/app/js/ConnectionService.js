@@ -256,7 +256,7 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', '$lo
       }
    };
 
-   var runCommandQueue = async.queue(function (task, callback) {
+   var runCommandQueue = async.priorityQueue(function (task, callback) {
       // Starts Command session
       connectionList[getClusterContext()].exec(task.name, function(err, stream) {
 
@@ -281,12 +281,20 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', '$lo
          });
       });
    }, 1);
-
-   var runCommand = function(command) {
+   
+   /**
+    * Run a command on the remote cluster and get the output
+    * @param {String} comamnd - Command to execute
+    * @param {Integer} priority - Priority of the command, default: 1.  Higher numbers have lower priority.  0 is the highest priority.
+    * @memberof HCCGo.ConnectionServiceModule
+    *
+    */
+   var runCommand = function(command, priority) {
+      priority = (typeof priority !== 'undefined') ?  priority : 1;
 
       var deferred = $q.defer();         // Used to return promise data
 
-      runCommandQueue.push({name: command}, function(err, cumulData) {
+      runCommandQueue.push({name: command}, priority, function(err, cumulData) {
           if (err) {
               deferred.reject("Error running command " + command + ": " + err);
           } else {
