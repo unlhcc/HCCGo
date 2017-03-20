@@ -71,7 +71,7 @@ tutorialModule.controller('tutorialCtrl', ['$scope', '$log', '$routeParams', '$l
 
         // Run the git clone
         connectionService.runCommand("cd $WORK; git clone " + tutorial.gitrepo ).then(function(data){
-          analyticsService.event("tutorial clone", tutorial.name);
+          analyticsService.event("tutorial clone", tutorial.name, tutorial.version);
           callback(null);
         }, function(err) {
           callback(err);
