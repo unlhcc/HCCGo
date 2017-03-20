@@ -9,11 +9,70 @@ jobStatusService = angular.module('jobStatusService', []);
  * @memberof HCCGo
  * @class jobStatusService
  */
-jobStatusService.service('jobStatusService',['$log','$q','notifierService', 'dbService', function($log, $q, notifierService, dbService) {
+jobStatusService.service('jobStatusService',['$log','$q','notifierService', 'dbService', 'connectionService', function($log, $q, notifierService, dbService, connectionService) {
 	var async = require('async');
 	var oldData = null;
 	var lastRequestedTime = 0;
 	var lastPromise = null;
+	
+	/**
+	 * Adds job to submitted DB
+	 * @method addJobToDb
+	 * @memberof HCCGo.jobStatusService
+	 * @param {Object} clusterInterface - Used to grab job attributes
+	 * @param {Object} Job - Job information to add to DB
+	 */
+	var addJobToDb = function(clusterInterface, job, callback) {
+		
+		job.complete = false;
+		job.cluster = connectionService.connectionDetails.shorthost;
+		var now = Date.now();
+		job.timestamp = now;
+		job.runtime = job.timelimit;
+	
+		
+		// Now, add the jobs to the db
+		dbService.getSubmittedJobsDB().then(function(submittedJobsDB) {
+			submittedJobsDB.insert(job, function(err, newDoc) {
+				// Now, we have the _id from the doc, now issue the commands to get the 
+				// error and output files and update the DB when we do.
+				clusterInterface.getJobAttribute(newDoc.jobId, 'stdout').then(function(value) {
+					submittedJobsDB.update(
+						{ _id: newDoc._id },
+						{ $set: 
+							{
+								"outputPath": value
+							}}
+					);
+				});
+				
+				clusterInterface.getJobAttribute(newDoc.jobId, 'stderr').then(function(value) {
+					submittedJobsDB.update(
+						{ _id: newDoc._id },
+						{ $set: 
+							{
+								"errorPath": value
+							}}
+					);
+				});
+				
+				clusterInterface.getJobAttribute(newDoc.jobId, 'command').then(function(value) {
+					submittedJobsDB.update(
+						{ _id: newDoc._id },
+						{ $set: 
+							{
+								"location": value
+							}}
+					);
+				});
+				
+				
+				return callback(null, newDoc);
+			});
+		});
+		
+	}
+	
 	return {
 
 	  /**
@@ -93,6 +152,9 @@ jobStatusService.service('jobStatusService',['$log','$q','notifierService', 'dbS
 							} else {
 								// Job showed up in the cluster jobs output, update it's status
 								cluster_job = cluster_jobs[db_jobs[i].jobId];
+								
+								// Remove the cluster job from the list so we can see externally submitted jobs
+								delete cluster_jobs[db_jobs[i].jobId];
 
 								if (cluster_job.running) {
 									db_jobs[i].status = 'RUNNING';
@@ -129,7 +191,10 @@ jobStatusService.service('jobStatusService',['$log','$q','notifierService', 'dbS
 									})(db_jobs[i], cluster_job));
 
 							}
-						}
+						} // End for loop through db_jobs
+						
+						// Now everything in cluster_jobs should be newly discovered external jobs
+						
 
 
 		        // Now, recent_completed are jobs that are in the DB as running, but
@@ -138,7 +203,16 @@ jobStatusService.service('jobStatusService',['$log','$q','notifierService', 'dbS
 
 		        // Update the DB
 		        async.series([
-		          function(callback) {
+							function(callback) {
+								// This function will update all of the cluster externally submitted jobs
+								
+								// For each external job, add it to the DB
+								async.map(cluster_jobs, addJobToDb.bind(null, clusterInterface), function(err, results) {
+									callback(err, results);
+								});
+								
+							}
+		          ,function(callback) {
 		            if (recent_completed.length < 1) {
 		              return callback(null, null);
 		            }
@@ -195,7 +269,7 @@ jobStatusService.service('jobStatusService',['$log','$q','notifierService', 'dbS
 
 		          }
 		        ],
-		        function(err, recent_completed_jobs) {
+		        function(err, series_results) {
 		          var updatedData = {
 		          	numRunning: results[2].numRunning,
 		          	numIdle: results[2].numIdle,
@@ -204,11 +278,15 @@ jobStatusService.service('jobStatusService',['$log','$q','notifierService', 'dbS
 		          };
 		          $log.debug("Concat all the things!");
 		          // Ok, now concat everything together.  Running jobs, completed jobs, and recently completed jobs.
-		          if (recent_completed_jobs[0] == null) {
+		          if (series_results[0] == null) {
 		            updatedData.jobs = completed_jobs.concat(db_jobs);
 		          } else {
-		            updatedData.jobs = recent_completed_jobs[0].concat(completed_jobs, db_jobs);
+		            updatedData.jobs = series_results[0].concat(completed_jobs, db_jobs);
 		          }
+							
+							if (series_results[1] != null) {
+								updatedData.jobs = updatedData.jobs.concat(series_results[1]);
+							}
 
 		          lastPromise.resolve(updatedData);
 		        });

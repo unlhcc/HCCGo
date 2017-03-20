@@ -20,7 +20,7 @@ SlurmClusterInterface.prototype.getJobs = function() {
   // return a promise if the jobs info are found
   var deferred = this.$q.defer();
 
-  var promise = this.connectionService.runCommand("squeue -u `whoami` -o '%i,%P,%j,%u,%t,%M,%D,%S,%R,%C,%L'");
+  var promise = this.connectionService.runCommand("squeue -u `whoami` -o '%i,%P,%j,%u,%t,%M,%D,%S,%R,%C,%L,%m,%l'");
   promise.then(function(data) {
     console.log("Got data: " + data);
 
@@ -51,6 +51,8 @@ SlurmClusterInterface.prototype.getJobs = function() {
 
       curJob.runTime = entry.TIME;
       curJob.startTime = entry.START_TIME;
+      curJob.memory = entry.MIN_MEMORY
+      curJob.timelimit = entry.TIME_LIMIT
       jobs[curJob.jobId] = curJob;
     });
 
@@ -114,6 +116,19 @@ SlurmClusterInterface.prototype.getCompletedJobs = function(docs) {
   return deferred.promise;
 }
 
+
+SlurmClusterInterface.prototype.getJobAttribute = function(jobId, attribute) {
+  var deferred = this.$q.defer();
+  
+  this.connectionService.runCommand("squeue -j " + jobId + " -O '" + attribute + ":1024'", 2).then(function(attribute) {
+    var trimmed = attribute.trim();
+    var splitted = trimmed.split('\n');
+    deferred.resolve(splitted[1]);
+  });
+  
+  return deferred.promise;
+  
+}
 
 
 //SlurmClusterInterface.prototype.getStorageInfo = function() {
