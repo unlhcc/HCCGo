@@ -137,7 +137,7 @@
                       <ul class="jqueryFileTree" 
                          ng-repeat="folder in fileManage.remoteFiles">
                          <li ng-switch on="folder.Class" class="{{folder.Class}}">
-                             <a id="r{{folder.name}}" ng-switch-when="directory" ng-click="fileManage.remoteHighlight(folder)" ng-dblclick="fileManage.cdSSH(folder)">{{folder.name}}</a>
+                             <a id="r{{folder.name}}" ng-switch-when="directory" ng-click="fileManage.remoteHighlight(folder); fileManage.isDirectory(folder)" ng-dblclick="fileManage.cdSSH(folder)">{{folder.name}}</a>
                              <a id="r{{folder.name}}" ng-switch-default ng-click="fileManage.remoteHighlight(folder)" ng-dblclick="">{{folder.name}}</a>
                          </li>
                      </ul>

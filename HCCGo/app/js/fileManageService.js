@@ -254,13 +254,18 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
                         else {
                             notifierService.error("Error viewing the file!", "File View Failed!");
                         }
-                        $timeout(() => {console.log("deleting!"); cleanupCallback();}, 3000);
+                        $timeout(() => {
+                            shell.moveItemToTrash(path);
+                        }, 3000);
                     });
                 });
             }
         });
     };
 
+   service.isDirectory = function(id) {
+       angular.element("#btnView").attr('disabled', '');
+   };
    // Upload entire directory
    service.uploadCall = function() {
       let boolStarter = true;
@@ -362,7 +367,7 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
       service.processFinished = false;
       service.userUpAuth = false;
       service.userDownAuth = false;
-   }
+   };
    
    service.localHighlight = function(id) {
       service.localOverwrite = false;
@@ -395,7 +400,7 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
       service.processFinished = false;
       service.userUpAuth = false;
       service.userDownAuth = false;
-   }
+   };
 
    // Value initialization
    //

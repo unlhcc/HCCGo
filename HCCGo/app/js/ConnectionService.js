@@ -914,8 +914,6 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', '$lo
            }
            else
            {
-               console.log(remotePath);
-               console.log(localPath);
                sftp.fastGet(remotePath, localPath, function(err) {
                    console.log("File transfer successful!");
                    sftp.end();
