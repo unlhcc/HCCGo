@@ -236,7 +236,7 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', '$lo
    var submitJob = function(location) {
       var deferred = $q.defer();
       $log.debug("Running command: " + 'sbatch ' + location);
-      runCommand('sbatch ' + location).then(function(data) {
+      runCommand('cd ' + path.dirname(location) + '; sbatch ' + location).then(function(data) {
         deferred.resolve(data);
       }, function(data) { // thrown on failure
         $log.log("Error log: " + data)
