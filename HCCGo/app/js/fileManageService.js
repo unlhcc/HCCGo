@@ -188,22 +188,23 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
    };
    
    service.verifyUpload = function () {
-        service.canUpload = false;
-	    service.userUpAuth = true;
-	    service.processStatus = true;
-	  
-        connectionService.localSize(String(service.localWD + "/" + service.localFocus)).then( function(ldata) {
-            if (service.remoteWD.indexOf(service.workWD) > -1) {
-                connectionService.runCommand("lfs quota -g `id -g` /work").then(function(data) {
-                    service.processStatus = false;
-                    service.accuSize = ldata;
+       service.canUpload = false;
+       service.userUpAuth = true;
+       service.processStatus = true;
 
-                    let reported_output = data.split("\n")[2];
-                    let split_output = $.trim(reported_output).split(/[ ]+/);
-                    service.diskAvail = Math.floor(((split_output[3] - split_output[1]) / split_output[3])*100);
-                    service.diskQuota = Math.floor(((ldata / Math.pow(1024, 1)) / split_output[3])*100);
-				  
-				    deferred.resolve(null);
+       connectionService.localSize(String(service.localWD + "/" + service.localFocus)).then( function(ldata) {
+           if (service.remoteWD.indexOf(service.workWD) > -1) {
+               connectionService.runCommand("lfs quota -g `id -g` /work").then(function(data) {
+                   service.processStatus = false;
+                   service.accuSize = ldata;
+
+                   let reported_output = data.split("\n")[2];
+                   let split_output = $.trim(reported_output).split(/[ ]+/);
+
+                   service.diskAvail = Math.floor(((split_output[3] - split_output[1]) / split_output[3])*100);
+                   service.diskQuota = Math.floor(((ldata / Math.pow(1024, 1)) / split_output[3])*100);
+
+                   deferred.resolve(null);
                 });
             } 
             else {
@@ -226,25 +227,25 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
    };
 
    service.verifyDownload = function () {
-        service.canDownload = false;
-        service.userDownAuth = true;
-        service.processStatus = true;
-
-        connectionService.runCommand("du -sb " + String(service.remoteWD + "/" + service.remoteFocus)).then(function (data) {
-            service.processStatus = false;
-            let data_response = data.split(/[	]+/); //NOTE: Matches tab spaces
-            service.accuSize = data_response[0];
-            disk.check(service.localWD, function(err, info) {
-                service.diskQuota = Math.floor((data_response[0]/info.available)*100);
-                service.diskAvail = Math.floor((info.free/info.total)*100);
+       service.canDownload = false;
+       service.userDownAuth = true;
+       service.processStatus = true;
+       
+       connectionService.runCommand("du -sb " + String(service.remoteWD + "/" + service.remoteFocus)).then(function (data) {
+           service.processStatus = false;
+           let data_response = data.split(/[	]+/); //NOTE: Matches tab spaces
+           service.accuSize = data_response[0];
+           disk.check(service.localWD, function(err, info) {
+               service.diskQuota = Math.floor((data_response[0]/info.available)*100);
+               service.diskAvail = Math.floor((info.free/info.total)*100);
             });
         });
-   };
-   
-   service.verifyDownloadCancel = function () {
+    };
+    
+    service.verifyDownloadCancel = function () {
         service.userDownAuth = false;
         notifierService.warning('Action cancelled by user.');
-   };
+    };
    
    service.viewFile = function() {
         connectionService.getFileSize(service.focus.location).then(function(size){
@@ -270,181 +271,177 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
         });
     };
 
-   // Upload entire directory
-   service.uploadCall = function() {
-      let boolStarter = true;
-	  service.processStatus = true;
-	  service.userUpAuth = false;
-	  
-      // Runs file upload
-      connectionService.uploadFile(String(service.localWD + "/" + service.localFocus), String(service.remoteWD + "/"), 
-	   function(total_transferred,counter,filesTotal,currentTotal,sizeTotal){
-	     // Only want this if to execute once
-		 if(boolStarter) {
-			 service.uploadStatus = true;
-			 service.filesTotal = filesTotal;
-			 boolStarter = false;
-		 }         
-         $timeout(function() {
-             service.counter = counter;       
+    // Upload entire directory
+    service.uploadCall = function() {
+        let boolStarter = true;
+        service.processStatus = true;
+        service.userUpAuth = false;
 
-             service.totalProgress = Math.floor(((total_transferred + currentTotal)/sizeTotal)*100);
-	     }, 15);
+        // Runs file upload
+        connectionService.uploadFile(String(service.localWD + "/" + service.localFocus), String(service.remoteWD + "/"), 
+        function(total_transferred,counter,filesTotal,currentTotal,sizeTotal){
+            // Only want this if to execute once
+            if(boolStarter) {
+                service.uploadStatus = true;
+                service.filesTotal = filesTotal;
+                boolStarter = false;
+            }
 
-       }, function() {
-         // update view
-         notifierService.success('Your file transfer was succesfull!', 'Transfer!');
-		 service.processStatus = false;
-         service.processFinished = true;
-         remoteRead(service.remoteWD);
-       }, function(err) {
-         // Error occurred in ConnectionService
-		 service.processStatus = false;
-		 notifierService.error(err, 'Error in ConnectionService');
-       });
-   };
+            $timeout(function() {
+                service.counter = counter;
+                service.totalProgress = Math.floor(((total_transferred + currentTotal)/sizeTotal)*100);
+            }, 15);
+        }, function() {
+            // update view
+            notifierService.success('Your file transfer was succesfull!', 'Transfer!');
+            service.processStatus = false;
+            service.processFinished = true;
+            remoteRead(service.remoteWD);
+        }, function(err) {
+            // Error occurred in ConnectionService
+            service.processStatus = false;
+            notifierService.error(err, 'Error in ConnectionService');
+        });
+    };
 
-   service.downloadCall = function () {
-      let boolStarter = true;
-	  service.processStatus = true;
-	  service.userDownAuth = false;
-
-      // Runs file upload
-      connectionService.downloadFile(String(service.localWD + "/"), 
+    service.downloadCall = function () {
+        let boolStarter = true;
+        service.processStatus = true;
+        service.userDownAuth = false;
+        // Runs file upload
+        connectionService.downloadFile(String(service.localWD + "/"),
         String(service.remoteWD + "/" + service.remoteFocus),
         function(total_transferred,counter,filesTotal,currentTotal,sizeTotal){
-         // Parity check
-         if(boolStarter) {
-             service.uploadStatus = true;
-             service.filesTotal = filesTotal;
-             boolStarter = false;
-         }
+            // Parity check
+            if(boolStarter) {
+                service.uploadStatus = true;
+                service.filesTotal = filesTotal;
+                boolStarter = false;
+            }
 
-		 $timeout(function() {
-             // Callback function for progress bar
-             service.counter = counter;
-         
-             // Work on progress bar
-             service.totalProgress = Math.floor(((total_transferred + currentTotal)/sizeTotal)*100);
-	     }, 15);
-       }, function() {
-         // update view
-         localRead(service.localWD);
-		 service.processStatus = false;
-         notifierService.success('Your file transfer was succesfull!', 'Transfered!');
-         service.processFinished = true;   // Show finished message         
-       }, function(err) {
-         // Error occurred in ConnectionService
-		 service.processStatus = false;
-		 notifierService.error(err, 'Error in ConnectionService');
-       });
-   };
+            $timeout(function() {
+                // Callback function for progress bar
+                service.counter = counter;
+                
+                // Work on progress bar
+                service.totalProgress = Math.floor(((total_transferred + currentTotal)/sizeTotal)*100);
+            }, 15);
+        }, function() {
+            // update view
+            localRead(service.localWD);
+            service.processStatus = false;
+            notifierService.success('Your file transfer was succesfull!', 'Transfered!');
+            service.processFinished = true;   // Show finished message         
+        }, function(err) {
+            // Error occurred in ConnectionService
+            service.processStatus = false;
+            notifierService.error(err, 'Error in ConnectionService');
+        });
+    };
+    service.remoteHighlight = function(id) {
+        service.remoteOverwrite = false;
+        service.localOverwrite = false;
+        service.focus.location = id.location;
+        service.focus.size = id.size;
+        service.focus.mtime = id.mtime;
 
-   service.remoteHighlight = function(id) {
-      service.remoteOverwrite = false;
-      service.localOverwrite = false;
-      service.focus.location = id.location;
-      service.focus.size = id.size;
-      service.focus.mtime = id.mtime;
-
-      for(let dirObj of service.localFiles) {
-        if(id.name === dirObj.name) {
-        service.localOverwrite = true; 
+        for(let dirObj of service.localFiles) {
+            if(id.name === dirObj.name) {
+                service.localOverwrite = true; 
+            }
         }
-      }
-      
-      service.canDownload = true;                           // Enables download button
-      service.canView = id.Class !== 'directory';           // Enables view button if file is not a directory
-      service.canUpload = false;                            // Disables upload button
+        service.canDownload = true;                           // Enables download button
+        service.canView = id.Class !== 'directory';           // Enables view button if file is not a directory
+        service.canUpload = false;                            // Disables upload button
 
-      angular.element("#l" + service.localFocus.replace(/\./g, "\\.")).removeClass('highlight');
-      service.localFocus = "";
-      angular.element("#r" + service.remoteFocus.replace(/\./g, "\\.")).removeClass('highlight');
-      service.remoteFocus = id.name;
-      angular.element("#r" + id.name.replace(/\./g, "\\.")).addClass('highlight');
-
-      // Change button context
-      angular.element("#tranContent").text("Download: " + service.remoteFocus);
-
-      // Sets all 'processing' displays to be hidden
-      service.processStatus = false;
-      service.uploadStatus = false;
-      service.processFinished = false;
-      service.userUpAuth = false;
-      service.userDownAuth = false;
-   };
-   
-   service.localHighlight = function(id) {
-      service.localOverwrite = false;
-      service.remoteOverwrite = false;
-      service.focus.location = id.location;
-      service.focus.size = id.size;
-      service.focus.mtime = id.mtime;
-
-      for(let dirObj of service.remoteFiles) {
-        if(id.name === dirObj.name) {
-          service.remoteOverwrite = true; 
+        angular.element("#l" + service.localFocus.replace(/\./g, "\\.")).removeClass('highlight');
+        service.localFocus = "";
+        angular.element("#r" + service.remoteFocus.replace(/\./g, "\\.")).removeClass('highlight');
+        service.remoteFocus = id.name;
+        angular.element("#r" + id.name.replace(/\./g, "\\.")).addClass('highlight');
+        
+        // Change button context
+        angular.element("#tranContent").text("Download: " + service.remoteFocus);
+        
+        // Sets all 'processing' displays to be hidden
+        service.processStatus = false;
+        service.uploadStatus = false;
+        service.processFinished = false;
+        service.userUpAuth = false;
+        service.userDownAuth = false;
+    };
+    
+    service.localHighlight = function(id) {
+        service.localOverwrite = false;
+        service.remoteOverwrite = false;
+        service.focus.location = id.location;
+        service.focus.size = id.size;
+        service.focus.mtime = id.mtime;
+        
+        for(let dirObj of service.remoteFiles) {
+            if(id.name === dirObj.name) {
+                service.remoteOverwrite = true; 
+            }
         }
-      }
 
-      service.canDownload = false;      // Disables download button
-      service.canView = false;          // Disables view button
-      service.canUpload = true;         // Enables upload button
+        service.canDownload = false;      // Disables download button
+        service.canView = false;          // Disables view button
+        service.canUpload = true;         // Enables upload button
+        
+        angular.element("#r" + service.remoteFocus.replace(/\./g, "\\.")).removeClass('highlight');
+        service.remoteFocus = "";
+        angular.element("#l" + service.localFocus.replace(/\./g, "\\.")).removeClass('highlight');
+        service.localFocus = id.name;
+        angular.element("#l" + id.name.replace(/\./g, "\\.")).addClass('highlight');
+        
+        // Change button context
+        angular.element("#tranContent").text("Upload: " + service.localFocus);
+        
+        // Sets all 'processing' displays to be hidden
+        service.processStatus = false;
+        service.uploadStatus = false;
+        service.processFinished = false;
+        service.userUpAuth = false;
+        service.userDownAuth = false;
+    };
 
-      angular.element("#r" + service.remoteFocus.replace(/\./g, "\\.")).removeClass('highlight');
-      service.remoteFocus = "";
-      angular.element("#l" + service.localFocus.replace(/\./g, "\\.")).removeClass('highlight');
-      service.localFocus = id.name;
-      angular.element("#l" + id.name.replace(/\./g, "\\.")).addClass('highlight');
+    // Value initialization
+    //
+    // Gets directory strings from remote server
+    //
+    if (service.homeWD == "") {
+        connectionService.getHomeWD().then(function(data) {
+            service.remoteWD = data;
+            service.homeWD = data;
+            remoteRead(service.remoteWD);    // Sets remote display
+            $log.debug("Home directory: " + service.homeWD);
+        });
+    }
+    if (service.workWD == "") {
+        connectionService.getWorkWD().then(function(data) {
+            service.workWD = data;
+            $log.debug("Work directory: " + service.workWD);
+        });
+    }
 
-      // Change button context
-      angular.element("#tranContent").text("Upload: " + service.localFocus);
+    // Gets directory strings from local system
+    if (process.platform === 'win32') {
+        $log.debug("Process env: ");
+        $log.debug(process.env);
+        if (service.localWD == "") {
+            service.localWD = process.env.HOMEDRIVE + process.env.HOMEPATH;
+        }
+    } 
+    else {
+        // Runs for Mac and Linux systems
+        // Establishes Displayed files
+        $log.debug("process working directory: " + process.env.HOME);
+        if (service.localWD == "") {
+            service.localWD = process.env.HOME;
+        }
+    }
 
-      // Sets all 'processing' displays to be hidden
-      service.processStatus = false;
-      service.uploadStatus = false;
-      service.processFinished = false;
-      service.userUpAuth = false;
-      service.userDownAuth = false;
-   };
-
-   // Value initialization
-   //
-   // Gets directory strings from remote server
-   //
-   if (service.homeWD == "") {
-       connectionService.getHomeWD().then(function(data) {
-          service.remoteWD = data;
-          service.homeWD = data;
-          remoteRead(service.remoteWD);    // Sets remote display
-          $log.debug("Home directory: " + service.homeWD);
-       });
-   }
-   if (service.workWD == "") {
-       connectionService.getWorkWD().then(function(data) {
-           service.workWD = data;
-           $log.debug("Work directory: " + service.workWD);
-       });
-   }
-
-   // Gets directory strings from local system
-   if (process.platform === 'win32') {
-       $log.debug("Process env: ");
-       $log.debug(process.env);
-       if (service.localWD == "") {
-          service.localWD = process.env.HOMEDRIVE + process.env.HOMEPATH;
-       }
-   } else {
-       // Runs for Mac and Linux systems
-       // Establishes Displayed files
-       $log.debug("process working directory: " + process.env.HOME);
-       if (service.localWD == "") {
-           service.localWD = process.env.HOME;
-       }
-   }
-
-   localRead(service.localWD);    // Sets local display
-  
-   return service;
+    localRead(service.localWD);    // Sets local display
+    return service;
   
 }]);
