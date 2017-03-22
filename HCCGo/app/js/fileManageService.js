@@ -51,6 +51,12 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
 
    service.localOverwrite = false;
 
+   service.canDownload = false;
+
+   service.canUpload = false;
+
+   service.canView = false;
+
    service.localFiles = [];
 
    service.remoteFiles = [];
@@ -159,7 +165,7 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
        }
 
 	   // Hides download button
-       angular.element('#btnDownload').attr('disabled', '');
+       service.canDownload = false;
        angular.element('#tranContent').text('');
 	   
        remoteRead(service.remoteWD);
@@ -175,43 +181,44 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
        }
 
        // Hides upload button
+       service.canUpload = false;
        angular.element('#tranContent').text('');
-       angular.element('#btnUpload').attr('disabled', '');
 	   
        localRead(service.localWD);
    };
    
    service.verifyUpload = function () {
-	  angular.element('#btnUpload').attr('disabled', '');
-	  service.userUpAuth = true;
-	  service.processStatus = true;
+        service.canUpload = false;
+	    service.userUpAuth = true;
+	    service.processStatus = true;
 	  
-      connectionService.localSize(String(service.localWD + "/" + service.localFocus)).then( function(ldata) {
-          if (service.remoteWD.indexOf(service.workWD) > -1) {
-              connectionService.runCommand("lfs quota -g `id -g` /work").then(function(data) {
-                  service.processStatus = false;
-                  service.accuSize = ldata;
+        connectionService.localSize(String(service.localWD + "/" + service.localFocus)).then( function(ldata) {
+            if (service.remoteWD.indexOf(service.workWD) > -1) {
+                connectionService.runCommand("lfs quota -g `id -g` /work").then(function(data) {
+                    service.processStatus = false;
+                    service.accuSize = ldata;
 
-                  let reported_output = data.split("\n")[2];
-                  let split_output = $.trim(reported_output).split(/[ ]+/);
-                  service.diskAvail = Math.floor(((split_output[3] - split_output[1]) / split_output[3])*100);
-                  service.diskQuota = Math.floor(((ldata / Math.pow(1024, 1)) / split_output[3])*100);
+                    let reported_output = data.split("\n")[2];
+                    let split_output = $.trim(reported_output).split(/[ ]+/);
+                    service.diskAvail = Math.floor(((split_output[3] - split_output[1]) / split_output[3])*100);
+                    service.diskQuota = Math.floor(((ldata / Math.pow(1024, 1)) / split_output[3])*100);
 				  
-				  deferred.resolve(null);
-              });
-          } else {
-              connectionService.runCommand("quota -w -f /home").then(function(data) {
-                  service.processStatus = false;
-                  service.accuSize = ldata;
+				    deferred.resolve(null);
+                });
+            } 
+            else {
+                connectionService.runCommand("quota -w -f /home").then(function(data) {
+                    service.processStatus = false;
+                    service.accuSize = ldata;
 
-                  let reported_output = data.split("\n")[2];              
-                  let split_output = reported_output.split(/[ ]+/);
-                  service.diskAvail = Math.floor(((split_output[2] - split_output[1]) / split_output[2])*100);
-                  service.diskQuota = Math.floor(((ldata / Math.pow(1024, 1)) / split_output[2])*100);
-              });
-          }
-      });
-   };
+                    let reported_output = data.split("\n")[2];              
+                    let split_output = reported_output.split(/[ ]+/);
+                    service.diskAvail = Math.floor(((split_output[2] - split_output[1]) / split_output[2])*100);
+                    service.diskQuota = Math.floor(((ldata / Math.pow(1024, 1)) / split_output[2])*100);
+                });
+            }
+        });
+    };
    
    service.verifyUploadCancel = function() {
 	  service.userUpAuth = false;
@@ -219,24 +226,24 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
    };
 
    service.verifyDownload = function () {
-	  angular.element('#btnDownload').attr('disabled', '');
-	  service.userDownAuth = true;
-	  service.processStatus = true;
+        service.canDownload = false;
+        service.userDownAuth = true;
+        service.processStatus = true;
 
-      connectionService.runCommand("du -sb " + String(service.remoteWD + "/" + service.remoteFocus)).then(function (data) {
-          service.processStatus = false;
-          let data_response = data.split(/[	]+/); //NOTE: Matches tab spaces
-          service.accuSize = data_response[0];
-          disk.check(service.localWD, function(err, info) {
-              service.diskQuota = Math.floor((data_response[0]/info.available)*100);
-              service.diskAvail = Math.floor((info.free/info.total)*100);
-          });
-      });
+        connectionService.runCommand("du -sb " + String(service.remoteWD + "/" + service.remoteFocus)).then(function (data) {
+            service.processStatus = false;
+            let data_response = data.split(/[	]+/); //NOTE: Matches tab spaces
+            service.accuSize = data_response[0];
+            disk.check(service.localWD, function(err, info) {
+                service.diskQuota = Math.floor((data_response[0]/info.available)*100);
+                service.diskAvail = Math.floor((info.free/info.total)*100);
+            });
+        });
    };
    
    service.verifyDownloadCancel = function () {
-	  service.userDownAuth = false;
-      notifierService.warning('Action cancelled by user.');
+        service.userDownAuth = false;
+        notifierService.warning('Action cancelled by user.');
    };
    
    service.viewFile = function() {
@@ -263,9 +270,6 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
         });
     };
 
-   service.isDirectory = function(id) {
-       angular.element("#btnView").attr('disabled', '');
-   };
    // Upload entire directory
    service.uploadCall = function() {
       let boolStarter = true;
@@ -349,9 +353,10 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
         }
       }
       
-	  angular.element("#btnDownload").removeAttr('disabled');       // Shows download button
-      angular.element("#btnView").removeAttr('disabled');           // Shows view file button
-      angular.element("#btnUpload").attr('disabled', '');           // Hides upload button
+      service.canDownload = true;                           // Enables download button
+      service.canView = id.Class !== 'directory';           // Enables view button if file is not a directory
+      service.canUpload = false;                            // Disables upload button
+
       angular.element("#l" + service.localFocus.replace(/\./g, "\\.")).removeClass('highlight');
       service.localFocus = "";
       angular.element("#r" + service.remoteFocus.replace(/\./g, "\\.")).removeClass('highlight');
@@ -382,9 +387,10 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
         }
       }
 
-      angular.element("#btnDownload").attr('disabled', '');         // Hides download button
-      angular.element("#btnView").attr('disabled', '');             // Hides view file button
-      angular.element("#btnUpload").removeAttr('disabled');         // Shows upload button
+      service.canDownload = false;      // Disables download button
+      service.canView = false;          // Disables view button
+      service.canUpload = true;         // Enables upload button
+
       angular.element("#r" + service.remoteFocus.replace(/\./g, "\\.")).removeClass('highlight');
       service.remoteFocus = "";
       angular.element("#l" + service.localFocus.replace(/\./g, "\\.")).removeClass('highlight');

@@ -30,13 +30,13 @@
                    <div class="col-xs-6 col-sm-4">
                       <div class="panel panel-default width-control">
                          <div class="panel-body">
-                            <button id="btnDownload" disabled ng-click="fileManage.verifyDownload()" type="button" class="btn btn-primary btn-block">
+                            <button id="btnDownload" ng-disabled="!fileManage.canDownload" ng-click="fileManage.verifyDownload()" type="button" class="btn btn-primary btn-block">
                                 <span class="glyphicon glyphicon-arrow-left" aria-hidden="true">Download</span>
                             </button>
-                            <button id="btnUpload" disabled ng-click="fileManage.verifyUpload()" type="button" class="btn btn-primary btn-block">
+                            <button id="btnUpload" ng-disabled="!fileManage.canUpload" ng-click="fileManage.verifyUpload()" type="button" class="btn btn-primary btn-block">
                                 <span class="glyphicon glyphicon-arrow-right" aria-hidden="true">Upload</span>
                             </button>
-                            <button id="btnView" disabled ng-click="fileManage.viewFile()" type="button" class="btn btn-primary btn-block">
+                            <button id="btnView" ng-disabled="!fileManage.canView" ng-click="fileManage.viewFile()" type="button" class="btn btn-primary btn-block">
                                 <span class ="glyphicon" aria-hidden="true">View</span>
                             </button>
                             <br/>
@@ -137,7 +137,7 @@
                       <ul class="jqueryFileTree" 
                          ng-repeat="folder in fileManage.remoteFiles">
                          <li ng-switch on="folder.Class" class="{{folder.Class}}">
-                             <a id="r{{folder.name}}" ng-switch-when="directory" ng-click="fileManage.remoteHighlight(folder); fileManage.isDirectory(folder)" ng-dblclick="fileManage.cdSSH(folder)">{{folder.name}}</a>
+                             <a id="r{{folder.name}}" ng-switch-when="directory" ng-click="fileManage.remoteHighlight(folder)" ng-dblclick="fileManage.cdSSH(folder)">{{folder.name}}</a>
                              <a id="r{{folder.name}}" ng-switch-default ng-click="fileManage.remoteHighlight(folder)" ng-dblclick="">{{folder.name}}</a>
                          </li>
                      </ul>
