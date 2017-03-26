@@ -97,6 +97,7 @@ module.exports = function(config) {
 
     client: {
       useIframe: false,
+      captureConsole: true
     }
     
   })
