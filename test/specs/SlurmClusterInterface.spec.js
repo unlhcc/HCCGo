@@ -87,6 +87,36 @@ describe('Slurm Cluster Interface', function() {
     
   });
   
+  it("should faile to return jobs", function() {
+    var returnJob = "JOBID|PARTITION|NAME|USER|ST|TIME|NODES|START_TIME|NODELIST(REASON)|CPUS|TIME_LEFT|MIN_MEMORY|TIME_LIMIT \n\
+7128652|batch|A |test 2|dweitzel|R|0:00|1|2017-03-26T17:28:10|c0404|1|10:00|1024M|10:00";
+    
+    var jobs = null;
+    var jobsErr = "";
+    
+    clusterInterface.getJobs().then(function(data) {
+      jobs = data;
+      fail("Jobs should fail, it didn't!");
+    }, function(err) {
+      jobsErr = err;
+    });
+    
+    
+    
+    deferred.resolve(returnJob);
+    
+    scope.$apply();
+    
+    // Jobs shouldn't set, it should fail
+    expect(jobs).toBeNull();
+    expect(jobsErr).not.toBe("");
+    expect(InternalConnectionService.runCommand).toHaveBeenCalled();
+    
+    
+  });
+  
+  
+  
   
   
 });

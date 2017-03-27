@@ -31,7 +31,11 @@ SlurmClusterInterface.prototype.getJobs = function() {
     };
 
     csv_parse = require("csv-parse/lib/sync");
-    records = csv_parse(data, {columns: true, delimiter: '|'});
+    try { 
+      records = csv_parse(data, {columns: true, delimiter: '|'});
+    } catch (err) {
+      return deferred.reject("Error reading in CSV: " + err);
+    }
     jobs = {};
 
     records.forEach(function(entry) {
