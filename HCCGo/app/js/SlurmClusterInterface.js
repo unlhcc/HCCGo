@@ -2,7 +2,7 @@
 
 
 
-var SlurmClusterInterface = function(connectionService, $q) {
+SlurmClusterInterface = function(connectionService, $q) {
 
   GenericClusterInterface.call(this, connectionService, $q);
 
@@ -20,7 +20,7 @@ SlurmClusterInterface.prototype.getJobs = function() {
   // return a promise if the jobs info are found
   var deferred = this.$q.defer();
 
-  var promise = this.connectionService.runCommand("squeue -u `whoami` -o '%i,%P,%j,%u,%t,%M,%D,%S,%R,%C,%L,%m,%l'");
+  var promise = this.connectionService.runCommand("squeue -u `whoami` -o '%i|%P|%j|%u|%t|%M|%D|%S|%R|%C|%L|%m|%l'");
   promise.then(function(data) {
     console.log("Got data: " + data);
 
@@ -31,7 +31,11 @@ SlurmClusterInterface.prototype.getJobs = function() {
     };
 
     csv_parse = require("csv-parse/lib/sync");
-    records = csv_parse(data, {columns: true});
+    try { 
+      records = csv_parse(data, {columns: true, delimiter: '|'});
+    } catch (err) {
+      return deferred.reject("Error reading in CSV: " + err);
+    }
     jobs = {};
 
     records.forEach(function(entry) {
