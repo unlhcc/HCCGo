@@ -57,6 +57,8 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
 
    service.canView = false;
 
+   service.viewing = false;
+
    service.localFiles = [];
 
    service.remoteFiles = [];
@@ -248,19 +250,23 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
     };
    
    service.viewFile = function() {
+        service.viewing = true;
         connectionService.getFileSize(service.focus.location).then(function(size){
             if (size > 5*105*1024) {
                 notifierService.warning("File must be downloaded to be viewed.", "File too big to view!");
+                service.viewing = false;
             }
             else {
                 let file = "/" + service.focus.location.substring(service.focus.location.lastIndexOf("/"), service.focus.location.length);
                 tmp.dir({prefix: 'hcc_tmp', unsafeCleanup: true}, function _tempDirCreated(err, path, cleanupCallback) {
                     connectionService.quickDownload(service.focus.location, path + file).then(function(flag) {
                         if (flag) {
+                            service.viewing = false;
                             shell.openItem(path + file);
                         }
                         else {
                             notifierService.error("Error viewing the file!", "File View Failed!");
+                            service.viewing = false;
                         }
                         $timeout(() => {
                             shell.moveItemToTrash(path);
@@ -268,6 +274,7 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
                     });
                 });
             }
+        
         });
     };
 
