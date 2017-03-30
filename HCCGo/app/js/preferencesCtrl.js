@@ -13,4 +13,12 @@ preferencesModule = angular.module('HccGoApp.preferencesCtrl', ['ngRoute' ]);
  */
 preferencesModule.controller('preferencesCtrl', ['$scope', '$log', 'preferencesManager', function($scope, $log, preferencesManager) {
 
+  $(function() {
+    $('#toggle-one').bootstrapToggle({
+      on: 'Slurm',
+      off: 'Condor',
+      offstyle: 'info'
+    });
+  })
+
 }]);
