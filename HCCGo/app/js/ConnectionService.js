@@ -236,7 +236,7 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', '$lo
    var submitJob = function(location) {
       var deferred = $q.defer();
       $log.debug("Running command: " + 'sbatch ' + location);
-      runCommand('sbatch ' + location).then(function(data) {
+      runCommand('cd ' + path.dirname(location) + '; sbatch ' + location).then(function(data) {
         deferred.resolve(data);
       }, function(data) { // thrown on failure
         $log.log("Error log: " + data)
@@ -256,9 +256,13 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', '$lo
       }
    };
 
-   var runCommandQueue = async.queue(function (task, callback) {
+   var runCommandQueue = async.priorityQueue(function (task, callback) {
       // Starts Command session
-      connectionList[getClusterContext()].exec(task.name, function(err, stream) {
+      // Always source /etc/bashrc on the remote cluster before
+      // running commands
+      // How are we going to handle those people whose default shell is not bash?
+      real_task = "if [ -f /etc/bashrc ]; then . /etc/bashrc; fi; if [ -f ~/.bashrc ]; then . ~/.bashrc; fi; " + task.name;
+      connectionList[getClusterContext()].exec(real_task, function(err, stream) {
 
          cumulData = "";
 
@@ -281,12 +285,20 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', '$lo
          });
       });
    }, 1);
-
-   var runCommand = function(command) {
+   
+   /**
+    * Run a command on the remote cluster and get the output
+    * @param {String} comamnd - Command to execute
+    * @param {Integer} [priority=1] - Priority of the command, default: 1.  Higher numbers have lower priority.  0 is the highest priority.
+    * @memberof HCCGo.connectionService
+    *
+    */
+   var runCommand = function(command, priority) {
+      priority = (typeof priority !== 'undefined') ?  priority : 1;
 
       var deferred = $q.defer();         // Used to return promise data
 
-      runCommandQueue.push({name: command}, function(err, cumulData) {
+      runCommandQueue.push({name: command}, priority, function(err, cumulData) {
           if (err) {
               deferred.reject("Error running command " + command + ": " + err);
           } else {

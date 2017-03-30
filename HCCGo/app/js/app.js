@@ -1,5 +1,6 @@
 var app = angular.module('HccGoApp', ['HccGoApp.WelcomeCtrl',
                               'ngRoute',
+                              'ngAnimate',
                               'ConnectionServiceModule',
 				                      'NotifierModule',
                               'HccGoApp.clusterLandingCtrl',

@@ -195,7 +195,6 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
                   service.diskAvail = Math.floor(((split_output[3] - split_output[1]) / split_output[3])*100);
                   service.diskQuota = Math.floor(((ldata / Math.pow(1024, 1)) / split_output[3])*100);
 				  
-				  deferred.resolve(null);
               });
           } else {
               connectionService.runCommand("quota -w -f /home").then(function(data) {
