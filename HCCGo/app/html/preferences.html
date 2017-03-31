@@ -9,14 +9,15 @@
           <div class="form-group">
             <label class="control-label col-sm-2" for="uuid">UUID:</label>
             <div class="col-sm-10">
-              <input class="form-control" disabled placeholder="UUID">
+              <input class="form-control" disabled ng-value="uuid">
             </div>
           </div>
           <div class="form-group">
             <div class="col-sm-offset-2 col-sm-10">
-                <input type="checkbox" checked id="toggle-one" data-style="cluster">
+                <input type="checkbox" checked id="cluster-toggle" data-style="cluster">
             </div>
           </div>
+          <p>{{cluster}}</p>
         </form>
       </div>
     </div>
