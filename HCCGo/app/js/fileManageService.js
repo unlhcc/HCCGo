@@ -10,7 +10,7 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
    const disk = require('diskusage');
    const tmp = require('tmp');
    const {shell} = require('electron');
-
+   
    let service = {};
 
    /**
@@ -251,6 +251,7 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
    
    service.viewFile = function() {
         service.viewing = true;
+        tmp.setGracefulCleanup();
         connectionService.getFileSize(service.focus.location).then(function(size){
             if (size > 5*105*1024) {
                 notifierService.warning("File must be downloaded to be viewed.", "File too big to view!");
@@ -268,9 +269,6 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
                             notifierService.error("Error viewing the file!", "File View Failed!");
                             service.viewing = false;
                         }
-                        $timeout(() => {
-                            shell.moveItemToTrash(path);
-                        }, 3000);
                     });
                 });
             }

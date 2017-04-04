@@ -3,6 +3,9 @@
 const {app, BrowserWindow, globalShortcut, Menu} = require('electron');
 const {ipcMain} = require('electron');
 const {autoUpdater} = require('electron');
+const rimraf = require('rimraf');
+const os = require('os');
+const path = require('path');
 
 if (require('electron-squirrel-startup')) return;
 
@@ -233,4 +236,8 @@ app.on('ready', function() {
 
 
 
+});
+
+app.on('quit', function() {
+  rimraf.sync(path.join(os.tmpdir(), "hcc_tmp*"));
 });
