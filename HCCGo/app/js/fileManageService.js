@@ -252,7 +252,7 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
         service.viewing = true;
         tmp.setGracefulCleanup();
         connectionService.getFileSize(service.focus.location).then(function(size){
-            if (size > 5*105*1024) {
+            if (size > 5*1024*1024) {
                 notifierService.warning("File must be downloaded to be viewed.", "File too big to view!");
                 service.viewing = false;
             }
