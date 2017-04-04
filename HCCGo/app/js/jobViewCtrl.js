@@ -38,6 +38,13 @@ jobViewModule.controller('jobViewCtrl', ['$scope', '$log', '$timeout', 'connecti
           $scope.job = result;
         });
       }
+      else if (typeof result.outputPath == undefined) {
+        result.outText = "Output file not loaded, please check back in a moment";
+      } 
+      else if (typeof result.errorPath == undefined) {
+        result.errText = "Error file not loaded, please check back in a moment";
+      }
+      
       else {
         // In parallel, get the size of the output and error
         connectionService.getFileSize(result.outputPath).then(function(size) {

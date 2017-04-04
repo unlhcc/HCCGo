@@ -190,6 +190,7 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
    };
    
    service.verifyUpload = function () {
+
        service.canUpload = false;
        service.userUpAuth = true;
        service.processStatus = true;
@@ -202,11 +203,9 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
 
                    let reported_output = data.split("\n")[2];
                    let split_output = $.trim(reported_output).split(/[ ]+/);
-
                    service.diskAvail = Math.floor(((split_output[3] - split_output[1]) / split_output[3])*100);
                    service.diskQuota = Math.floor(((ldata / Math.pow(1024, 1)) / split_output[3])*100);
 
-                   deferred.resolve(null);
                 });
             } 
             else {
