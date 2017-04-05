@@ -30,11 +30,14 @@
                    <div class="col-xs-6 col-sm-4">
                       <div class="panel panel-default width-control">
                          <div class="panel-body">
-                            <button id="btnDownload" disabled ng-click="fileManage.verifyDownload()" type="button" class="btn btn-primary btn-block">
+                            <button id="btnDownload" ng-disabled="!fileManage.canDownload" ng-click="fileManage.verifyDownload()" type="button" class="btn btn-primary btn-block">
                                 <span class="glyphicon glyphicon-arrow-left" aria-hidden="true">Download</span>
                             </button>
-                            <button id="btnUpload" disabled ng-click="fileManage.verifyUpload()" type="button" class="btn btn-primary btn-block">
+                            <button id="btnUpload" ng-disabled="!fileManage.canUpload" ng-click="fileManage.verifyUpload()" type="button" class="btn btn-primary btn-block">
                                 <span class="glyphicon glyphicon-arrow-right" aria-hidden="true">Upload</span>
+                            </button>
+                            <button id="btnView" ng-disabled="!fileManage.canView" ng-click="fileManage.viewFile()" type="button" class="btn btn-primary btn-block">
+                                <span class ="glyphicon" aria-hidden="true">View</span>
                             </button>
                             <br/>
                             <div id="tranContent"></div>
@@ -108,6 +111,13 @@
                             </td>
                          </tr>
                       </table>
+                     </div>
+                     <div class="panel-body" ng-show="fileManage.viewing">
+                         <div class="text-center">
+                            <span class="glyphicon glyphicon-refresh spinning-image gi-8x"></span>
+                            <h4> Loading... </h4>
+                         </div>
+                         
                      </div>
                    </div>
              </div>
