@@ -43,7 +43,6 @@ fileManageService.factory('navService',['$log', '$q', '$location', '$routeParams
    //if($templateCache.get('username') == null){
    service.username = connectionService.connectionDetails.username;
    service.host = connectionService.connectionDetails.hostname;
-  
    return service;
   
 }]);
