@@ -9,6 +9,7 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
    const fs = require('fs');
    const disk = require('diskusage');
    const tmp = require('tmp');
+   const os = require("os");
    const {shell} = require('electron');
    
    let service = {};
@@ -258,11 +259,24 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
             }
             else {
                 let file = "/" + service.focus.location.substring(service.focus.location.lastIndexOf("/"), service.focus.location.length);
-                tmp.dir({prefix: 'hcc_tmp', unsafeCleanup: true}, function _tempDirCreated(err, path, cleanupCallback) {
-                    connectionService.quickDownload(service.focus.location, path + file).then(function(flag) {
+                tmp.dir({prefix: 'hcc_tmp', unsafeCleanup: true}, function _tempDirCreated(err, tmppath, cleanupCallback) {
+                    connectionService.quickDownload(service.focus.location, path.join(tmppath, file + ".tmp")).then(function(flag) {
                         if (flag) {
-                            service.viewing = false;
-                            shell.openItem(path + file);
+                            var readable = fs.createReadStream(path.join(tmppath, file + ".tmp"));
+                            var finalfile = fs.openSync(path.join(tmppath, file), 'w')
+                            readable.on('data', (chunk) => {
+                               var text = chunk.toString('utf8');
+                               fs.writeSync(finalfile, text.replace(/\r\n|\r|\n/g, os.EOL)); 
+                            });
+                            readable.on('end', () => {
+                              fs.closeSync(finalfile);
+                              fs.unlinkSync(path.join(tmppath, file + ".tmp"));
+                              $timeout(function() {
+             				          service.viewing = false;
+             				      }, 0);
+                              
+                              shell.openItem(path.join(tmppath, file));
+                            });
                         }
                         else {
                             notifierService.error("Error viewing the file!", "File View Failed!");
