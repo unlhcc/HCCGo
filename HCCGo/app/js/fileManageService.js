@@ -249,7 +249,7 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
         notifierService.warning('Action cancelled by user.');
     };
    
-   service.viewFile = function() {
+   service.viewFile = function(isText) {
         service.viewing = true;
         tmp.setGracefulCleanup();
         connectionService.getFileSize(service.focus.location).then(function(size){
@@ -262,6 +262,8 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
                 tmp.dir({prefix: 'hcc_tmp', unsafeCleanup: true}, function _tempDirCreated(err, tmppath, cleanupCallback) {
                     connectionService.quickDownload(service.focus.location, path.join(tmppath, file + ".tmp")).then(function(flag) {
                         if (flag) {
+                           if (isText) {
+                            // Open the temporary file and convert line endings
                             var readable = fs.createReadStream(path.join(tmppath, file + ".tmp"));
                             var finalfile = fs.openSync(path.join(tmppath, file), 'w')
                             readable.on('data', (chunk) => {
@@ -277,6 +279,13 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
                               
                               shell.openItem(path.join(tmppath, file));
                             });
+                         } else { // Else Binary - isText if false
+                            fs.renameSync(path.join(tmppath, file  + ".tmp"), path.join(tmppath, file));
+                            $timeout(function() {
+                                service.viewing = false;
+                            }, 0);
+                            shell.openItem(path.join(tmppath, file));
+                         }
                         }
                         else {
                             notifierService.error("Error viewing the file!", "File View Failed!");
