@@ -1,9 +1,9 @@
 
 fileManageService = angular.module('fileManageService', [])
 
-fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'connectionService', 'notifierService', '$timeout',
-   function($log, $q, $routeParams, connectionService, notifierService, $timeout) {
-  
+fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'connectionService', 'notifierService', '$timeout', 'analyticsService',
+   function($log, $q, $routeParams, connectionService, notifierService, $timeout, analyticsService) {
+
    const async = require('async');
    const path = require('path');
    const fs = require('fs');
@@ -11,7 +11,7 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
    const tmp = require('tmp');
    const os = require("os");
    const {shell} = require('electron');
-   
+
    let service = {};
 
    /**
@@ -75,14 +75,14 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
    service.remoteFocus = new String("");
 
    service.localFocus = new String("");
-   
+
    service.lblRemote = "Home";
-   
+
    service.lblSwitch = "Work";
 
    service.focus = {};
-   
-   
+
+
    let remoteRead = function(data, finish){
        let _tempFiles = [];
 
@@ -137,11 +137,11 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
 				     service.localFiles = _tempFiles;
 				 }, 100);
              }
-         }); 
+         });
       });
    };
 
-   service.wdSwitcher = function(){       
+   service.wdSwitcher = function(){
        service.userDownAuth = false;
        service.userUpAuth = false;
 
@@ -156,7 +156,7 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
        }
 
        remoteRead(service.remoteWD);
-	   
+
 	   return 0;
    };
 
@@ -170,9 +170,9 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
 	   // Hides download button
        service.canDownload = false;
        angular.element('#tranContent').text('');
-	   
+
        remoteRead(service.remoteWD);
-	   
+
 	   return 0;
    };
 
@@ -186,10 +186,10 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
        // Hides upload button
        service.canUpload = false;
        angular.element('#tranContent').text('');
-	   
+
        localRead(service.localWD);
    };
-   
+
    service.verifyUpload = function () {
 
        service.canUpload = false;
@@ -208,13 +208,13 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
                    service.diskQuota = Math.floor(((ldata / Math.pow(1024, 1)) / split_output[3])*100);
 
                 });
-            } 
+            }
             else {
                 connectionService.runCommand("quota -w -f /home").then(function(data) {
                     service.processStatus = false;
                     service.accuSize = ldata;
 
-                    let reported_output = data.split("\n")[2];              
+                    let reported_output = data.split("\n")[2];
                     let split_output = reported_output.split(/[ ]+/);
                     service.diskAvail = Math.floor(((split_output[2] - split_output[1]) / split_output[2])*100);
                     service.diskQuota = Math.floor(((ldata / Math.pow(1024, 1)) / split_output[2])*100);
@@ -222,7 +222,7 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
             }
         });
     };
-   
+
    service.verifyUploadCancel = function() {
 	  service.userUpAuth = false;
       notifierService.warning('Action cancelled by user.');
@@ -232,7 +232,7 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
        service.canDownload = false;
        service.userDownAuth = true;
        service.processStatus = true;
-       
+
        connectionService.runCommand("du -sb " + String(service.remoteWD + "/" + service.remoteFocus)).then(function (data) {
            service.processStatus = false;
            let data_response = data.split(/[	]+/); //NOTE: Matches tab spaces
@@ -243,16 +243,18 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
             });
         });
     };
-    
+
     service.verifyDownloadCancel = function () {
         service.userDownAuth = false;
         notifierService.warning('Action cancelled by user.');
     };
-   
+
    service.viewFile = function(isText) {
         service.viewing = true;
         tmp.setGracefulCleanup();
         connectionService.getFileSize(service.focus.location).then(function(size){
+            var type = isText ? "text" : "raw";
+            analyticsService.event('file view', type, '', size);
             if (size > 5*1024*1024) {
                 notifierService.warning("File must be downloaded to be viewed.", "File too big to view!");
                 service.viewing = false;
@@ -268,7 +270,7 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
                             var finalfile = fs.openSync(path.join(tmppath, file), 'w')
                             readable.on('data', (chunk) => {
                                var text = chunk.toString('utf8');
-                               fs.writeSync(finalfile, text.replace(/\r\n|\r|\n/g, os.EOL)); 
+                               fs.writeSync(finalfile, text.replace(/\r\n|\r|\n/g, os.EOL));
                             });
                             readable.on('end', () => {
                               fs.closeSync(finalfile);
@@ -276,7 +278,7 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
                               $timeout(function() {
              				          service.viewing = false;
              				      }, 0);
-                              
+
                               shell.openItem(path.join(tmppath, file));
                             });
                          } else { // Else Binary - isText if false
@@ -294,7 +296,7 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
                     });
                 });
             }
-        
+
         });
     };
 
@@ -305,7 +307,7 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
         service.userUpAuth = false;
 
         // Runs file upload
-        connectionService.uploadFile(String(service.localWD + "/" + service.localFocus), String(service.remoteWD + "/"), 
+        connectionService.uploadFile(String(service.localWD + "/" + service.localFocus), String(service.remoteWD + "/"),
         function(total_transferred,counter,filesTotal,currentTotal,sizeTotal){
             // Only want this if to execute once
             if(boolStarter) {
@@ -349,7 +351,7 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
             $timeout(function() {
                 // Callback function for progress bar
                 service.counter = counter;
-                
+
                 // Work on progress bar
                 service.totalProgress = Math.floor(((total_transferred + currentTotal)/sizeTotal)*100);
             }, 15);
@@ -358,7 +360,7 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
             localRead(service.localWD);
             service.processStatus = false;
             notifierService.success('Your file transfer was succesfull!', 'Transfered!');
-            service.processFinished = true;   // Show finished message         
+            service.processFinished = true;   // Show finished message
         }, function(err) {
             // Error occurred in ConnectionService
             service.processStatus = false;
@@ -374,7 +376,7 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
 
         for(let dirObj of service.localFiles) {
             if(id.name === dirObj.name) {
-                service.localOverwrite = true; 
+                service.localOverwrite = true;
             }
         }
         service.canDownload = true;                           // Enables download button
@@ -386,10 +388,10 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
         angular.element("#r" + service.remoteFocus.replace(/\./g, "\\.")).removeClass('highlight');
         service.remoteFocus = id.name;
         angular.element("#r" + id.name.replace(/\./g, "\\.")).addClass('highlight');
-        
+
         // Change button context
         angular.element("#tranContent").text("Download: " + service.remoteFocus);
-        
+
         // Sets all 'processing' displays to be hidden
         service.processStatus = false;
         service.uploadStatus = false;
@@ -397,33 +399,33 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
         service.userUpAuth = false;
         service.userDownAuth = false;
     };
-    
+
     service.localHighlight = function(id) {
         service.localOverwrite = false;
         service.remoteOverwrite = false;
         service.focus.location = id.location;
         service.focus.size = id.size;
         service.focus.mtime = id.mtime;
-        
+
         for(let dirObj of service.remoteFiles) {
             if(id.name === dirObj.name) {
-                service.remoteOverwrite = true; 
+                service.remoteOverwrite = true;
             }
         }
 
         service.canDownload = false;      // Disables download button
         service.canView = false;          // Disables view button
         service.canUpload = true;         // Enables upload button
-        
+
         angular.element("#r" + service.remoteFocus.replace(/\./g, "\\.")).removeClass('highlight');
         service.remoteFocus = "";
         angular.element("#l" + service.localFocus.replace(/\./g, "\\.")).removeClass('highlight');
         service.localFocus = id.name;
         angular.element("#l" + id.name.replace(/\./g, "\\.")).addClass('highlight');
-        
+
         // Change button context
         angular.element("#tranContent").text("Upload: " + service.localFocus);
-        
+
         // Sets all 'processing' displays to be hidden
         service.processStatus = false;
         service.uploadStatus = false;
@@ -458,7 +460,7 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
         if (service.localWD == "") {
             service.localWD = process.env.HOMEDRIVE + process.env.HOMEPATH;
         }
-    } 
+    }
     else {
         // Runs for Mac and Linux systems
         // Establishes Displayed files
@@ -470,5 +472,5 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
 
     localRead(service.localWD);    // Sets local display
     return service;
-  
+
 }]);
