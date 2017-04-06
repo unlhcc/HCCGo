@@ -13,20 +13,8 @@ preferencesModule = angular.module('HccGoApp.preferencesCtrl', ['ngRoute' ]);
  */
 preferencesModule.controller('preferencesCtrl', ['$scope', '$log', 'preferencesManager', function($scope, $log, preferencesManager) {
 
-  // init the toggle switch
-  $('#cluster-toggle').bootstrapToggle({
-    on: 'Slurm',
-    off: 'Condor',
-    offstyle: 'info'
-  });
-
-  // toggle cluster type
-  $('#cluster-toggle').change(function() {
-    $scope.cluster = $(this).prop('checked');
-  });
-
   preferencesManager.getPreferences().then(function(data) {
     $scope.uuid = data.uuid;
   });
-
+  
 }]);
