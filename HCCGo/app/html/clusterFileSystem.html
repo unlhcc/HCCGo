@@ -31,14 +31,23 @@
                       <div class="panel panel-default width-control">
                          <div class="panel-body">
                             <button id="btnDownload" ng-disabled="!fileManage.canDownload" ng-click="fileManage.verifyDownload()" type="button" class="btn btn-primary btn-block">
-                                <span class="glyphicon glyphicon-arrow-left" aria-hidden="true">Download</span>
+                                <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span> Download
                             </button>
                             <button id="btnUpload" ng-disabled="!fileManage.canUpload" ng-click="fileManage.verifyUpload()" type="button" class="btn btn-primary btn-block">
-                                <span class="glyphicon glyphicon-arrow-right" aria-hidden="true">Upload</span>
+                                <span class="glyphicon glyphicon-arrow-right" aria-hidden="true"></span> Upload
                             </button>
-                            <button id="btnView" ng-disabled="!fileManage.canView" ng-click="fileManage.viewFile()" type="button" class="btn btn-primary btn-block">
-                                <span class ="glyphicon" aria-hidden="true">View</span>
-                            </button>
+                            <div class="row">
+                                  <div class="col-sm-6">
+                                        <button id="btnView" ng-disabled="!fileManage.canView" ng-click="fileManage.viewFile(false)" type="button" class="btn btn-primary btn-block col-sm-6">
+                                            View Binary
+                                        </button>
+                                  </div>
+                                  <div class="col-sm-6">
+                                        <button id="btnView" ng-disabled="!fileManage.canView" ng-click="fileManage.viewFile(true)" type="button" class="btn btn-primary btn-block col-sm-6">
+                                            View Text
+                                        </button>
+                                  </div>
+                            </div>
                             <br/>
                             <div id="tranContent"></div>
                             <div id="fileStats" ng-show="focusFile.location">
