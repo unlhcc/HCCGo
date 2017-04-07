@@ -37,6 +37,13 @@ body {
   height: 130%;
 }
 
+.sidebar {
+  // this makes the height the entire rest of the page
+  margin-bottom: -99999px;
+  padding-bottom: 99999px;
+  // coloring and top/side margins need to be adjusted
+}
+
 .highlight {
   background-color: #F1F5F8;
 }
@@ -295,7 +302,7 @@ div.historyinfo {
   a.deleteButton i.glyphicon {
     color: red;
   }
-  
+
 }
 
 .jobstatus-link {
@@ -308,7 +315,7 @@ div.historyinfo {
     opacity:0;
     max-height:0;
   }
-  
+
   &.ng-leave,&.ng-move.ng-move-active,&.ng-enter.ng-enter-active {
     opacity:1;
     max-height:100px;
@@ -497,4 +504,3 @@ a i.fa {
 .selectize-control.multi .selectize-input > div.active, .selectize-control.multi .selectize-input.input-active > div.active, .selectize-control.multi .selectize-input > .item.active, .selectize-control.multi .selectize-input.input-active > .item.active {
   background: #efefef;
 }
-
