@@ -2,7 +2,8 @@
 
 <div class="container">
   <div class="row">
-    <div class="col-md-4">
+    <div class="col-md-2" ng-include="'html/navbar.html'"></div>
+    <div class="col-md-3">
       <div class="well">
         <h3 class="text-center">{{job.jobName}}</h3>
         <hr />
@@ -14,7 +15,7 @@
         <p><strong>Maximum Memory Used:</strong> {{job.maxMemory}}</p>
       </div>
     </div>
-    <div class="col-md-8">
+    <div class="col-md-7">
       <div class="well">
         <div class="panel-group">
           <div class="panel panel-default">
