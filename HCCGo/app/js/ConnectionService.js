@@ -18,7 +18,7 @@ connectionModule = angular.module('ConnectionServiceModule', [])
  * @requires fs
  * @requires ssh2
  */
-connectionModule.factory('connectionService',['$log', '$q', '$routeParams', '$location', 'notifierService', 'analyticsService', function($log, $q, $routeParams, $location, notifierService, analyticsService) {
+connectionModule.factory('connectionService',['$log', '$q', '$routeParams', '$location', 'notifierService', 'analyticsService', '$rootScope', function($log, $q, $routeParams, $location, notifierService, analyticsService, $rootScope) {
 
    const async = require('async');
    const path = require('path');
@@ -905,6 +905,7 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', '$lo
       connectionDetails['hostname'] = hostname;
       connectionDetails['shorthost'] = cluster;
       completed(null);
+      $rootScope.$broadcast("login");
       $log.log('Client :: ready');
      }).on('error', function(err) {
       $log.error(err);

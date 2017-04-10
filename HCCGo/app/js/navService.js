@@ -1,15 +1,22 @@
 
 fileManageService = angular.module('navService', [])
 
-fileManageService.factory('navService',['$log', '$q', '$location', '$routeParams', 'connectionService', 'notifierService', '$timeout',
-   function($log, $q, $location, $routeParams, connectionService, notifierService, $timeout) {
+fileManageService.factory('navService',['$log', '$q', '$location', '$routeParams', 'connectionService', 'notifierService', '$timeout', '$rootScope',
+   function($log, $q, $location, $routeParams, connectionService, notifierService, $timeout, $rootScope) {
 
    let service = {};
+   let scope = $rootScope.$new();
 
    /**
    * To handle state information for the navigation bar
    *
    */
+   $rootScope.$on('login', function(event) {
+      // on login event, update the username and host information
+      service.username = connectionService.connectionDetails.username;
+      service.host = connectionService.connectionDetails.hostname;
+   });
+   
 
    // Value initialization
    //
