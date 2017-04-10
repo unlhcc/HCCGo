@@ -91,7 +91,15 @@
 
   </head>
   <body ng-app="HccGoApp">
-    <div ng-view>
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-md-2">
+          <div ng-include="'html/navbar.html'"></div>
+        </div>
+        <div class="col-md-10">
+          <div ng-view></div>
+        </div>
+      </div>
     </div>
   </body>
 </html>
