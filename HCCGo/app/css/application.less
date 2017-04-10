@@ -35,19 +35,31 @@ body {
 
 .add-top-margin {
   margin-top: 10px;
+  height: 100%;
 }
 
 .navIcon {
   height: 130%;
 }
 
+.col-md-2.no-left-padding {
+  padding-left: 0px;
+  height: 100%;
+}
+
+body, html {
+  height: 100%;
+}
+
 .sidebar {
   // this makes the height the entire rest of the page
-  margin-bottom: -99999px;
-  padding-bottom: 99999px;
+  height: 100%;
   // coloring and top/side margins need to be adjusted
-  margin-left:-10px;
-  margin-right:-20px;
+  //margin-left:-10px;
+  //margin-top: -20px;
+  padding-top: 20px;
+  // margin-right:-20px;
+  background-color: #9E9E9E;
 }
 
 .profile-userpic img {
@@ -86,7 +98,7 @@ body {
   font-size: 11px;
   font-weight: 600;
   padding: 6px 15px;
-  margin-right: 5px;
+  margin-right: 10px;
 }
 
 .profile-usermenu {
@@ -124,8 +136,8 @@ body {
 .profile-usermenu ul li.active a {
   color: #5b9bd1;
   background-color: #f6f9fb;
-  border-left: 2px solid #5b9bd1;
-  margin-left: -2px;
+  border-right: 8px solid @headerBackground;
+  margin-left: -8px;
 }
 
 .highlight {
