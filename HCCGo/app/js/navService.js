@@ -40,6 +40,10 @@ fileManageService.factory('navService',['$log', '$q', '$location', '$routeParams
       $location.path("/tutorials");
    }
    
+   service.goToDashboard = function() {
+     $location.path("/cluster");
+   }
+   
    //if($templateCache.get('username') == null){
    service.username = connectionService.connectionDetails.username;
    service.host = connectionService.connectionDetails.hostname;
