@@ -22,22 +22,22 @@
     
     <div class="profile-usermenu">
 			<ul class="nav">
-				<li class="active">
+				<li ng-class="{ 'active': isActive('/cluster') }">
 					<a ng-click="servicer.goToDashboard()">
 					<i class="glyphicon glyphicon-stats"></i>
 					Dashboard </a>
 				</li>
-				<li>
+				<li ng-class="{ 'active': isActive('/jobHistory') || isActive('/jobSubmission') }">
 					<a ng-click="servicer.jobHistory()">
 					<i class="glyphicon glyphicon-user"></i>
 					Submit </a>
 				</li>
-				<li>
+				<li ng-class="{ 'active': isActive('/filesystem') }">
 					<a ng-click="servicer.goToSCP()">
 					<i class="glyphicon glyphicon-folder-open"></i>
 					File Management </a>
 				</li>
-				<li>
+				<li ng-class="{ 'active': isActive('/tutorials') }">
 					<a ng-click="servicer.goToTutorials()">
 					<i class="glyphicon glyphicon-flag"></i>
 					Tutorials </a>
