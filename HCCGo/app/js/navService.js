@@ -5,7 +5,7 @@ fileManageService.factory('navService',['$log', '$q', '$location', '$routeParams
    function($log, $q, $location, $routeParams, connectionService, notifierService, $timeout, $rootScope) {
 
    let service = {};
-   let scope = $rootScope.$new();
+   const ipcRenderer = require('electron').ipcRenderer;
 
    /**
    * To handle state information for the navigation bar
@@ -54,6 +54,15 @@ fileManageService.factory('navService',['$log', '$q', '$location', '$routeParams
    //if($templateCache.get('username') == null){
    service.username = connectionService.connectionDetails.username;
    service.host = connectionService.connectionDetails.hostname;
+   
+   // Get the Version
+   ipcRenderer.send('get-version');
+   ipcRenderer.on('get-version-message', function(event, arg) {
+      service.version = arg;
+      
+   });
+   
+   
    return service;
   
 }]);
