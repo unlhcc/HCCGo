@@ -91,12 +91,12 @@
 
   </head>
   <body ng-app="HccGoApp">
-    <div class="container-fluid">
+    <div class="container-fluid" ng-class="{'add-top-margin': showSidebar }">
       <div class="row">
-        <div class="col-md-2">
+        <div class="col-md-2" ng-show="showSidebar">
           <div ng-include="'html/navbar.html'"></div>
         </div>
-        <div class="col-md-10">
+        <div ng-class="{ 'col-md-10': showSidebar }">
           <div ng-view></div>
         </div>
       </div>
