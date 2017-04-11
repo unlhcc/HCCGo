@@ -11,6 +11,7 @@ install:
   - npm install
   - npm --prefix ./HCCGo install HCCGo
   - npm install -g grunt
+  - npm install -g bower
   - bower install
 
 build: off
