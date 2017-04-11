@@ -51,13 +51,10 @@ module.exports = function(grunt) {
       }
     },
     bower: {
-      install: {
+      dev: {
+        dest: 'HCCGo/app/lib',
         options: {
-          targetDir: 'HCCGo/app/lib',
-          layout: 'byComponent',
-          install: true,
-          verbose: true,
-          cleanTargetDir: false
+          expand: true
         }
       }
     },
@@ -74,10 +71,10 @@ module.exports = function(grunt) {
       }
     }
   });
+  grunt.loadNpmTasks('grunt-bower');
   grunt.loadNpmTasks('grunt-auto-install');
   grunt.loadNpmTasks('grunt-contrib-less');
   grunt.loadNpmTasks('grunt-shell');
-  grunt.loadNpmTasks('grunt-bower-task');
   grunt.loadNpmTasks('grunt-marked');
   grunt.loadNpmTasks('grunt-jsdoc');
   grunt.registerTask('default', ['less',

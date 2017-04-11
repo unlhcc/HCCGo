@@ -1,8 +1,9 @@
 #!/bin/bash -xe
 
-
+npm install -g bower
 
 grunt docs
+bower install
 grunt bower
 pushd HCCGo
 npm install
