@@ -6,7 +6,7 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
   $scope.params = $routeParams;
 
   //initialize editor
-  ace.config.set('basePath','lib/ace-builds/src-noconflict');
+  ace.config.set('basePath','bower_components/ace-builds/src-noconflict');
   var editor = ace.edit("commands");
   editor.setTheme("ace/theme/chrome");
   editor.getSession().setMode("ace/mode/sh");
