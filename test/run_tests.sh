@@ -4,7 +4,7 @@ npm install -g bower
 
 grunt docs
 bower install
-grunt bower
+grunt bowerInstall
 pushd HCCGo
 npm install
 popd
