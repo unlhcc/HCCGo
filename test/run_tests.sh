@@ -3,7 +3,7 @@
 
 
 grunt docs
-grunt bower
+grunt bower:install
 pushd HCCGo
 npm install
 popd
