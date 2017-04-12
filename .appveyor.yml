@@ -1,0 +1,28 @@
+
+environment:
+  nodejs_version: "6"
+
+
+# Install scripts. (runs after repo cloning)
+install:
+  # Get the latest stable version of Node.js or io.js
+  - ps: Install-Product node $env:nodejs_version
+  # install modules
+  - npm install
+  - npm --prefix ./HCCGo install HCCGo
+  - npm install -g grunt
+  - npm install -g bower
+  - bower install
+
+build: off
+
+# Post-install test scripts.
+test_script:
+  # Output useful info for debugging.
+  - node --version
+  - npm --version
+  - grunt bowerInstall
+  # run tests
+  - npm --prefix ./HCCGo test
+  - grunt packageWin
+

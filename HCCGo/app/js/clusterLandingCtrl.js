@@ -72,11 +72,11 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
 
   // Nav to jobHistory
   $scope.jobHistory = function() {
-     $location.path("cluster/" + $scope.params.clusterId + "/jobHistory");
+     $location.path("/jobHistory");
   }
 
   $scope.refreshCluster = function(force=false) {
-    getClusterStats($scope.params.clusterId, force);
+    getClusterStats(connectionService.connectionDetails.shorthost, force);
 
   }
 
@@ -140,7 +140,7 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
 
   $scope.viewOutErr = function(id) {
     // view the selected job's stander out and err
-    $location.path("cluster/" + $routeParams.clusterId + "/jobview/" + id);
+    $location.path("/jobview/" + id);
   }
 
   function getClusterStats(clusterId, force) {
@@ -153,7 +153,17 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
       $scope.numRunning = data.numRunning;
       $scope.numIdle = data.numIdle;
       $scope.numError = data.numError;
-      $scope.jobs = data.jobs;
+      // Animations look weird if you completely change the jobs variable
+      // Instead, loop through, and update
+      for (i = 0; i < $scope.jobs.length; i++) {
+        var result = $.grep(data.jobs, function(e){ return e._id === $scope.jobs[i]._id; });
+        Object.assign($scope.jobs[i], result[0]);
+        // Purge the data.jobs as we go
+        data.jobs.splice(data.jobs.indexOf(result[0]), 1);
+      }
+      // All of the remaining data.jobs should be appended
+      // https://stackoverflow.com/questions/1374126/how-to-extend-an-existing-javascript-array-with-another-array-without-creating
+      Array.prototype.push.apply($scope.jobs, data.jobs)
 
       // Stop spinning image
       $("#jobrefresh").removeClass("spinning-image");
@@ -168,33 +178,29 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
       $("#graphrefresh").addClass("spinning-image");
 
       dataUsageService.getDataUsage(clusterInterface, force).then(function(data) {
-
         $("#homeUsageGauge").removeClass("loading");
         $("#workUsageGauge").removeClass("loading");
         $("#graphrefresh").removeClass("spinning-image");
 
+        homeUsageGauge.internal.config.gauge_max = data[0].blocksLimit;
         homeUsageGauge.load({
             columns: [
               ['Used', data[0].blocksUsed]
             ]
         });
 
-        // POSSIBLE FUTURE DEPRECATION: Messing with interals instead of using load function
-        homeUsageGauge.internal.config.gauge_max = data[0].blocksQuota;
-
+        workUsageGauge.internal.config.gauge_max = data[1].blocksLimit;
         workUsageGauge.load({
             columns: [
               ['Used', data[1].blocksUsed]
             ]
         });
 
-        // POSSIBLE FUTURE DEPRECATION: Messing with interals instead of using load function
-        workUsageGauge.internal.config.gauge_max = data[1].blocksLimit;
     });
   }
   preferencesManager.getClusters().then(function(clusters) {
     // Get the cluster type
-    var clusterType = $.grep(clusters, function(e) {return e.label == $scope.params.clusterId})[0].type;
+    var clusterType = $.grep(clusters, function(e) {return e.label == connectionService.connectionDetails.shorthost})[0].type;
 
     switch (clusterType) {
       case "slurm":
@@ -205,7 +211,6 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
         break;
     }
     $rootScope.clusterInterface = clusterInterface;
-    $rootScope.clusterId = $scope.params.clusterId;
 
     // Update the cluster every 15 seconds
     var refreshingClusterPromise;
@@ -215,7 +220,7 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
       isRefreshingCluster = true;
       (function refreshEvery(){
         //Do refresh
-        getClusterStats($scope.params.clusterId);
+        getClusterStats(connectionService.connectionDetails.shorthost);
         //If async in then in callback do...
         refreshingClusterPromise = $timeout(refreshEvery,15000);
       }());
@@ -233,7 +238,7 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
       if(isRefreshingGraphs) return;
       isRefreshingGraphs = true;
       (function refreshEvery() {
-        updateGraphs();
+        updateGraphs(false);
         refreshingGraphsPromise = $timeout(refreshEvery, 300000);
       }());
     };

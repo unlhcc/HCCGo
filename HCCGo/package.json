@@ -1,18 +1,23 @@
 {
   "name": "HCCGo",
-  "version": "0.2.0",
+  "version": "0.4.0-beta.1",
   "main": "./main.js",
   "description": "Interface for HCC Resouces",
   "scripts": {
     "start": "node node_modules/electron/cli.js .",
-    "packageWin": "node ./node_modules/electron-packager/cli.js ./ HCCGo --platform=win32 --arch=x64 --out ../packageWin/ --version 1.4.3 --overwrite --icon ./icons/HCCGo",
-    "packageOsx": "node ./node_modules/electron-packager/cli.js ./ HCCGo --platform=darwin --arch=x64 --out ../packageOsx/ --version 1.4.3 --overwrite --icon ./icons/HCCGo --osx-sign",
-    "packageNix": "node ./node_modules/electron-packager/cli.js ./ HCCGo --platform=linux --arch=x64 --out ../packageNix/ --version 1.4.3 --overwrite --icon ./icons/HCCGo",
-    "postinstall": "node postinstall.js"
+    "packageWin": "node ./node_modules/electron-packager/cli.js ./ HCCGo --platform=win32 --arch=x64 --out ../packageWin/ --electron-version 1.6.1 --overwrite --icon ./icons/HCCGo --version-string.ProductName=HCCGo",
+    "packageOsx": "node ./node_modules/electron-packager/cli.js ./ HCCGo --platform=darwin --arch=x64 --out ../packageOsx/ --electron-version 1.6.1 --overwrite --icon ./icons/HCCGo --osx-sign",
+    "packageNix": "node ./node_modules/electron-packager/cli.js ./ HCCGo --platform=linux --arch=x64 --out ../packageNix/ --electron-version 1.6.1 --overwrite --icon ./icons/HCCGo",
+    "postinstall": "node postinstall.js",
+    "installerWin": "node win-build-installer.js",
+    "installerOsx": "electron-installer-dmg --background=icons/HCCGoDMG.png ../packageOsx/HCCGo-darwin-x64/HCCGo.app HCCGo --icon=icons/HCCGo.png  --overwrite",
+    "test": "./node_modules/.bin/karma start --single-run --browsers Electron"
   },
   "keywords": [
     "HCC"
   ],
+  "author": "Derek Weitzel",
+  "homepage": "https://github.com/unlhcc/HCCGo",
   "dependencies": {
     "async": ">= 1.5.2",
     "c3": ">= 0.4.11",
@@ -21,21 +26,29 @@
     "d3": "^3.5.17",
     "diskusage": ">= 0.1.5",
     "electron-debug": "^1.0.1",
+    "electron-squirrel-startup": "^1.0.0",
+    "escape-html": ">=1.0.3",
     "fs": ">= 0.0.2",
     "nedb": "^1.8.0",
     "node-notifier": "^4.6.0",
     "path": ">= 0.12.7",
+    "rimraf": ">= 2.6.1",
     "ssh2": ">= 0.3.3",
+    "tmp": ">= 0.0.31",
     "uuid": "^3.0.1"
   },
   "devDependencies": {
-    "devtron": "^1.2.1",
     "asar": "^0.12.3",
-    "nslog": "^3.0.0",
-    "electron": "^1.4.3",
+    "devtron": "^1.2.1",
+    "electron": "1.6.1",
     "electron-packager": ">= 5.0.1",
-    "electron-prebuilt": ">= 0.30.3",
     "electron-rebuild": ">= 1.1.5",
-    "grunt-marked": "^0.1.3"
+    "electron-squirrel-startup": "^1.0.0",
+    "grunt-marked": "^0.1.3",
+    "jasmine": "^2.5.3",
+    "karma": "^1.4.1",
+    "karma-electron": "^5.1.1",
+    "karma-jasmine": "^1.1.0",
+    "nslog": "^3.0.0"
   }
 }

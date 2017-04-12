@@ -1,0 +1,56 @@
+
+{ "tutorials":
+  [
+    {
+      "name": "Beginner R Tutorials",
+      "type": "github",
+      "gitrepo": "https://github.com/unlhcc/r-tutorial-beginner.git",
+      "user": "unlhcc",
+      "repo": "r-tutorial-beginner",
+      "link": "https://github.com/unlhcc/r-tutorial-beginner"
+    },
+    {
+      "name": "Advanced R Tutorials",
+      "type": "github",
+      "gitrepo": "https://github.com/unlhcc/r-tutorial-advanced.git",
+      "user": "unlhcc",
+      "repo": "r-tutorial-advanced",
+      "link": "https://github.com/unlhcc/r-tutorial-advanced"
+    },
+    {
+      "name": "Matlab Tutorial",
+      "type": "github",
+      "gitrepo": "https://github.com/unlhcc/matlab-tutorial.gitt",
+      "user": "unlhcc",
+      "repo": "matlab-tutorial",
+      "link": "https://github.com/unlhcc/matlab-tutorial"
+    },
+    {
+      "name": "Python Tutorial",
+      "type": "github",
+      "gitrepo": "https://github.com/unlhcc/python-tutorial.git",
+      "user": "unlhcc",
+      "repo": "python-tutorial",
+      "link": "https://github.com/unlhcc/python-tutorial"
+    },
+    {
+      "name": "Mathematica Tutorial",
+      "type": "github",
+      "gitrepo": "https://github.com/unlhcc/mathematica-tutorial.git",
+      "user": "unlhcc",
+      "repo": "mathematica-tutorial",
+      "link": "https://github.com/unlhcc/mathematica-tutorial"
+    },
+    {
+      "name": "Blast Tutorial",
+      "type": "github",
+      "gitrepo": "https://github.com/unlhcc/blast-tutorial.git",
+      "user": "unlhcc",
+      "repo": "blast-tutorial",
+      "link": "https://github.com/unlhcc/blast-tutorial"
+    }
+  ]
+
+}
+
+

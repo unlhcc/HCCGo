@@ -1,5 +1,6 @@
 var app = angular.module('HccGoApp', ['HccGoApp.WelcomeCtrl',
                               'ngRoute',
+                              'ngAnimate',
                               'ConnectionServiceModule',
 							  'NotifierModule',
                               'HccGoApp.clusterLandingCtrl',
@@ -15,29 +16,30 @@ var app = angular.module('HccGoApp', ['HccGoApp.WelcomeCtrl',
                               'updaterModule',
                               'HccGoApp.updatePageCtrl',
                               'HccGoApp.NavCtrl', 'dataUsageService', 'jobStatusService',
-                              'AnalyticsModule']).config([
+                              'AnalyticsModule',
+                              'HccGoApp.tutorialCtrl']).config([
   '$routeProvider', function($routeProvider) {
     return $routeProvider.when('/', {
       title: 'Welcome',
       templateUrl: 'html/welcome.html',
       controller: 'welcomeCtrl'
-    }).when('/cluster/:clusterId', {
+    }).when('/cluster/', {
       title: 'Dashboard',
       templateUrl: 'html/clusterLanding.html',
       controller: 'clusterLandingCtrl'
-    }).when('/cluster/:clusterId/filesystem', {
+    }).when('/filesystem', {
       title: 'Filesystem',
       templateUrl: 'html/clusterFileSystem.html',
       controller: 'clusterFileSystemCtrl'
-    }).when('/cluster/:clusterId/jobSubmission', {
+    }).when('/jobSubmission', {
       title: 'Job Submission',
       templateUrl: 'html/jobSubmission.html',
       controller: 'jobSubmissionCtrl'
-    }).when('/cluster/:clusterId/jobHistory', {
+    }).when('/jobHistory', {
       title: 'Job History',
       templateUrl: 'html/jobHistory.html',
       controller: 'jobHistoryCtrl'
-    }).when('/cluster/:clusterId/jobview/:jobId', {
+    }).when('/jobview/:jobId', {
       title: 'Job View',
       templateUrl: 'html/jobView.html',
       controller: 'jobViewCtrl'
@@ -45,14 +47,25 @@ var app = angular.module('HccGoApp', ['HccGoApp.WelcomeCtrl',
       title: 'Update',
       templateUrl: 'html/update.html',
       controller: 'updatePageCtrl'
+    }).when('/tutorials', {
+      title: 'Tutorials',
+      templateUrl: 'html/tutorials.html',
+      controller: 'tutorialCtrl'
     }).otherwise({
       redirectTo: '/'
     });
   }
 ]);
 
-app.run(['$rootScope', '$route', 'analyticsService', function($rootScope, $route, analyticsService) {
-    $rootScope.$on('$routeChangeSuccess', function() {
+app.run(['$rootScope', '$route', 'analyticsService', '$location', function($rootScope, $route, analyticsService, $location) {
+    $rootScope.$on('$routeChangeSuccess', function(event, current, previous) {
         if($route.current.title) analyticsService.screenView($route.current.title); //screenView value is Dashboard
+        $rootScope.title = current.$$route.title;
+        if ($location.path() == '/') {
+          $rootScope.showSidebar = false;
+        } else {
+          $rootScope.showSidebar = true;
+        }
+        
     });
 }]);

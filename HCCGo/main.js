@@ -3,7 +3,11 @@
 const {app, BrowserWindow, globalShortcut, Menu} = require('electron');
 const {ipcMain} = require('electron');
 const {autoUpdater} = require('electron');
+const rimraf = require('rimraf');
+const os = require('os');
+const path = require('path');
 
+if (require('electron-squirrel-startup')) return;
 
 let mainWindow = null;
 
@@ -23,6 +27,10 @@ app.on('ready', function() {
 	    console.log("Checking if app has focus");
 		event.sender.send('focus-check-message', mainWindow.isFocused());
 	});
+  
+  ipcMain.on('get-version', (event, args) => {
+    event.sender.send('get-version-message', app.getVersion());
+  });
 
     mainWindow.on('closed', function() {
         mainWindow = null;
@@ -232,4 +240,8 @@ app.on('ready', function() {
 
 
 
+});
+
+app.on('quit', function() {
+  rimraf.sync(path.join(os.tmpdir(), "hcc_tmp*"));
 });

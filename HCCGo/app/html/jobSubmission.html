@@ -1,5 +1,5 @@
-<div ng-include="'html/navbar.html'"></div>
-<div class="container">
+
+<div>
   <div class="well">
     <h2 class="text-center">Job Submission Script</h2>
     <form class="form-horizontal" id="jobscript" name="jobscript" role="form" novalidate>
@@ -22,10 +22,10 @@
           <span class="glyphicon glyphicon-info-sign infoBubble" data-toggle="tooltip" data-container="body" data-placement="top" title="Size in MBs"></span>
         </label>
         <div class="col-sm-10">
-          <input type="text" class="form-control" id="memory" name="memory" ng-model="job.memory" ng-pattern="/^[0-9]{4,5}$/" placeholder="1024 (in megabytes)" required>
+          <input type="text" class="form-control" id="memory" name="memory" ng-model="job.memory" ng-pattern="/^[0-9]{1,}$/" placeholder="1024 (in megabytes)" required>
           <span class="text-danger" ng-show="jobscript.memory.$dirty && jobscript.memory.$invalid">
               <span ng-show="jobscript.memory.$error.required"> Memory is required. </span>
-              <span ng-show="jobscript.memory.$error.pattern"> Enter as a 4-5 digit number of megabytes. </span>
+              <span ng-show="jobscript.memory.$error.pattern"> Enter as a number of megabytes. </span>
           </span>
         </div>
       </div>

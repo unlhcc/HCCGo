@@ -18,78 +18,23 @@ connectionModule = angular.module('ConnectionServiceModule', [])
  * @requires fs
  * @requires ssh2
  */
-connectionModule.factory('connectionService',['$log', '$q', '$routeParams', '$location', 'notifierService', 'analyticsService', function($log, $q, $routeParams, $location, notifierService, analyticsService) {
-   var connectionList = {crane: null,
-                         tusker: null,
-                         sandhills: null,
-                         glidein: null};
+connectionModule.factory('connectionService',['$log', '$q', '$routeParams', '$location', 'notifierService', 'analyticsService', '$rootScope', function($log, $q, $routeParams, $location, notifierService, analyticsService, $rootScope) {
+
    const async = require('async');
    const path = require('path');
    const fs = require('fs');
-   $log.debug(connectionList);
+   var connectionDetails = {
+     "username": null,
+     "hostname": null,
+     "shorthost": null
+   }
+   var connection = null;
+
 
    /**
    * To initiate ssh connections to remote clusters.
    *
    */
-
-   // Returns the context of the connection (if cluster is Sandhills, use Sandhills connection etc...)
-   var getClusterContext = function() {
-      switch($routeParams.clusterId) {
-         case "Crane":
-            return 'crane';
-            break;
-         case "Tusker":
-            return 'tusker';
-            break;
-         case "Sandhills":
-            return 'sandhills';
-            break;
-         case "Glidein":
-            return 'glidein';
-            break;
-         default:
-            return 'crane';
-      }
-   }
-
-   // Checks if connection for a cluster exists
-   var getConnection = function() {
-      // Check if the host exists in the connection list
-      switch($routeParams.clusterId) {
-         case "Crane":
-            if (connectionList['crane'] != null) {
-               return true;
-            } else {
-               return false;
-            }
-            break;
-         case "Tusker":
-            if (connectionList['tusker'] != null) {
-               return true;
-            } else {
-               return false;
-            }
-            break;
-         case "Sandhills":
-            if (connectionList['sandhills'] != null) {
-               return true;
-            } else {
-               return false;
-            }
-            break;
-         case "Glidein":
-            if (connectionList['glidein'] != null) {
-               return true;
-            } else {
-               return false;
-            }
-            break;
-         default:
-            return false;
-      }
-
-   };
 
 
   /**
@@ -118,7 +63,7 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', '$lo
     async.waterfall([
       // Get the sftp module
       function(callback) {
-        var sftp_return = connectionList[getClusterContext()].sftp(function (err, sftp) {
+        var sftp_return = connection.sftp(function (err, sftp) {
           $log.log("Got sftp now");
           if (err){
             return callback(err);
@@ -190,7 +135,7 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', '$lo
     // process progression data is figured out
 
     // Starts the connection
-    connectionList[getClusterContext()].sftp(function (err, sftp) {
+    connection.sftp(function (err, sftp) {
       if (err) {
         deferred.reject(err);
       }
@@ -231,7 +176,7 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', '$lo
    var submitJob = function(location) {
       var deferred = $q.defer();
       $log.debug("Running command: " + 'sbatch ' + location);
-      runCommand('sbatch ' + location).then(function(data) {
+      runCommand('cd ' + path.dirname(location) + '; sbatch ' + location).then(function(data) {
         deferred.resolve(data);
       }, function(data) { // thrown on failure
         $log.log("Error log: " + data)
@@ -241,19 +186,19 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', '$lo
    }
 
    var closeStream = function() {
-      // Closes the connection stream
-      var clusters = ['crane','tusker','sandhills','glidein'];
-      for (var x = 0; x < clusters.length; x++) {
-         if (connectionList[clusters[x]] != null) {
-            connectionList[clusters[x]].end();
-            connectionList[clusters[x]] = null;
-         }
-      }
+     
+     if (connection != null) {
+       connection.end();
+     }
    };
 
-   var runCommandQueue = async.queue(function (task, callback) {
+   var runCommandQueue = async.priorityQueue(function (task, callback) {
       // Starts Command session
-      connectionList[getClusterContext()].exec(task.name, function(err, stream) {
+      // Always source /etc/bashrc on the remote cluster before
+      // running commands
+      // How are we going to handle those people whose default shell is not bash?
+      real_task = "if [ -f /etc/bashrc ]; then . /etc/bashrc; fi; if [ -f ~/.bashrc ]; then . ~/.bashrc; fi; " + task.name;
+      connection.exec(real_task, function(err, stream) {
 
          cumulData = "";
 
@@ -276,12 +221,20 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', '$lo
          });
       });
    }, 1);
-
-   var runCommand = function(command) {
+   
+   /**
+    * Run a command on the remote cluster and get the output
+    * @param {String} comamnd - Command to execute
+    * @param {Integer} [priority=1] - Priority of the command, default: 1.  Higher numbers have lower priority.  0 is the highest priority.
+    * @memberof HCCGo.connectionService
+    *
+    */
+   var runCommand = function(command, priority) {
+      priority = (typeof priority !== 'undefined') ?  priority : 1;
 
       var deferred = $q.defer();         // Used to return promise data
 
-      runCommandQueue.push({name: command}, function(err, cumulData) {
+      runCommandQueue.push({name: command}, priority, function(err, cumulData) {
           if (err) {
               deferred.reject("Error running command " + command + ": " + err);
           } else {
@@ -328,7 +281,7 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', '$lo
 
    var readDirQueue = async.cargo(function (task, callback) {
       // Starts SFTP session
-      connectionList[getClusterContext()].sftp(function (err, sftp) {
+      connection.sftp(function (err, sftp) {
          // Debug to console
          // $log.debug("SFTP has begun");
          // $log.debug("Reading server");
@@ -378,7 +331,7 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', '$lo
    var makeDir = function(dirList, root, dest, callback) {
       var attrs = {mode: '0775'};
 
-      connectionList[getClusterContext()].sftp(function (err, sftp) {
+      connection.sftp(function (err, sftp) {
       async.eachSeries(dirList, function(dir, done) {
           var dirs = [];
 	      var exists = false;
@@ -507,7 +460,7 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', '$lo
      var deferred = $q.defer();
 
      // Use stat from sftp
-     connectionList[getClusterContext()].sftp(function (err, sftp) {
+     connection.sftp(function (err, sftp) {
        if(err) {
          sftp.end();
          return deferred.reject("Error getting SFTP object: " + err);
@@ -532,7 +485,7 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', '$lo
     //  runCommand('cat ' + filePath).then(function(data) {
     //     deferred.resolve(data.trim());
     //  });
-    connectionList[getClusterContext()].sftp(function (err, sftp) {
+    connection.sftp(function (err, sftp) {
       if(err) {
         return deferred.reject("Error getting SFTP object: " + err);
       }
@@ -558,7 +511,7 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', '$lo
 
    var uploaderQueue = async.cargo(function (task, callback) {
       // Starts SFTP session
-      connectionList[getClusterContext()].sftp(function (err, sftp) {
+      connection.sftp(function (err, sftp) {
         async.each(task, function(worker, done) {
             var parityCheck = true;
             var totalCollector = 0;
@@ -704,7 +657,7 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', '$lo
 
    var remoteStatQueue = async.cargo(function (task, callback) {
       // Starts SFTP session
-      connectionList[getClusterContext()].sftp(function (err, sftp) {
+      connection.sftp(function (err, sftp) {
          // Debug to console
          // $log.debug("SFTP Stat has begun");
          // $log.debug("Reading server file");
@@ -751,7 +704,7 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', '$lo
 
     var downloaderQueue = async.cargo(function (task, callback) {
       // Starts SFTP session
-     connectionList[getClusterContext()].sftp(function (err, sftp) {
+     connection.sftp(function (err, sftp) {
         async.each(task, function(worker, done) {
           var totalCollector = 0;
           var parityCheck = true;
@@ -903,7 +856,7 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', '$lo
     */
    var quickDownload = function(remotePath, localPath) {
        var deferred = $q.defer();
-       connectionList[getClusterContext()].sftp(function (err, sftp) {
+       connection.sftp(function (err, sftp) {
            if (err) {
                deferred.reject(err);
            }
@@ -919,7 +872,6 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', '$lo
        return deferred.promise;
    };
    return {
-   getConnection: getConnection,
    runCommand: runCommand,
    getUsername: getUsername,
    uploadFile: uploadFile,
@@ -936,6 +888,7 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', '$lo
    checkWritable: checkWritable,
    getFileText: getFileText,
    getFileSize: getFileSize,
+   connectionDetails: connectionDetails,
    initiateConnection: function initiateConnection(username, password, hostname, cluster, needInput, completed) {
 
      var Client = require('ssh2').Client;
@@ -948,23 +901,12 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', '$lo
      }
 
      conn.on('ready', function() {
+      connectionDetails['username'] = username;
+      connectionDetails['hostname'] = hostname;
+      connectionDetails['shorthost'] = cluster;
       completed(null);
+      $rootScope.$broadcast("login");
       $log.log('Client :: ready');
-      conn.exec('uptime', function (err, stream) {
-        if (err) {
-         $log.error("Error Logging executing");
-         return;
-        }
-
-        stream.on('close', function(code, signal) {
-
-         $log.info('Stream :: close :: code: ' + code + ', signal: ' + signal)
-        }).on('data', function(data) {
-         $log.log('STDOUT' + data);
-        }).stderr.on('data', function(data) {
-         $log.log('STDERR' + data);
-        });
-      });
      }).on('error', function(err) {
       $log.error(err);
       completed(err);
@@ -1009,23 +951,7 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', '$lo
          completed(err);
      }
 
-      switch(cluster) {
-      case "Crane":
-         connectionList['crane'] = conn;
-         break;
-      case "Tusker":
-         connectionList['tusker'] = conn;
-         break;
-      case "Sandhills":
-         connectionList['sandhills'] = conn;
-         break;
-      case "Glidein":
-         connectionList['glidein'] = conn;
-         break;
-      default:
-         return false;
-     }
-     $log.debug(connectionList);
+     connection = conn;
 
    }
 

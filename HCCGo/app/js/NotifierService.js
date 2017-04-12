@@ -14,7 +14,7 @@ notifierModule = angular.module('NotifierModule', ['toastr'])
 notifierModule.factory('notifierService',['$log', '$q', '$routeParams', 'toastr',
                                            function($log, $q, $routeParams, toastr) {
 
-   const {ipcRenderer} = require('electron');
+   const ipcRenderer = require('electron').ipcRenderer;
    const notifier = require('node-notifier');
    var path = require('path');
    var fs = require('fs');
@@ -34,7 +34,7 @@ notifierModule.factory('notifierService',['$log', '$q', '$routeParams', 'toastr'
 	 */
   var getWinFocus = function() {
     var deferred = $q.defer();
-	  ipcRenderer.on('focus-check-message', (event, arg) => {
+	  ipcRenderer.on('focus-check-message', function(event, arg) {
           $log.debug("Window is focused: " + arg);
 		  deferred.resolve(arg);
       });

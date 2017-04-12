@@ -1,7 +1,16 @@
 # HCCGo
+
+[![Build Status](https://travis-ci.org/unlhcc/HCCGo.svg?branch=master)](https://travis-ci.org/unlhcc/HCCGo)
+[![Build status](https://ci.appveyor.com/api/projects/status/fgw8n9k22lp7xkdw/branch/master?svg=true)](https://ci.appveyor.com/project/djw8605/hccgo-668qn/branch/master)
+
 A GUI application for submitting and managing jobs at the Holland Computing Center.
 
 [Developer Documentation](https://unlhcc.github.io/hccgo-dev/)
+
+
+## Tutorials
+
+- [Writing Tutorials](tutorial-writing-tutorials.html)
 
 ## Setting up environment for running code
 To setup your environment to run the code you'll need to first clone the repository, install 'npm', and install 'grunt-cli' globally with the command:

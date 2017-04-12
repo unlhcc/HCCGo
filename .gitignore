@@ -9,12 +9,17 @@ npm-debug.log
 
 HCCGo/app/css/application.css
 bower_components/*
+HCCGo/bower_components
 HCCGo/app/lib/*
 HCCGo/node_modules/*
+HCCGo/HCCGo.dmg
 packageWin/*
 packageOsx/*
 packageNix/*
 HCCGo/app/html/beta_notice.html
+HCCGo/app/html/tutorial_help.html
+docs/*
+
 
 *.swp
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 const spawn = require('child_process').spawnSync;
 const fs = require('fs');
-const target = "1.4.3";
+const target = "1.6.1";
 const path = require('path');
 
 let rebuilder = "";
