@@ -48,6 +48,14 @@
       "user": "unlhcc",
       "repo": "blast-tutorial",
       "link": "https://github.com/unlhcc/blast-tutorial"
+    },
+    {
+      "name": "Blast Watermelon",
+      "type": "github",
+      "gitrepo": "https://github.com/unlhcc/blast-watermelon.git",
+      "user": "unlhcc",
+      "repo": "blast-watermelon",
+      "link": "https://github.com/unlhcc/blast-watermelon"
     }
   ]
 
