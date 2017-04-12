@@ -1,62 +1,57 @@
-<div ng-controller="NavCtrl">
-
-<div class="navbar navbar-hcc">
-  <div class="navbar-header">
-    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
-      <span class="icon-bar"></span>
-      <span class="icon-bar"></span>
-      <span class="icon-bar"></span>
-    </button>
-    <a ng-click="servicer.goHome()" class="navbar-brand" href="javascript:void(0)">
-        <img class="navIcon" src="../icons/HCCGo.png" />
-        <span class="imageSubtitle">Beta</span>
-    </a>
+<div ng-controller="NavCtrl" style="height: 100%">
+  <div class="sidebar card">
+		<div class="profile-userpic">
+			<img class="navIcon" src="../icons/HCCGo.png" width="100px" height="100px"/>
+		</div>
+		<!-- END SIDEBAR USERPIC -->
+		<!-- SIDEBAR USER TITLE -->
+		<div class="profile-usertitle">
+			<div class="profile-usertitle-name">
+				{{servicer.username}}
+			</div>
+			<div class="profile-usertitle-host">
+				{{servicer.host}}
+			</div>
+		</div>
+		<!-- END SIDEBAR USER TITLE -->
+		<!-- SIDEBAR BUTTONS -->
+		<div class="profile-userbuttons">
+			<button type="button" class="btn btn-danger btn-sm" ng-click="servicer.logout()">Logout</button>
+		</div>
+		
+    
+    <div class="profile-usermenu">
+			<ul class="nav">
+				<li ng-class="{ 'active': isActive('/cluster') }">
+					<a ng-click="servicer.goToDashboard()">
+					<i class="glyphicon glyphicon-stats"></i>
+					Dashboard </a>
+				</li>
+				<li ng-class="{ 'active': isActive('/jobHistory') || isActive('/jobSubmission') }">
+					<a ng-click="servicer.jobHistory()">
+					<i class="glyphicon glyphicon-user"></i>
+					Submit </a>
+				</li>
+				<li ng-class="{ 'active': isActive('/filesystem') }">
+					<a ng-click="servicer.goToSCP()">
+					<i class="glyphicon glyphicon-folder-open"></i>
+					File Management </a>
+				</li>
+				<li ng-class="{ 'active': isActive('/tutorials') }">
+					<a ng-click="servicer.goToTutorials()">
+					<i class="glyphicon glyphicon-flag"></i>
+					Tutorials </a>
+				</li>
+				<li ng-class" { 'active': isActive('/update') }" ng-show="updateAvailable" ng-controller="updateButtonCtrl">
+					<a ng-click="updateDialog()">
+						<i class="glyphicon glyphicon-arrow-up"></i>
+						Update <span class="badge pull-right">1</span>
+					</a>
+				</li>
+			</ul>
+		</div>
+		<div class="version-info">
+			Version <br/> {{ servicer.version }}
+		</div>
   </div>
-
-  <div class="navbar-collapse collapse navbar-responsive-collapse" id="myNavbar">
-  <!--File Management Dropdown -->
-    <ul class="nav navbar-nav">
-      <li>
-       <button type="button"
-           ng-click="servicer.jobHistory()"
-           class="navbar-left btn btn-success navbar-btn btn-primary">
-               Submit
-       </button>
-      </li>
-     <li>
-       <button type="button"
-           ng-click="servicer.goToSCP()"
-           class="navbar-left btn btn-secondary navbar-btn btn-primary">
-               File Management
-       </button>
-     </li>
-     <li>
-       <button type="button"
-           ng-click="servicer.goToTutorials()"
-           class="navbar-left btn btn-info navbar-btn">
-               Tutorials
-       </button>
-     </li>
-    </ul>
-
-    <ul class="nav navbar-nav navbar-right">
-      <li ng-controller="updateButtonCtrl">
-        <button type="button" 
-        ng-click="updateDialog()"
-        class="btn btn-info navbar-btn"
-        ng-show="updateAvailable">
-        Update Available
-        </button>
-      </li>
-      <li class="dropdown">
-        <a href="javascript:void(0)" data-target="#" 
-		   class="dropdown-toggle" 
-		   data-toggle="dropdown"> {{servicer.username}}@{{servicer.host}} <b class="caret"></b></a>
-        <ul class="dropdown-menu">
-          <li><a ng-click="servicer.logout()">Logout</a></li>
-        </ul>
-      </li>
-    </ul>
-  </div>
-</div>
 </div> <!-- End NavCtrl -->

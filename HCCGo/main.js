@@ -27,6 +27,10 @@ app.on('ready', function() {
 	    console.log("Checking if app has focus");
 		event.sender.send('focus-check-message', mainWindow.isFocused());
 	});
+  
+  ipcMain.on('get-version', (event, args) => {
+    event.sender.send('get-version-message', app.getVersion());
+  });
 
     mainWindow.on('closed', function() {
         mainWindow = null;

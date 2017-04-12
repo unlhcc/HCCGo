@@ -10,6 +10,9 @@ install:
   # install modules
   - npm install
   - npm --prefix ./HCCGo install HCCGo
+  - npm install -g grunt
+  - npm install -g bower
+  - bower install
 
 build: off
 
@@ -18,8 +21,7 @@ test_script:
   # Output useful info for debugging.
   - node --version
   - npm --version
-  - npm install -g grunt
-  - grunt bower
+  - grunt bowerInstall
   # run tests
   - npm --prefix ./HCCGo test
   - grunt packageWin

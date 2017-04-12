@@ -9,20 +9,16 @@
 
 
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-    <script src="lib/jquery/jquery.js"></script>
-    <script>window.$ = window.jQuery = require('./lib/jquery/jquery.js');</script>
+    <script src="../bower_components/jquery/dist/jquery.js"></script>
+    <script>window.$ = window.jQuery = require('../bower_components/jquery/dist/jquery.js');</script>
 
     <!-- Bootstrap -->
     <!--<link href="lib/css/bootstrap/bootstrap-theme.css" rel="stylesheet">-->
-    <link href="lib/bootstrap/css/bootstrap.css" rel="stylesheet">
-    <link href="lib/bootstrap-material-design/material.css" rel="stylesheet">
-    <link href="lib/bootstrap-material-design/ripples.css" rel="stylesheet">
+    <link href="../bower_components/bootstrap/dist/css/bootstrap.css" rel="stylesheet">
     <link href="../node_modules/c3/c3.css" rel="stylesheet">
-    <link href="lib/jquery-file-tree/css/jqueryFileTree.min.css" rel="stylesheet">
     <!-- <link href="lib/selectize/selectize.bootstrap3.css" rel="stylesheet"> -->
-    <link href="lib/angular-toastr/angular-toastr.css" rel="stylesheet" />
-    <link href="lib/font-awesome/css/font-awesome.css" rel="stylesheet" />
-    <link href="css/application.css" rel="stylesheet">
+    <link href="../bower_components/font-awesome/css/font-awesome.css" rel="stylesheet" />
+    
 
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -32,23 +28,37 @@
     <![endif]-->
 
     <!-- Include all compiled plugins (below), or include individual files as needed -->
-    <script src="lib/angular/angular.js"></script>
-    <script src="lib/angular-animate/angular-animate.js"></script>
-    <script src="lib/angular-route/angular-route.js"></script>
-    <script src="lib/angular-resource/angular-resource.js"></script>
-    <script src="lib/tether/tether.js"></script>
-    <script src="lib/bootstrap/js/bootstrap.js"></script>
-    <script src="lib/bootstrap-material-design/material.js"></script>
-    <script src="lib/bootstrap-material-design/ripples.js"></script>
+    <!-- bower:css -->
+    <link rel="stylesheet" href="../bower_components/bootstrap-material-design/dist/css/material.css" />
+    <link rel="stylesheet" href="../bower_components/bootstrap-material-design/dist/css/ripples.css" />
+    <link rel="stylesheet" href="../bower_components/selectize/dist/css/selectize.css" />
+    <link rel="stylesheet" href="../bower_components/jquery-file-tree/dist/css/jqueryFileTree.min.css" />
+    <link rel="stylesheet" href="../bower_components/angular-toastr/dist/angular-toastr.css" />
+    <!-- endbower -->
+    <link href="css/application.css" rel="stylesheet">
+    
+    <!-- bower:js -->
+    <script src="../bower_components/bootstrap-material-design/dist/js/material.js"></script>
+    <script src="../bower_components/bootstrap-material-design/dist/js/ripples.js"></script>
+    <script src="../bower_components/angular/angular.js"></script>
+    <script src="../bower_components/angular-route/angular-route.js"></script>
+    <script src="../bower_components/angular-resource/angular-resource.js"></script>
+    <script src="../bower_components/bootstrap/dist/js/bootstrap.js"></script>
+    <script src="../bower_components/sifter/sifter.js"></script>
+    <script src="../bower_components/microplugin/src/microplugin.js"></script>
+    <script src="../bower_components/selectize/dist/js/selectize.js"></script>
+    <script src="../bower_components/jquery-file-tree/dist/js/jQueryFileTree.min.js"></script>
+    <script src="../bower_components/angular-toastr/dist/angular-toastr.tpls.js"></script>
+    <script src="../bower_components/bootbox/bootbox.js"></script>
+    <script src="../bower_components/tether/dist/js/tether.js"></script>
+    <script src="../bower_components/angular-animate/angular-animate.js"></script>
+    <!-- endbower -->
+    
+    <script src="../bower_components/ace-builds/src-noconflict/ace.js"></script>
+    
     <script src="../node_modules/d3/d3.min.js"></script>
     <script src="../node_modules/c3/c3.min.js"></script>
-    <script src="lib/microplugin/microplugin.js"></script>
-    <script src="lib/sifter/sifter.js"></script>
-    <script src="lib/selectize/selectize.js"></script>
-    <script src="lib/angular-toastr/angular-toastr.tpls.js"></script>
-    <script src="lib/bootbox/bootbox.js"></script>
     <script src="js/fileManageService.js"></script>
-    <script src="lib/ace-builds/src-noconflict/ace.js"></script>
 
     <script src="js/WelcomeCtrl.js"></script>
     <script src="js/DebugLogger.js"></script>
@@ -91,7 +101,15 @@
 
   </head>
   <body ng-app="HccGoApp">
-    <div ng-view>
+    <div class="container-fluid" style="height: 100%">
+      <div class="row" style="height: 100%">
+        <div class="col-md-2 no-left-padding" style="height: 100%" ng-show="showSidebar">
+          <div ng-include="'html/navbar.html'" style="height: 100%"></div>
+        </div>
+        <div ng-class="{ 'col-md-10': showSidebar, 'add-top-margin': showSidebar }">
+          <div ng-view></div>
+        </div>
+      </div>
     </div>
   </body>
 </html>

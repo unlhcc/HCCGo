@@ -1,6 +1,5 @@
-<div ng-include="'html/navbar.html'"></div>
-<div class="container"> 
-      <div class="card">
+<div> 
+      <div class="card col-md-12">
             <div class="row">
                      <div class="col-xs-6 col-sm-4">
                         <div class="panel panel-default width-control">
@@ -38,12 +37,12 @@
                             </button>
                             <div class="row">
                                   <div class="col-sm-6">
-                                        <button id="btnView" ng-disabled="!fileManage.canView" ng-click="fileManage.viewFile(false)" type="button" class="btn btn-primary btn-block col-sm-6">
+                                        <button id="btnView" ng-disabled="!fileManage.canView" ng-click="fileManage.viewFile(false)" type="button" class="btn btn-primary btn-block">
                                             View Raw
                                         </button>
                                   </div>
                                   <div class="col-sm-6">
-                                        <button id="btnView" ng-disabled="!fileManage.canView" ng-click="fileManage.viewFile(true)" type="button" class="btn btn-primary btn-block col-sm-6">
+                                        <button id="btnView" ng-disabled="!fileManage.canView" ng-click="fileManage.viewFile(true)" type="button" class="btn btn-primary btn-block">
                                             View Text
                                         </button>
                                   </div>

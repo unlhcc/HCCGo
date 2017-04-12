@@ -199,7 +199,7 @@ clusterLandingModule.controller('clusterLandingCtrl', ['$scope', '$log', '$timeo
       if(isRefreshingGraphs) return;
       isRefreshingGraphs = true;
       (function refreshEvery() {
-        updateGraphs(true);
+        updateGraphs(false);
         refreshingGraphsPromise = $timeout(refreshEvery, 300000);
       }());
     };
