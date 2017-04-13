@@ -66,8 +66,6 @@ fileManageService.factory('navService',['$log', '$q', '$location', '$routeParams
 
    });
 
-
->>>>>>> master
    return service;
 
 }]);

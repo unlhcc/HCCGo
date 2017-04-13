@@ -1,25 +1,22 @@
-<div ng-include="'html/navbar.html'"></div>
-
-<div class="container">
-  <div class="row">
-    <div class="col-md-6 col-md-offset-3">
-      <div class="well">
-        <h3> Preferences </h3>
-        <form class="form-horizontal">
-          <div class="form-group">
-            <label class="control-label col-sm-2" for="uuid">UUID:</label>
-            <div class="col-sm-10">
-              <input class="form-control" disabled ng-value="uuid">
-            </div>
+<div class="row">
+  <div class="col-md-12">
+    <div class="well">
+      <h3 class="text-center"> Preferences </h3>
+      <form class="form-horizontal">
+        <div class="form-group">
+          <label class="control-label col-sm-2" for="schedulerSelect">Scheduler Type:</label>
+          <div class="col-sm-8">
+            <select class="form-control" id="schedulerSelect" name="schedulerSelect">
+            </select>
           </div>
-          <div class="form-group">
-            <div class="col-sm-offset-2 col-sm-10">
-              <select class="form-control servers" id="clusterSelect">
-              </select>
-            </div>
+        </div>
+        <div class="form-group">
+          <label class="control-label col-sm-2" for="uuid">UUID:</label>
+          <div class="col-sm-8">
+            <input class="form-control" disabled ng-value="uuid">
           </div>
-        </form>
-      </div>
+        </div>
+      </form>
     </div>
   </div>
 </div>

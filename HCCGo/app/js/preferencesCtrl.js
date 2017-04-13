@@ -17,33 +17,19 @@ preferencesModule.controller('preferencesCtrl', ['$scope', '$log', 'preferencesM
     $scope.uuid = data.uuid;
   });
 
-  var $selector = $('#clusterSelect').selectize({
-
+  var $selector = $('#schedulerSelect').selectize({
     createOnBlur: true,
     labelField: 'label',
     searchField: 'label',
-    valueField: 'url',
-    selectOnTab: true,
-    render: {
-      'option': function(data, escape) {
-            return '<div><span class="clusterLabel">' + escape(data.label) + '</span>' + '<span class="url">' + escape(data.url) + '</span></div>';
-        },
-       'option_create': function(data, escape) {
-         return '<div class="create">Hostname: <strong>' +  escape(data.input) + '</strong>&hellip;</div>';
-       }
-     },
-     create: function(input, callback) {
-       new_object = {}
-       new_object.label = input.split(".")[0];
-       new_object.url = input;
-       new_object.type = 'slurm';
-       $scope.clusters.push(new_object);
-       callback(new_object);
-
-     }
-
+    valueField: 'value',
+    selectOnTab: true
   });
 
   var selection = $selector[0].selectize;
+  var schedulers = [{"label":"Slurm", "value":"slurm"},{"label":"Condor", "value":"condor"}];
+  selection.addOption(schedulers);
+  selection.addItem(schedulers[0].value, false);
+  selection.refreshOptions(false);
+  selection.refreshItems();
 
 }]);

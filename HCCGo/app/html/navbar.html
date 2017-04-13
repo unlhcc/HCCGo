@@ -42,6 +42,11 @@
 					<i class="glyphicon glyphicon-flag"></i>
 					Tutorials </a>
 				</li>
+        <li ng-class" { 'active': isActive('/preferences') }">
+					<a ng-click="servicer.goToPreferences()">
+						<i class="glyphicon glyphicon-cog"></i>
+					Preferences </a>
+				</li>
 				<li ng-class" { 'active': isActive('/update') }" ng-show="updateAvailable" ng-controller="updateButtonCtrl">
 					<a ng-click="updateDialog()">
 						<i class="glyphicon glyphicon-arrow-up"></i>
