@@ -1,9 +1,10 @@
 #!/bin/bash -xe
 
-
+npm install -g bower
 
 grunt docs
-grunt bower
+bower install
+grunt bowerInstall
 pushd HCCGo
 npm install
 popd

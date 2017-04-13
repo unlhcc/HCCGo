@@ -19,7 +19,7 @@ module.exports = function(config) {
       '../node_modules/angular/angular.js',                             // angular
       '../node_modules/angular-route/angular-route.js', // ui-router
       '../node_modules/angular-mocks/angular-mocks.js',                 // loads our modules for tests
-      './app/lib/angular-toastr/angular-toastr.tpls.js',
+      './bower_components/angular-toastr/dist/angular-toastr.tpls.js',
       './node_modules/async/dist/async.js',
       './app/js/GenericClusterInterface.js',
       // Mocks

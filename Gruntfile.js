@@ -50,15 +50,27 @@ module.exports = function(grunt) {
         }
       }
     },
-    bower: {
-      install: {
-        options: {
-          targetDir: 'HCCGo/app/lib',
-          layout: 'byComponent',
-          install: true,
-          verbose: true,
-          cleanTargetDir: false
-        }
+    bowerInstall: {
+ 
+      target: {
+     
+        // Point to the files that should be updated when 
+        // you run `grunt bower-install` 
+        src: [
+          'HCCGo/**/*.html',   // .html support... 
+          'HCCGo/index.html',   // .jade support... 
+          'HCCGo/app/css/application.less'  // .scss & .sass support... 
+        ],
+     
+        // Optional: 
+        // --------- 
+        cwd: '',
+        dependencies: true,
+        devDependencies: false,
+        exclude: [],
+        fileTypes: {},
+        ignorePath: '',
+        overrides: {}
       }
     },
     jsdoc: {
@@ -74,34 +86,34 @@ module.exports = function(grunt) {
       }
     }
   });
+  grunt.loadNpmTasks('grunt-bower-install');
   grunt.loadNpmTasks('grunt-auto-install');
   grunt.loadNpmTasks('grunt-contrib-less');
   grunt.loadNpmTasks('grunt-shell');
-  grunt.loadNpmTasks('grunt-bower-task');
   grunt.loadNpmTasks('grunt-marked');
   grunt.loadNpmTasks('grunt-jsdoc');
   grunt.registerTask('default', ['less',
-                                 'bower',
+                                 'bowerInstall',
 				 'auto_install']);
   grunt.registerTask('run', ['less',
-                             'bower',
+                             'bowerInstall',
                              'marked',
 			     'auto_install',
 			     'shell:start_electron']);
   grunt.registerTask('packageWin', ['less',
-                                    'bower',
+                                    'bowerInstall',
                                     'marked',
 				    'auto_install',
 				    'shell:build_electron_windows',
             'shell:build_installer_windows']);
   grunt.registerTask('packageOsx', ['less',
-                                    'bower',
+                                    'bowerInstall',
                                     'marked',
 				    'auto_install',
 				    'shell:build_electron_macos',
             'shell:build_installer_macos']);
   grunt.registerTask('packageNix', ['less',
-                                    'bower',
+                                    'bowerInstall',
                                     'marked',
 				    'auto_install',
 				    'shell:build_electron_linux']);

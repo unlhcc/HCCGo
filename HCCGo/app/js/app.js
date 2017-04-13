@@ -64,8 +64,15 @@ var app = angular.module('HccGoApp', ['HccGoApp.WelcomeCtrl',
   }
 ]);
 
-app.run(['$rootScope', '$route', 'analyticsService', function($rootScope, $route, analyticsService) {
-    $rootScope.$on('$routeChangeSuccess', function() {
+app.run(['$rootScope', '$route', 'analyticsService', '$location', function($rootScope, $route, analyticsService, $location) {
+    $rootScope.$on('$routeChangeSuccess', function(event, current, previous) {
         if($route.current.title) analyticsService.screenView($route.current.title); //screenView value is Dashboard
+        $rootScope.title = current.$$route.title;
+        if ($location.path() == '/') {
+          $rootScope.showSidebar = false;
+        } else {
+          $rootScope.showSidebar = true;
+        }
+        
     });
 }]);
