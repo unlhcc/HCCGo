@@ -14,7 +14,7 @@
     var clientID = null;
     var userID = null;
   	var appName = 'HCCGo';
-  	var appVersion = '0.4.0-beta.2';
+  	var appVersion = '0.4.0';
   	var debug = false;
   	var performanceTracking = true;
   	var errorTracking = true;
