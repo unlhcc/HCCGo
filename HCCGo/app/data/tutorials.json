@@ -20,7 +20,7 @@
     {
       "name": "Matlab Tutorial",
       "type": "github",
-      "gitrepo": "https://github.com/unlhcc/matlab-tutorial.gitt",
+      "gitrepo": "https://github.com/unlhcc/matlab-tutorial.git",
       "user": "unlhcc",
       "repo": "matlab-tutorial",
       "link": "https://github.com/unlhcc/matlab-tutorial"
@@ -48,6 +48,14 @@
       "user": "unlhcc",
       "repo": "blast-tutorial",
       "link": "https://github.com/unlhcc/blast-tutorial"
+    },
+    {
+      "name": "Blast Watermelon",
+      "type": "github",
+      "gitrepo": "https://github.com/unlhcc/blast-watermelon.git",
+      "user": "unlhcc",
+      "repo": "blast-watermelon",
+      "link": "https://github.com/unlhcc/blast-watermelon"
     }
   ]
 
