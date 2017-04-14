@@ -11,14 +11,13 @@ preferencesModule = angular.module('HccGoApp.preferencesCtrl', ['ngRoute' ]);
  * @requires $log
  * @requires preferencesManager
  */
-preferencesModule.controller('preferencesCtrl', ['$scope', '$log', 'preferencesManager', function($scope, $log, preferencesManager) {
+preferencesModule.controller('preferencesCtrl', ['$scope', '$log', 'preferencesManager', 'notifierService', function($scope, $log, preferencesManager, notifierService) {
 
   preferencesManager.getPreferences().then(function(data) {
     $scope.uuid = data.uuid;
   });
 
   var $selector = $('#schedulerSelect').selectize({
-    createOnBlur: true,
     labelField: 'label',
     searchField: 'label',
     valueField: 'value',
@@ -28,8 +27,25 @@ preferencesModule.controller('preferencesCtrl', ['$scope', '$log', 'preferencesM
   var selection = $selector[0].selectize;
   var schedulers = [{"label":"Slurm", "value":"slurm"},{"label":"Condor", "value":"condor"}];
   selection.addOption(schedulers);
-  selection.addItem(schedulers[0].value, false);
+  preferencesManager.getPreferences().then(function(data) {
+    selection.addItem(data.scheduler, true);
+  });
+
   selection.refreshOptions(false);
   selection.refreshItems();
 
+  // on change update scheduler
+  selection.on("change", function(value) {
+    selection.disable();
+    var preference = {"scheduler": value}
+    preferencesManager.setPreferences(preference).then(function(data) {
+      schedulerChange = value;
+      selection.enable();
+      notifierService.success('You successfully changed to ' + value, 'Schedular Changed!');
+    },
+    function(data) {
+      selection.enable();
+      notifierService.error('An error occurred while trying to change schedulars' , 'Schedular Change Error!');
+    });
+  });
 }]);

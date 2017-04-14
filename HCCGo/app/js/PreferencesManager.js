@@ -3,12 +3,12 @@
 preferencesModule = angular.module('PreferencesManager', [])
 
 preferencesModule.factory('preferencesManager',['$log', '$q', 'filePathService', function($log, $q, filePathService) {
-  
+
   var clustersDefer;
   var preferencesDefer;
   var preferencePath = filePathService.getPreferencePath();
   var fs = require("fs");
-  
+
   /**
      * Initializes and reads preferences.json and reads clusters.json, resolves promises for method execution
      * @method init
@@ -25,13 +25,13 @@ preferencesModule.factory('preferencesManager',['$log', '$q', 'filePathService',
         $log.error(err);
         readClustersDefer.reject(err);
       }
-      
+
       clusters = JSON.parse(data);
       readClustersDefer.resolve(clusters.clusters);
-      
+
     })
-    
-    
+
+
     // Initialize the file and id if not initialized
     readPrefDefer = $q.defer();
     preferencesDefer = readPrefDefer.promise;
@@ -39,7 +39,7 @@ preferencesModule.factory('preferencesManager',['$log', '$q', 'filePathService',
     fs.exists(preferencePath, function(exists) {
       if(!exists) {
         ws = fs.createWriteStream(preferencePath);
-        var uuid = require('uuid');       
+        var uuid = require('uuid');
         var obj = { uuid : uuid(null,0) };
         ws.write(JSON.stringify(obj));
         readPrefDefer.resolve(obj);
@@ -53,29 +53,29 @@ preferencesModule.factory('preferencesManager',['$log', '$q', 'filePathService',
     })
 
   }
-  
-  
-  
+
+
+
   var getClusters = function() {
     var returnDefer = $q.defer();
     clustersDefer.then(function(clusters) {
       returnDefer.resolve(clusters);
     })
-    
+
     return returnDefer.promise;
-    
+
   }
-  
+
   var setClusters = function(clusters) {
-    
-    
+
+
   }
-  
+
   var addCluster = function(cluster) {
-    
+
   }
-  
-  
+
+
   /**
    * Get the array of tutorials in the tutorials.json file
    * This file is distributed with the Application.
@@ -85,24 +85,24 @@ preferencesModule.factory('preferencesManager',['$log', '$q', 'filePathService',
    */
   var getTutorials = function() {
     var toReturn = $q.defer();
-    
+
     // Get the path to the tutorials file
     var path = require("path");
     var tutorials = path.join(__dirname, 'data/tutorials.json');
-    
+
     // Read in the tutorials file
     fs.readFile(tutorials, function(err, data) {
       if (err) {
         return toReturn.reject(err);
       }
-      
+
       return toReturn.resolve(JSON.parse(data));
     })
 
-    
+
     return toReturn.promise;
   }
-  
+
   /**
      * Get the currently set preferences
      * @method getPreferences
@@ -112,7 +112,7 @@ preferencesModule.factory('preferencesManager',['$log', '$q', 'filePathService',
   var getPreferences = function() {
     var returnDefer = $q.defer();
     preferencesDefer.then(function(preferences) {
-	  returnDefer.resolve(preferences);
+	     returnDefer.resolve(preferences);
     })
     return returnDefer.promise;
   }
@@ -144,7 +144,7 @@ preferencesModule.factory('preferencesManager',['$log', '$q', 'filePathService',
     })
     return returnDefer.promise;
   }
-  
+
   init();
     return {
       getClusters: getClusters,
@@ -153,7 +153,6 @@ preferencesModule.factory('preferencesManager',['$log', '$q', 'filePathService',
       getPreferences: getPreferences,
       setPreferences: setPreferences,
       getTutorials: getTutorials
-      
+
     }
 }]);
-  
