@@ -90,13 +90,12 @@
             </div>
             <div class="row-content">
               <div class="action-secondary">
-                <button type="button" class="btn btn-danger btn-xs deleteButton" ng-click="removeCompletedJob(job._id, $event)" ng-if="job.complete">
+                <button type="button" class="btn btn-danger btn-sm deleteButton" ng-click="removeCompletedJob(job._id, $event)" ng-if="job.complete">
                   <i class="glyphicon glyphicon-remove"></i> Remove
                 </button>
-                <a class="cancelButton" href="javascript:void(0)" ng-click="cancelModal(job, $event)"  ng-if="job.running || job.idle">
-                  <i class="glyphicon glyphicon-ban-circle"></i>
-                  <h4>Cancel Job</h4>
-                </a>
+                <button type="button" class="btn btn-warning btn-sm deleteButton" ng-click="cancelModal(job, $event)" ng-if="job.running || job.idle">
+                  <i class="glyphicon glyphicon-ban-circle"></i> Cancel
+                </button>
               </div>
               <h4 class="list-group-item-heading">{{job.jobName}}</h4>
 
