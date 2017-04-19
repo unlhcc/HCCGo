@@ -24,6 +24,7 @@ jobViewModule.controller('jobViewCtrl', ['$scope', '$log', '$timeout', 'connecti
 
   $scope.params = $routeParams;
 
+  $scope.loading = true;
   // query the db for the specific job and check if out/err is loaded
   dbService.getSubmittedJobsDB().then(function(db) {
     var outDownload = true;
@@ -115,6 +116,7 @@ jobViewModule.controller('jobViewCtrl', ['$scope', '$log', '$timeout', 'connecti
       }
       $scope.$apply(function() {
           $scope.job = result;
+          $scope.loading = false;
       });
     });
   });
