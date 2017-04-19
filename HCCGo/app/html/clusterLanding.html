@@ -90,10 +90,10 @@
             </div>
             <div class="row-content">
               <div class="action-secondary">
-                <button type="button" class="btn btn-danger btn-sm deleteButton" ng-click="removeCompletedJob(job._id, $event)" ng-if="job.complete">
+                <button type="button" class="btn btn-danger btn-flat btn-sm deleteButton" ng-click="removeCompletedJob(job._id, $event)" ng-if="job.complete">
                   <span class="glyphicon glyphicon-remove"></span> Remove
                 </button>
-                <button type="button" class="btn btn-warning btn-sm deleteButton" ng-click="cancelModal(job, $event)" ng-if="job.running || job.idle">
+                <button type="button" class="btn btn-warning btn-flat btn-sm deleteButton" ng-click="cancelModal(job, $event)" ng-if="job.running || job.idle">
                   <span class="glyphicon glyphicon-ban-circle"></span> Cancel
                 </button>
               </div>
