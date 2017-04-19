@@ -153,7 +153,7 @@ jobSubmissionModule.controller('jobSubmissionCtrl', ['$scope', '$log', '$timeout
   $scope.writeSubmissionScript = function(job) {
 
     $("#submitbtn").prop('disabled', true);
-
+    $('#submitprogress').css('width', '10%').attr('aria-valuenow', 10);
     // Separate SBATCH options from commands
     job.commands = editor.getValue().replace(/\r\n/, "\n");
     var other = job.commands.split(/\n/);
