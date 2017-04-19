@@ -23,8 +23,10 @@ jobViewModule = angular.module('HccGoApp.jobViewCtrl', ['ngRoute' ]);
 jobViewModule.controller('jobViewCtrl', ['$scope', '$log', '$timeout', 'connectionService', '$routeParams', '$location', '$q', 'preferencesManager', 'notifierService', 'jobService', 'dbService', function($scope, $log, $timeout, connectionService, $routeParams, $location, $q, preferencesManager, notifierService, jobService, dbService) {
 
   $scope.params = $routeParams;
+  $scope.job = {};
+  $scope.job.outText = "Loading Output...";
+  $scope.job.errText = "Loading Error...";
 
-  $scope.loading = true;
   // query the db for the specific job and check if out/err is loaded
   dbService.getSubmittedJobsDB().then(function(db) {
     var outDownload = true;
@@ -47,6 +49,10 @@ jobViewModule.controller('jobViewCtrl', ['$scope', '$log', '$timeout', 'connecti
       }
       
       else {
+        $scope.$apply(function() {
+          $scope.job.outText = "Loading Output...";
+          $scope.job.errText = "Loading Error...";
+        })
         // In parallel, get the size of the output and error
         connectionService.getFileSize(result.outputPath).then(function(size) {
           // If the file is larger than 5MB
@@ -120,6 +126,7 @@ jobViewModule.controller('jobViewCtrl', ['$scope', '$log', '$timeout', 'connecti
       });
     });
   });
+
 
   /**
    * Saves the output or error to a file
