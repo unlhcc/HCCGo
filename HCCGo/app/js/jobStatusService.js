@@ -231,8 +231,9 @@ jobStatusService.service('jobStatusService',['$log','$q','notifierService', 'dbS
                             {
                             "complete": true,
                             "idle": false,
-                            "error": job.State != "COMPLETED" && job.State != "RUNNING" && job.State != "IDLE",
+                            "error": job.State != "COMPLETED" && job.State != "RUNNING" && job.State != "IDLE" && !job.State.startsWith("CANCELLED"),
                             "running": false,
+                            "cancelled" : job.State.startsWith("CANCELLED"),
                             "elapsed": job.Elapsed,
                             "reqMem": job.ReqMem,
                             "jobName": job.JobName,
@@ -244,9 +245,9 @@ jobStatusService.service('jobStatusService',['$log','$q','notifierService', 'dbS
                           { returnUpdatedDocs: true },
                           function (err, numReplaced, affectedDocuments) {
                             // update db with data so it doesn't have to be queried again
-                            if (!err) {
+                            
+                            if (!err && !affectedDocuments.cancelled) {
                               notifierService.success('Your job, ' + affectedDocuments.jobName + ', has been completed', 'Job Completed!');
-                              $log.debug("Completed job is: " + affectedDocuments);
 
                               recent_completed_jobs.push(affectedDocuments);
                               return each_callback(null);
