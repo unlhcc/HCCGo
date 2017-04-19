@@ -23,9 +23,6 @@ jobViewModule = angular.module('HccGoApp.jobViewCtrl', ['ngRoute' ]);
 jobViewModule.controller('jobViewCtrl', ['$scope', '$log', '$timeout', 'connectionService', '$routeParams', '$location', '$q', 'preferencesManager', 'notifierService', 'jobService', 'dbService', function($scope, $log, $timeout, connectionService, $routeParams, $location, $q, preferencesManager, notifierService, jobService, dbService) {
 
   $scope.params = $routeParams;
-  $scope.job = {};
-  $scope.job.outText = "Loading Output...";
-  $scope.job.errText = "Loading Error...";
 
   // query the db for the specific job and check if out/err is loaded
   dbService.getSubmittedJobsDB().then(function(db) {
@@ -49,10 +46,11 @@ jobViewModule.controller('jobViewCtrl', ['$scope', '$log', '$timeout', 'connecti
       }
       
       else {
-        $scope.$apply(function() {
-          $scope.job.outText = "Loading Output...";
-          $scope.job.errText = "Loading Error...";
-        })
+        result.outText = "Loading output...";
+        result.errText = "Loading error...";
+
+        $('#outText').addClass('spinning-image');
+        $('#errText').addClass('spinning-image');
         // In parallel, get the size of the output and error
         connectionService.getFileSize(result.outputPath).then(function(size) {
           // If the file is larger than 5MB
@@ -82,9 +80,10 @@ jobViewModule.controller('jobViewCtrl', ['$scope', '$log', '$timeout', 'connecti
               );
             });
           }
+          $('#outText').removeClass('spinning-image');
         });
 
-
+        
         connectionService.getFileSize(result.errorPath).then(function(size) {
           if(size > 5*1025*1024) {
             result.errText = "The Error file is too large to be displayed here.";
@@ -118,11 +117,11 @@ jobViewModule.controller('jobViewCtrl', ['$scope', '$log', '$timeout', 'connecti
               }
             });
           }
+          $('#errText').removeClass('spinning-image');
         });
       }
       $scope.$apply(function() {
           $scope.job = result;
-          $scope.loading = false;
       });
     });
   });
