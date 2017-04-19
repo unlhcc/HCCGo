@@ -256,7 +256,7 @@ fileManageService.factory('fileManageService',['$log', '$q', '$routeParams', 'co
             var type = isText ? "text" : "raw";
             analyticsService.event('file view', type, '', size);
             if (size > 5*1024*1024) {
-                notifierService.warning("File big to view!  Larger than 5MB.  File must be downloaded to be viewed.", "File too big to view!");
+                notifierService.warning("File too big to view!  Larger than 5MB.  File must be downloaded to be viewed.", "File too big to view!");
                 service.viewing = false;
             }
             else {
