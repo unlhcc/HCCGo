@@ -16,7 +16,7 @@ fileManageService.factory('navService',['$log', '$q', '$location', '$routeParams
       service.username = connectionService.connectionDetails.username;
       service.host = connectionService.connectionDetails.hostname;
    });
-   
+
 
    // Value initialization
    //
@@ -37,32 +37,35 @@ fileManageService.factory('navService',['$log', '$q', '$location', '$routeParams
    service.goToSCP = function() {
       $location.path("/filesystem");
    };
-   
+
    // Nav to jobHistory
    service.jobHistory = function() {
       $location.path("/jobHistory");
    }
-   
+
    service.goToTutorials = function() {
       $location.path("/tutorials");
    }
-   
+
+   service.goToPreferences = function() {
+     $location.path("/preferences");
+   }
+
    service.goToDashboard = function() {
      $location.path("/cluster");
    }
-   
+
    //if($templateCache.get('username') == null){
    service.username = connectionService.connectionDetails.username;
    service.host = connectionService.connectionDetails.hostname;
-   
+
    // Get the Version
    ipcRenderer.send('get-version');
    ipcRenderer.on('get-version-message', function(event, arg) {
       service.version = arg;
-      
+
    });
-   
-   
+
    return service;
-  
+
 }]);
