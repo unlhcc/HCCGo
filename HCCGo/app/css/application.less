@@ -573,13 +573,35 @@ div.historyinfo {
 	font-size:1em;
 }
 
-/* Placeholder for job submission */
-.list-group-item.empty-placeholder {
-  border-style: dashed;
-  border-width: 3px;
-  text-align: center;
+/* Template for when jobs are loading.*/
+.jobs-loading {
+    padding: 12px;
+    margin: 0 auto;
+    max-width: 472px;
+    min-height: 300px;
 }
 
+@keyframes placeHolderShimmer{
+    0%{
+        background-position: -468px 0
+    }
+    100%{
+        background-position: 468px 0
+    }
+}
+
+.animated-background {
+    animation-duration: 1s;
+    animation-fill-mode: forwards;
+    animation-iteration-count: infinite;
+    animation-name: placeHolderShimmer;
+    animation-timing-function: linear;
+    background: #f6f7f8;
+    background: linear-gradient(to right, #eeeeee 8%, #dddddd 18%, #eeeeee 33%);
+    background-size: 800px 104px;
+    height: 96px;
+    position: relative;
+}
 /* For the panels, add some space */
 .panel-collapse, .panel-group .panel {
   margin-bottom: 1em;
