@@ -2,8 +2,8 @@
   <div class="row">
     <div class="well col-sm-12">
       <h2 class="text-center"> Job History </h2>
-        <div class="panel-group" id="accordion">
-         <div class="panel panel-default" ng-attr-id="{{ 'panel' + job._id }}" ng-repeat="job in jobs | orderBy:'-timestamp'">
+        <div class="panel-group" id="accordion" ng-show="!loading">
+         <div class="panel panel-default" ng-attr-id="{{ 'panel' + job._id }}" ng-repeat="job in jobs | orderBy:'-timestamp'" >
            <div class="panel-heading jobhistory">
              <div class="row">
                <div class="col-sm-4">
@@ -40,9 +40,13 @@
              </div>
            </div>
          </div>
-       </div>
-      <button type="button" class="btn btn-info" ng-click="cancel()">Cancel</button>
-      <button type="button" class="btn btn-primary pull-right" ng-click="loadDefault()">Create New Job</button>
+        </div>
+        <div class="list-group-item empty-placeholder" ng-show="loading">
+          <h3> Loading Job Templates... </h3>
+          <br/>
+        </div>
+      <button type="button" class="btn btn-info" ng-click="cancel()" ng-show="!loading">Cancel</button>
+      <button type="button" class="btn btn-primary pull-right" ng-click="loadDefault()" ng-show="!loading">Create New Job</button>
     </div>
   </div>
 </div>

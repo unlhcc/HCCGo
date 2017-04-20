@@ -9,7 +9,7 @@ jobHistoryModule = angular.module('HccGoApp.jobHistoryCtrl', ['ngRoute' ]);
 jobHistoryModule.service('jobService', ['$q', 'connectionService', 'dbService', function($q, connectionService, dbService) {
 
   var job = null;
-  
+
   var getJob = function() {
     var temp = job;
     job = null;
@@ -22,7 +22,6 @@ jobHistoryModule.service('jobService', ['$q', 'connectionService', 'dbService', 
   
   var getDBJobs = function() {
     var toReturn = $q.defer();
-    
     dbService.getJobHistoryDB().then(function(jobHistoryDB) {
       jobHistoryDB.find({}, function (err, docs) {
         // if data already loaded, just add them to the list
@@ -113,7 +112,7 @@ jobHistoryModule.service('jobService', ['$q', 'connectionService', 'dbService', 
 }]).controller('jobHistoryCtrl', ['$scope', '$log', '$timeout', 'connectionService', '$routeParams', '$location', '$q', 'preferencesManager', 'jobService', 'dbService', function($scope, $log, $timeout, connectionService, $routeParams, $location, $q, preferencesManager, jobService, dbService) {
 
   $scope.params = $routeParams;
-
+  $scope.loading = true;
   $scope.cancel = function() {
     $location.path("/cluster");
   }
@@ -134,6 +133,9 @@ jobHistoryModule.service('jobService', ['$q', 'connectionService', 'dbService', 
   // Get completed jobs from db file
   jobService.getDBJobs().then(function(jobs) {
     $scope.jobs = jobs;
+    $timeout(function() {
+      $scope.loading = false;
+    }, 2000);
   });
 
 
