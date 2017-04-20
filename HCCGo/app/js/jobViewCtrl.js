@@ -57,6 +57,7 @@ jobViewModule.controller('jobViewCtrl', ['$scope', '$log', '$timeout', 'connecti
           if(size > 5*1025*1024) {
             result.outText = "The Output file is too large to be displayed here.";
             outDownload = false;
+            $('#outText').removeClass('spinning-image');
           } else {
             connectionService.getFileText(result.outputPath).then(function(data) {
               var text = data.length>0 ? data : "(none)";
@@ -78,9 +79,9 @@ jobViewModule.controller('jobViewCtrl', ['$scope', '$log', '$timeout', 'connecti
                   }
                 }
               );
+              $('#outText').removeClass('spinning-image');
             });
           }
-          $('#outText').removeClass('spinning-image');
         });
 
         
@@ -88,6 +89,7 @@ jobViewModule.controller('jobViewCtrl', ['$scope', '$log', '$timeout', 'connecti
           if(size > 5*1025*1024) {
             result.errText = "The Error file is too large to be displayed here.";
             errDownload = false;
+            $('#errText').removeClass('spinning-image');
           }
           else {
             connectionService.getFileText(result.errorPath).then(function(data) {
@@ -114,10 +116,11 @@ jobViewModule.controller('jobViewCtrl', ['$scope', '$log', '$timeout', 'connecti
                 );
                 result.errDownload = errDownload;
                 result.outDownload = outDownload;
+
+                $('#errText').removeClass('spinning-image');
               }
             });
           }
-          $('#errText').removeClass('spinning-image');
         });
       }
       $scope.$apply(function() {
