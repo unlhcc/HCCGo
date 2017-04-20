@@ -78,7 +78,11 @@
         <a class="pull-right" href="javascript:void(0)" ng-click="refreshCluster(true)"><i id="jobrefresh" class="mdi-action-autorenew"></i></a>
         <br />
         <hr />
-        <div class="list-group">
+        <div class="animated-background" ng-show="!jobs.length">
+          <div class="jobs-loading">
+          </div>
+        </div>
+        <div class="list-group" ng-show="jobs.length">
           <div class="list-group-item jobstatus-link" ng-repeat-start="job in jobs | filter:q | orderBy:'timestamp':true" ng-class="{running: job.running, idle: job.idle, error: job.error, complete: job.complete}" ng-click="viewOutErr(job._id)">
             <div class="row-action-primary">
               <i class="mdi-action-trending-neutral" ng-if="job.running" />
@@ -108,6 +112,7 @@
             </div>
           </div>
           <div class="list-group-separator" ng-repeat-end ng-if="!$last"></div>
+          <!--
           <div class="list-group-item empty-placeholder" ng-show="!jobs.length">
             <div>
               <h3 ng-hide="loading">Looks like you don't have any jobs here yet!</h3>
@@ -116,6 +121,7 @@
               <a href="javascript:void(0)" class="btn btn-raised btn-primary" ng-click="jobHistory()">Submit A Job</a>
             </div>
           </div>
+          -->
         </div>
       </div>
     </div>

@@ -370,7 +370,34 @@ div.historyinfo {
 .icon-mixin {
   font-size: 40px;
 }
+.jobs-loading {
+    padding: 12px;
+    margin: 0 auto;
+    max-width: 472px;
+    min-height: 200px;
+}
 
+@keyframes placeHolderShimmer{
+    0%{
+        background-position: -468px 0
+    }
+    100%{
+        background-position: 468px 0
+    }
+}
+
+.animated-background {
+    animation-duration: 1s;
+    animation-fill-mode: forwards;
+    animation-iteration-count: infinite;
+    animation-name: placeHolderShimmer;
+    animation-timing-function: linear;
+    background: #f6f7f8;
+    background: linear-gradient(to right, #eeeeee 8%, #dddddd 18%, #eeeeee 33%);
+    background-size: 800px 104px;
+    height: 96px;
+    position: relative;
+}
 .jobdisplay .list-group {
   list-style:none;
   overflow-y: auto;
@@ -574,7 +601,7 @@ div.historyinfo {
 }
 
 /* Placeholder for job submission */
-.list-group-item.empty-placeholder {
+.empty-placeholder {
   border-style: dashed;
   border-width: 3px;
   text-align: center;
