@@ -180,13 +180,13 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', '$lo
         deferred.resolve(data);
       }, function(data) { // thrown on failure
         $log.log("Error log: " + data)
-        return deferred.reject("An error occurred when submitting the job.");
+        return deferred.reject("An error occurred when submitting the job: " + data);
       });
       return deferred.promise;
    }
 
    var closeStream = function() {
-     
+
      if (connection != null) {
        connection.end();
      }
@@ -221,7 +221,7 @@ connectionModule.factory('connectionService',['$log', '$q', '$routeParams', '$lo
          });
       });
    }, 1);
-   
+
    /**
     * Run a command on the remote cluster and get the output
     * @param {String} comamnd - Command to execute
